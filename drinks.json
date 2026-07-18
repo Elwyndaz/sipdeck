@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "ingredients": {
+    "tequila-blanco": { "en": "Blanco tequila", "sv": "Blanco-tequila" },
+    "triple-sec": { "en": "Triple sec", "sv": "Triple sec" },
+    "lime-juice": { "en": "Lime juice", "sv": "Limejuice" },
+    "salt-rim": { "en": "Salt rim", "sv": "Saltad kant" },
+    "white-rum": { "en": "White rum", "sv": "Vit rom" },
+    "sugar-syrup": { "en": "Sugar syrup", "sv": "Sockerlag" },
+    "mint-leaves": { "en": "Mint leaves", "sv": "Myntablad" },
+    "soda-water": { "en": "Soda water", "sv": "Sodavatten" },
+    "gin": { "en": "Gin", "sv": "Gin" },
+    "campari": { "en": "Campari", "sv": "Campari" },
+    "sweet-vermouth": { "en": "Sweet vermouth", "sv": "Söt vermouth" },
+    "orange-peel": { "en": "Orange peel", "sv": "Apelsinskal" },
+    "bourbon": { "en": "Bourbon whiskey", "sv": "Bourbonwhisky" },
+    "angostura-bitters": { "en": "Angostura bitters", "sv": "Angostura bitters" },
+    "lemon-juice": { "en": "Lemon juice", "sv": "Citronjuice" },
+    "egg-white": { "en": "Egg white", "sv": "Äggvita" },
+    "maraschino-cherry": { "en": "Maraschino cherry", "sv": "Maraschinobär" },
+    "dry-vermouth": { "en": "Dry vermouth", "sv": "Torr vermouth" },
+    "olive": { "en": "Olive", "sv": "Oliv" },
+    "lime-cordial": { "en": "Lime cordial", "sv": "Lime cordial" },
+    "lime-wheel": { "en": "Lime wheel", "sv": "Limeskiva" },
+    "vodka": { "en": "Vodka", "sv": "Vodka" },
+    "coffee-liqueur": { "en": "Coffee liqueur", "sv": "Kaffelikör" },
+    "espresso": { "en": "Fresh espresso", "sv": "Färsk espresso" },
+    "coffee-beans": { "en": "Coffee beans", "sv": "Kaffebönor" },
+    "cranberry-juice": { "en": "Cranberry juice", "sv": "Tranbärsjuice" }
+  },
+  "drinks": [
+    {
+      "id": "margarita",
+      "name": "Margarita",
+      "type": "sour",
+      "base": "tequila",
+      "iba": true,
+      "bar": true,
+      "tags": ["citrusy", "strong"],
+      "glass": "coupe",
+      "ingredients": [
+        { "id": "tequila-blanco", "ml": 50, "essential": true },
+        { "id": "triple-sec", "ml": 20, "essential": true },
+        { "id": "lime-juice", "ml": 15, "essential": true },
+        { "id": "salt-rim", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Shake all ingredients with ice, strain into a chilled salt-rimmed coupe.",
+        "sv": "Skaka alla ingredienser med is, sila i ett kylt coupeglas med saltad kant."
+      }
+    },
+    {
+      "id": "daiquiri",
+      "name": "Daiquiri",
+      "type": "sour",
+      "base": "rum",
+      "iba": true,
+      "bar": true,
+      "tags": ["citrusy", "refreshing"],
+      "glass": "coupe",
+      "ingredients": [
+        { "id": "white-rum", "ml": 45, "essential": true },
+        { "id": "lime-juice", "ml": 25, "essential": true },
+        { "id": "sugar-syrup", "ml": 15, "essential": true }
+      ],
+      "method": {
+        "en": "Shake with ice, double strain into a chilled coupe.",
+        "sv": "Skaka med is, dubbelsila i ett kylt coupeglas."
+      }
+    },
+    {
+      "id": "mojito",
+      "name": "Mojito",
+      "type": "highball",
+      "base": "rum",
+      "iba": true,
+      "bar": true,
+      "tags": ["refreshing", "herbal"],
+      "glass": "highball",
+      "ingredients": [
+        { "id": "white-rum", "ml": 45, "essential": true },
+        { "id": "lime-juice", "ml": 30, "essential": true },
+        { "id": "sugar-syrup", "ml": 15, "essential": true },
+        { "id": "mint-leaves", "qty": 8, "unit": "leaf", "essential": true },
+        { "id": "soda-water", "qty": 1, "unit": "top", "essential": true }
+      ],
+      "method": {
+        "en": "Muddle mint gently with syrup and lime juice, add rum and crushed ice, top with soda water, stir, garnish with a mint sprig.",
+        "sv": "Mortla myntan försiktigt med sockerlag och limejuice, tillsätt rom och krossad is, fyll på med sodavatten, rör om, garnera med en myntakvist."
+      }
+    },
+    {
+      "id": "negroni",
+      "name": "Negroni",
+      "type": "aromatic",
+      "base": "gin",
+      "iba": true,
+      "bar": true,
+      "tags": ["bitter", "stirred", "aperitif"],
+      "glass": "rocks",
+      "ingredients": [
+        { "id": "gin", "ml": 30, "essential": true },
+        { "id": "campari", "ml": 30, "essential": true },
+        { "id": "sweet-vermouth", "ml": 30, "essential": true },
+        { "id": "orange-peel", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Stir all ingredients with ice, strain into a rocks glass over ice, garnish with orange peel.",
+        "sv": "Rör om alla ingredienser med is, sila i ett glas med is, garnera med apelsinskal."
+      }
+    },
+    {
+      "id": "old-fashioned",
+      "name": "Old Fashioned",
+      "type": "spirit-forward",
+      "base": "whiskey",
+      "iba": true,
+      "bar": true,
+      "tags": ["strong", "stirred", "classic"],
+      "glass": "rocks",
+      "ingredients": [
+        { "id": "bourbon", "ml": 60, "essential": true },
+        { "id": "sugar-syrup", "ml": 10, "essential": true },
+        { "id": "angostura-bitters", "qty": 3, "unit": "dash", "essential": true },
+        { "id": "orange-peel", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Stir bourbon, sugar syrup and bitters with ice, strain over a large ice cube in a rocks glass, express the orange peel over the top and drop it in.",
+        "sv": "Rör om bourbon, sockerlag och bitter med is, sila över en stor isbit i ett lowballglas, pressa ur oljan ur apelsinskalet över drinken och lägg i det."
+      }
+    },
+    {
+      "id": "whiskey-sour",
+      "name": "Whiskey Sour",
+      "type": "sour",
+      "base": "whiskey",
+      "iba": true,
+      "bar": true,
+      "tags": ["citrusy", "frothy"],
+      "glass": "rocks",
+      "ingredients": [
+        { "id": "bourbon", "ml": 45, "essential": true },
+        { "id": "lemon-juice", "ml": 30, "essential": true },
+        { "id": "sugar-syrup", "ml": 15, "essential": true },
+        { "id": "egg-white", "qty": 1, "unit": "barspoon", "essential": false },
+        { "id": "angostura-bitters", "qty": 1, "unit": "dash", "essential": false },
+        { "id": "maraschino-cherry", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Dry shake with the egg white, then shake again with ice, strain into a rocks glass over ice, garnish with a cherry and a dash of bitters on the foam.",
+        "sv": "Skaka torrt med äggvitan, skaka sedan igen med is, sila i ett lowballglas med is, garnera med ett bär och en skvätt bitter på skummet."
+      }
+    },
+    {
+      "id": "dry-martini",
+      "name": "Dry Martini",
+      "type": "spirit-forward",
+      "base": "gin",
+      "iba": true,
+      "bar": true,
+      "tags": ["strong", "stirred", "dry"],
+      "glass": "martini",
+      "ingredients": [
+        { "id": "gin", "ml": 60, "essential": true },
+        { "id": "dry-vermouth", "ml": 10, "essential": true },
+        { "id": "olive", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Stir gin and vermouth with ice, strain into a chilled martini glass, garnish with an olive.",
+        "sv": "Rör om gin och vermouth med is, sila i ett kylt martiniglas, garnera med en oliv."
+      }
+    },
+    {
+      "id": "gimlet",
+      "name": "Gimlet",
+      "type": "sour",
+      "base": "gin",
+      "iba": true,
+      "bar": true,
+      "tags": ["citrusy", "gin-forward"],
+      "glass": "martini",
+      "ingredients": [
+        { "id": "gin", "ml": 45, "essential": true },
+        { "id": "lime-cordial", "ml": 15, "essential": true },
+        { "id": "lime-wheel", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Shake gin and lime cordial with ice, strain into a chilled martini glass, garnish with a lime wheel.",
+        "sv": "Skaka gin och lime cordial med is, sila i ett kylt martiniglas, garnera med en limeskiva."
+      }
+    },
+    {
+      "id": "espresso-martini",
+      "name": "Espresso Martini",
+      "type": "contemporary",
+      "base": "vodka",
+      "iba": true,
+      "bar": true,
+      "tags": ["coffee", "strong", "contemporary"],
+      "glass": "martini",
+      "ingredients": [
+        { "id": "vodka", "ml": 40, "essential": true },
+        { "id": "coffee-liqueur", "ml": 20, "essential": true },
+        { "id": "espresso", "ml": 20, "essential": true },
+        { "id": "coffee-beans", "qty": 3, "unit": "piece", "essential": false }
+      ],
+      "method": {
+        "en": "Shake all liquids hard with ice, double strain into a chilled martini glass, garnish with three coffee beans.",
+        "sv": "Skaka alla ingredienser hårt med is, dubbelsila i ett kylt martiniglas, garnera med tre kaffebönor."
+      }
+    },
+    {
+      "id": "cosmopolitan",
+      "name": "Cosmopolitan",
+      "type": "sour",
+      "base": "vodka",
+      "iba": true,
+      "bar": true,
+      "tags": ["citrusy", "vodka-forward"],
+      "glass": "martini",
+      "ingredients": [
+        { "id": "vodka", "ml": 40, "essential": true },
+        { "id": "triple-sec", "ml": 15, "essential": true },
+        { "id": "cranberry-juice", "ml": 15, "essential": true },
+        { "id": "lime-juice", "ml": 10, "essential": true },
+        { "id": "orange-peel", "qty": 1, "unit": "garnish", "essential": false }
+      ],
+      "method": {
+        "en": "Shake with ice, strain into a chilled martini glass, garnish with an orange peel.",
+        "sv": "Skaka med is, sila i ett kylt martiniglas, garnera med apelsinskal."
+      }
+    }
+  ]
+}

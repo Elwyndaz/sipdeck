@@ -1,0 +1,59 @@
+/* Sipdeck design tokens — output of the Claude design session, baked in 2026-07-18.
+   Source: DESIGN-BRIEF.md → design/identity-full.html. Inline this block into
+   index.html's <style> at scaffold time (project convention: tokens in :root, no
+   separate stylesheet request, no build step).
+
+   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+   Deviation from the design output: dark mode activates via prefers-color-scheme
+   automatically below, not a manual [data-theme] attribute — v1 has no theme toggle,
+   so the simpler mechanism wins (YAGNI). Reintroduce [data-theme="dark"/"light"]
+   overrides only if a manual toggle ships later; the color values are unchanged. */
+
+:root{
+  /* color */
+  --sd-bg: #EFE8DB;            /* app background — one step below paper */
+  --sd-card: #FBF7EF;          /* card surface = the illustrations' paper. Never themed. */
+  --sd-ink: #211B12;
+  --sd-ink-2: #6E6455;
+  --sd-accent: #2F6B3F;        /* vermouth green */
+  --sd-accent-pressed: #24522F;
+  --sd-save: var(--sd-accent); /* swipe right — saving IS the brand action */
+  --sd-skip: #8A5A21;          /* swipe left — bitters amber, neutral not punitive */
+  --sd-line: rgba(33,27,18,.14);
+  --sd-shadow: 0 1px 2px rgba(33,27,18,.06), 0 12px 32px -12px rgba(33,27,18,.25);
+
+  /* type */
+  --sd-font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sd-font-ui: 'Work Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* motion */
+  --sd-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.35); /* the only overshoot in the app */
+  --sd-ease-fly:    cubic-bezier(0.33, 0.85, 0.55, 1);      /* inherits finger velocity, lands soft */
+  --sd-ease-flip:   cubic-bezier(0.4, 0.1, 0.15, 1);
+  --sd-ease-list:   cubic-bezier(0.2, 0, 0, 1);
+  --sd-t-spring: 420ms;  --sd-t-fly: 320ms;  --sd-t-flip: 480ms;
+  --sd-t-list: 240ms;    --sd-t-micro: 140ms;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --sd-bg: #17130E;
+    --sd-ink: #EDE5D6;
+    --sd-ink-2: #A79B87;
+    --sd-accent: #7FB56F;
+    --sd-accent-pressed: #9CCB8A; /* pressed goes LIGHTER on dark */
+    --sd-skip: #D8A659;
+    --sd-line: rgba(237,229,214,.16);
+    --sd-shadow: 0 2px 4px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.6);
+    /* --sd-card intentionally unchanged — the illustrations are painted on warm-white
+       paper regardless of theme; the deck reads as lit cards on a dark bar top. */
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --sd-t-spring: 0ms; --sd-t-fly: 0ms; --sd-t-flip: 0ms; --sd-t-list: 0ms; --sd-t-micro: 0ms; }
+}
+
+/* Work Sans defaults to proportional oldstyle figures — force this on every amount display. */
+.amount{ font: 500 16px/1.4 var(--sd-font-ui); font-variant-numeric: lining-nums tabular-nums; }

@@ -1,0 +1,19 @@
+<!-- Master app-icon mark. Source for 192/512/apple-touch/maskable exports (BACKLOG
+     item 11): render on a solid #FBF7EF square for standard icons, full-bleed for
+     maskable — the mark already sits inside the central 80% safe zone. Do NOT rescale
+     this down for 48px or smaller; use icon-48.svg / favicon.svg instead, they use
+     thicker strokes and (for favicon) a simplified glass-only mark for legibility. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Sipdeck">
+  <rect width="96" height="96" fill="#FBF7EF"/>                 <!-- omit for transparent bg -->
+  <rect x="38" y="21" width="34" height="50" rx="7" transform="rotate(7 55 46)"
+        fill="none" stroke="#211B12" stroke-width="3" opacity=".3"/>   <!-- rest of the deck -->
+  <g transform="rotate(-8 48 48)">                              <!-- top card, mid-swipe -->
+    <rect x="28" y="21" width="38" height="54" rx="8" fill="#FBF7EF"
+          stroke="#211B12" stroke-width="3.5"/>
+    <path d="M 36,37 L 47,51 L 58,37 Z" fill="none" stroke="#211B12"
+          stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 47,51 V 62 M 40,62 H 54" fill="none" stroke="#211B12"
+          stroke-width="3" stroke-linecap="round"/>
+    <circle cx="55.5" cy="33" r="4" fill="#2F6B3F"/>             <!-- the garnish -->
+  </g>
+</svg>

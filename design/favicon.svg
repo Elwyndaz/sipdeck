@@ -1,0 +1,10 @@
+<!-- 16/32px favicon: the card doesn't read below 48px, so this drops it entirely for a
+     simplified thin-line glass with the garnish dot clear of the bowl. Not a scaled-down
+     icon.svg — a deliberately different, simpler mark. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="16" height="16" role="img" aria-label="Sipdeck">
+  <g transform="rotate(-6 48 48)">
+    <path d="M 16,20 L 48,57 L 80,20 Z" fill="none" stroke="#211B12" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 48,57 V 78 M 30,80 H 66" fill="none" stroke="#211B12" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="74" cy="13" r="10" fill="#2F6B3F"/>
+  </g>
+</svg>

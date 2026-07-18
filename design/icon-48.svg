@@ -1,0 +1,9 @@
+<!-- 48px variant: ghost card dropped, strokes thickened — the legibility floor for the
+     "card" story per the design brief's export guidance. Use verbatim at 48px. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="48" height="48" role="img" aria-label="Sipdeck">
+  <g transform="rotate(-8 48 48)">
+    <rect x="28" y="21" width="38" height="54" rx="8" fill="#FBF7EF" stroke="#211B12" stroke-width="4.5"/>
+    <path d="M 36,37 L 47,51 L 58,37 Z M 47,51 V 62 M 40,62 H 54" fill="none" stroke="#211B12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="55.5" cy="33" r="5" fill="#2F6B3F"/>
+  </g>
+</svg>

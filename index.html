@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sipdeck</title>
+<meta name="description" content="Sipdeck. Swipe. Save. Shake.">
+<meta name="theme-color" content="#EFE8DB">
+<link rel="icon" href="design/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ---- design/tokens.css, inlined verbatim (scaffold convention: no separate stylesheet request) ---- */
+:root{
+  /* color */
+  --sd-bg: #EFE8DB;            /* app background — one step below paper */
+  --sd-card: #FBF7EF;          /* card surface = the illustrations' paper. Never themed. */
+  --sd-ink: #211B12;
+  --sd-ink-2: #6E6455;
+  --sd-accent: #2F6B3F;        /* vermouth green */
+  --sd-accent-pressed: #24522F;
+  --sd-save: var(--sd-accent); /* swipe right — saving IS the brand action */
+  --sd-skip: #8A5A21;          /* swipe left — bitters amber, neutral not punitive */
+  --sd-line: rgba(33,27,18,.14);
+  --sd-shadow: 0 1px 2px rgba(33,27,18,.06), 0 12px 32px -12px rgba(33,27,18,.25);
+
+  /* type */
+  --sd-font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sd-font-ui: 'Work Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* motion */
+  --sd-ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.35); /* the only overshoot in the app */
+  --sd-ease-fly:    cubic-bezier(0.33, 0.85, 0.55, 1);      /* inherits finger velocity, lands soft */
+  --sd-ease-flip:   cubic-bezier(0.4, 0.1, 0.15, 1);
+  --sd-ease-list:   cubic-bezier(0.2, 0, 0, 1);
+  --sd-t-spring: 420ms;  --sd-t-fly: 320ms;  --sd-t-flip: 480ms;
+  --sd-t-list: 240ms;    --sd-t-micro: 140ms;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --sd-bg: #17130E;
+    --sd-ink: #EDE5D6;
+    --sd-ink-2: #A79B87;
+    --sd-accent: #7FB56F;
+    --sd-accent-pressed: #9CCB8A; /* pressed goes LIGHTER on dark */
+    --sd-skip: #D8A659;
+    --sd-line: rgba(237,229,214,.16);
+    --sd-shadow: 0 2px 4px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.6);
+    /* --sd-card intentionally unchanged — the illustrations are painted on warm-white
+       paper regardless of theme; the deck reads as lit cards on a dark bar top. */
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --sd-t-spring: 0ms; --sd-t-fly: 0ms; --sd-t-flip: 0ms; --sd-t-list: 0ms; --sd-t-micro: 0ms; }
+}
+
+/* Work Sans defaults to proportional oldstyle figures — force this on every amount display. */
+.amount{ font: 500 16px/1.4 var(--sd-font-ui); font-variant-numeric: lining-nums tabular-nums; }
+
+/* ---- scaffold layout (BACKLOG item 1) ---- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font:400 16px/1.5 var(--sd-font-ui);background:var(--sd-bg);color:var(--sd-ink);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 6rem}
+header.brand{display:flex;flex-direction:column;gap:.35rem;padding:.5rem 0 1rem}
+header.brand .wordmark{color:var(--sd-ink);width:112px;height:auto;display:block}
+header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2);letter-spacing:.02em}
+
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--sd-card);
+  border-top:1px solid var(--sd-line);box-shadow:var(--sd-shadow);z-index:10;
+  padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav a{flex:1;text-align:center;padding:.75rem .25rem;font:500 .68rem/1.2 var(--sd-font-ui);
+  letter-spacing:.03em;color:var(--sd-ink-2);border-top:2px solid transparent}
+.bottom-nav a.active{color:var(--sd-accent);border-top-color:var(--sd-accent)}
+
+.screen-title{font:400 2rem/1.1 var(--sd-font-display);margin-bottom:1rem}
+.empty{color:var(--sd-ink-2);text-align:center;padding:3rem 1rem}
+.list-card{background:var(--sd-card);border-radius:12px;box-shadow:var(--sd-shadow);padding:1rem 1.1rem;
+  margin-bottom:.75rem}
+.list-card .name{font:400 1.3rem/1.2 var(--sd-font-display)}
+.list-card .meta{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2);margin-top:.15rem}
+.deck-count{color:var(--sd-ink-2);font:500 .85rem/1.4 var(--sd-font-ui);margin-bottom:.75rem}
+
+/* ---- deck & cards (BACKLOG item 4) ---- */
+.deck{position:relative;height:min(64vh,540px);max-width:340px;margin:0 auto;perspective:1200px}
+.card{position:absolute;inset:0;border-radius:16px;touch-action:none;cursor:grab;
+  transition:transform var(--sd-t-list) var(--sd-ease-list)}
+.card[data-depth="1"]{transform:translateY(12px) scale(.964);pointer-events:none}
+.card[data-depth="2"]{transform:translateY(24px) scale(.928);pointer-events:none}
+.card[data-depth="3"]{transform:translateY(24px) scale(.928);opacity:0;pointer-events:none}
+.card-inner{position:absolute;inset:0;transform-style:preserve-3d;
+  transition:transform var(--sd-t-flip) var(--sd-ease-flip)}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+/* faces live on the illustrations' paper — fixed paper-ink palette, never dark-mode inverted */
+.card-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  background:var(--sd-card);color:#211B12;border-radius:16px;box-shadow:var(--sd-shadow);
+  padding:1.1rem;display:flex;flex-direction:column;overflow:hidden}
+.card-back{transform:rotateY(180deg)}
+.card-name{font:400 1.6rem/1.15 var(--sd-font-display);margin:.4rem 0 .1rem}
+.card-meta{font:500 .8rem/1.4 var(--sd-font-ui);color:#6E6455}
+.card-art{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.glass-ph{width:38%;max-height:100%;color:#6E6455;opacity:.55}
+.card-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
+.chip{border:1px solid rgba(33,27,18,.18);border-radius:999px;padding:.12rem .6rem;
+  font:500 .72rem/1.4 var(--sd-font-ui);color:#6E6455}
+.ing{list-style:none;margin:.5rem 0;flex-shrink:0}
+.ing li{display:flex;gap:.6rem;padding:.22rem 0;font:400 .92rem/1.4 var(--sd-font-ui)}
+.ing li .amount{min-width:4.2em;text-align:right}
+.ing li.opt{color:#6E6455}
+.card-method{font:400 .85rem/1.5 var(--sd-font-ui);color:#211B12;overflow-y:auto;min-height:0}
+.card-ctrl{margin-top:auto;padding-top:.7rem;display:flex;align-items:center;justify-content:space-between}
+.stepper{display:flex;align-items:center;gap:.7rem}
+.stepper button,.units button{border:1px solid rgba(33,27,18,.18);border-radius:8px;color:#211B12;
+  padding:.3rem .65rem;font:500 .85rem/1 var(--sd-font-ui);background:none}
+.units{display:flex;gap:.3rem}
+.units button.active{background:#2F6B3F;border-color:#2F6B3F;color:#FBF7EF}
+/* gesture tint: opacity-only per frame (composited), fixed paper-palette colors */
+.tint{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;
+  transition:opacity var(--sd-t-micro) linear}
+.tint-save{box-shadow:inset 0 0 0 3px #2F6B3F}
+.tint-skip{box-shadow:inset 0 0 0 3px #8A5A21}
+dl.settings{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;font-size:.95rem}
+dl.settings dt{color:var(--sd-ink-2)}
+
+/* ---- favorites (BACKLOG item 5): reuse .list-card/.deck/.card, only row + toolbar chrome is new ---- */
+.fav-row{display:flex;align-items:center;gap:.75rem}
+.fav-thumb{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:var(--sd-bg);border-radius:8px}
+.fav-thumb .glass-ph{width:65%;opacity:.6}
+.fav-info{flex:1;min-width:0}
+.fav-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;gap:.5rem}
+.fav-back,.fav-remove{border:1px solid rgba(33,27,18,.18);border-radius:8px;padding:.35rem .65rem;
+  color:var(--sd-ink-2);font:500 .78rem/1.2 var(--sd-font-ui)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <a href="#/" aria-label="Sipdeck">
+      <svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 254 84" role="img" aria-label="sipdeck">
+        <!-- design/wordmark.svg, inlined verbatim: stroke="currentColor" needs a real <svg>, not <img>,
+             to inherit --sd-ink / dark-mode ink. Only the i-dot is a fixed accent fill. -->
+        <g fill="none" stroke="currentColor" stroke-width="8.5"
+           stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 27,27.5 C 23.5,22 7.5,21.5 7,29 C 6.5,36.5 27.5,34.5 27,44 C 26.5,52.5 8,52.5 5.5,46"/>
+          <path d="M 42,24.5 V 55.75"/>
+          <path d="M 56.4,24.5 V 74"/><circle cx="72" cy="40" r="15.75"/>
+          <circle cx="114" cy="40" r="15.75"/><path d="M 129.75,6 V 55.75"/>
+          <path d="M 167.5,51 A 15.75,15.75 0 1 1 171.75,36.5 H 141"/>
+          <path d="M 210,29 A 15.75,15.75 0 1 0 210,51"/>
+          <path d="M 224,6 V 55.75"/><path d="M 241,25.5 L 224.5,43.5"/><path d="M 231.5,36.5 L 242,55.75"/>
+        </g>
+        <circle cx="42" cy="9" r="5.5" fill="var(--sd-accent, #2F6B3F)"/>
+      </svg>
+    </a>
+    <div class="tagline" id="tagline"></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <nav class="bottom-nav" id="nav" aria-label="Main">
+    <a href="#/" data-match="#/"></a>
+    <a href="#/favoriter" data-match="#/favoriter"></a>
+    <a href="#/skafferi" data-match="#/skafferi"></a>
+    <a href="#/installningar" data-match="#/installningar"></a>
+  </nav>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

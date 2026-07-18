@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 254 84" role="img" aria-label="sipdeck">
+  <!-- stroke="currentColor": inline this SVG (don't use <img src>) so it inherits
+       the sd-ink token / dark-mode ink from its container. Only the i-dot is a fixed accent. -->
+  <g fill="none" stroke="currentColor" stroke-width="8.5"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 27,27.5 C 23.5,22 7.5,21.5 7,29 C 6.5,36.5 27.5,34.5 27,44 C 26.5,52.5 8,52.5 5.5,46"/>
+    <path d="M 42,24.5 V 55.75"/>
+    <path d="M 56.4,24.5 V 74"/><circle cx="72" cy="40" r="15.75"/>
+    <circle cx="114" cy="40" r="15.75"/><path d="M 129.75,6 V 55.75"/>
+    <path d="M 167.5,51 A 15.75,15.75 0 1 1 171.75,36.5 H 141"/>
+    <path d="M 210,29 A 15.75,15.75 0 1 0 210,51"/>
+    <path d="M 224,6 V 55.75"/><path d="M 241,25.5 L 224.5,43.5"/><path d="M 231.5,36.5 L 242,55.75"/>
+  </g>
+  <circle cx="42" cy="9" r="5.5" fill="var(--sd-accent, #2F6B3F)"/>
+</svg>
