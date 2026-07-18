@@ -54,9 +54,10 @@ lists). Personal + friends first, but every decision assumes it goes public late
   ⊆ pantry; non-essential ignored).
 - **i18n**: EN + SV string table from day 1. Swedish: decimal comma, space as thousands
   separator, never an em-dash.
-- **Images**: AI-generated drawn-style sketches (generated externally with a consistent
-  style prompt). Filename = `img/<drink-id>.webp`. Lazy-load only the top 3–4 cards.
-  SVG placeholder until an image exists.
+- **Images**: AI-generated drawn-style sketches from the frozen HANDOFF.md workflow.
+  Codex built-in `gpt-image-2` generates one drink at a time using the approved first
+  images as style-only references; production filename = `img/<drink-id>.webp`.
+  Lazy-load only the top 3–4 cards. SVG placeholder until an image exists.
 
 ## Visual identity (locked 2026-07-18)
 
@@ -108,7 +109,8 @@ This exact blob is what `PUT /state` will carry in v1.1. Never store derived dat
 
 ```json
 { "schema": 1,
-  "ingredients": { "lime-juice": { "en": "Lime juice", "sv": "Limejuice" } },
+  "ingredients": { "lime-juice": { "en": "Lime juice", "sv": "Limejuice",
+                                      "group": "fresh" } },
   "drinks": [ {
     "id": "margarita",
     "name": "Margarita",
@@ -129,6 +131,8 @@ This exact blob is what `PUT /state` will carry in v1.1. Never store derived dat
 
 - An ingredient line has **either** `ml` (number, canonical) **or** `qty` + `unit`
   (`dash`, `barspoon`, `piece`, `leaf`, `slice`, `garnish`, `top` — never converted).
+- Ingredient metadata has `en`, `sv` and pantry `group`; group is one of `spirits`,
+  `liqueurs`, `fresh`, `pantry` and drives the grouped checklist.
 - `name` is a string (cocktail names are proper nouns); allow `{en, sv}` object override
   for the rare translated name. `type`, `base`, `glass`, `tags`, `unit` are ids resolved
   through the string table.
@@ -216,8 +220,9 @@ mixable drinks.**
 ### Epic G — Images & pipeline
 
 **G1. As the curator, I want a repeatable image pipeline so that ~90 images stay consistent.**
-- One documented style prompt (HANDOFF.md) used for every generation; filename = drink id;
-  conversion step to WebP (target ≤ 80 kB at ~640×800); `img/<id>.webp`.
+- One documented style prompt and approved reference set (HANDOFF.md) used for every
+  one-drink `gpt-image-2` generation; filename = drink id; conversion step to WebP
+  (target ≤ 80 kB at ~640×800); `img/<id>.webp`.
 - Cards lazy-load images for the top 3–4 cards only; a styled inline-SVG placeholder
   (glass silhouette by `glass` type) renders until the image loads or when none exists.
 - Missing images never break layout or animation.

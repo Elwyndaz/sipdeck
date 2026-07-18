@@ -5,16 +5,16 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
-**BACKLOG items 1–7 done** (2026-07-18). Filters now combine the editorial `bar` toggle,
-single-select base spirit and visible match count, reset and reshuffle the deck on change,
-persist under `settings.filters`, and have a friendly zero-match state. Pantry now lists
-all 26 used ingredients in four editorial groups, persists selections, and feeds a
-combinable essential-subset "what can I make" deck filter. BACKLOG 9 is partially done:
-Margarita, Mojito and Negroni have 640×800 WebP art at 27–45 kB, while missing images keep
-the inline SVG fallback without changing card layout. `test.js`: 528 checks green. Items
-1–5 retain their earlier phone-browser verification; this session had no controllable
-browser, so filters, pantry and image loading still need the phone-viewport interaction
-pass. The real-phone 60 fps feel check also remains outstanding. Next: BACKLOG item 8.
+**BACKLOG items 1–7 done** (2026-07-18), and the image-generation portion of item 9 is
+complete for the 10-drink seed. Every drink now has visually reviewed 640×800 WebP art at
+18–45 kB, generated in one coherent ink-and-watercolor family. Card fronts lazy-load the
+top four and retain the inline SVG fallback without changing layout if future art is
+missing; item 9 only still owes silhouettes keyed by `glass`. Filters combine editorial
+`bar`, base spirit and transient makeable mode; pantry persists all 26 grouped ingredient
+choices. `test.js`: 528 checks green. Items 1–5 retain earlier phone-browser verification,
+but no controllable browser was available for the filters/pantry/full-image sessions, so
+those flows still need the phone-viewport pass. Real-phone 60 fps feel is also outstanding.
+Next: BACKLOG item 8.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -28,7 +28,8 @@ pass. The real-phone 60 fps feel check also remains outstanding. Next: BACKLOG i
 - `formatAmount` returns non-convertible unit labels as raw keys (`dash`); the view layer
   translates via `t('unit_' + key)`; unit `top` renders as just "toppa upp"/"top up".
 - Card fronts try `img/<drink-id>.webp` for the top four live cards and retain the favicon
-  glass monoline (`GLASS_PH`) until load or on error. Item 9 still owes per-glass
+  glass monoline (`GLASS_PH`) until load or on error. All 10 current ids have art; the
+  fallback protects future additions and broken requests. Item 9 still owes per-glass
   silhouettes. `convert()` uses 30 ml/oz (bar standard; PRODUCT.md doesn't pin it).
 - The `#view` click delegate is attached ONCE at startup (the element is never replaced);
   `#deck`/`#favDeck` listeners re-attach per render (those nodes are recreated).
@@ -99,13 +100,16 @@ in PRODUCT.md "Locked decisions".
 
 ## Image pipeline (operational spec)
 
-1. Style prompt (keep verbatim for every drink, only swap the bracketed parts):
+1. **Frozen visual direction.** Keep this short form verbatim for every drink, only
+   swapping the bracketed parts:
    > "Hand-drawn ink and watercolor sketch of a [DRINK NAME] cocktail in a [GLASS] glass,
    > single subject centered on a plain warm-white (#FBF7EF) background, loose confident
    > linework, limited palette with one or two accent colors true to the drink, generous
    > white space around the subject, no text, no watermark, no border, portrait
    > composition."
-   Refine once on the first 3 drinks, then freeze the prompt here.
+   The first-three trial passed and the direction is frozen. Margarita, Mojito and
+   Negroni are the primary style references; the approved Daiquiri is a fourth reference
+   when a broader set helps.
 
    **Ready-to-paste ChatGPT session opener** (first 3 test drinks — margarita/coupe,
    mojito/highball, negroni/rocks — chosen for distinct glass shapes and colors):
@@ -129,21 +133,76 @@ in PRODUCT.md "Locked decisions".
    Negroni share the same warm-white paper, confident fine ink, watercolor texture,
    centered portrait composition, generous whitespace and comparable line weight. The
    Mojito is naturally more detailed, but its rendering still clearly belongs to the
-   same set. No prompt adjustment is needed before generating the remaining drinks.
-2. Generated externally (ChatGPT image tools) by the user; agent receives PNGs.
-3. Convert: to WebP ≤ 80 kB at ~640×800 (`cwebp -q 80` or equivalent available tool);
-   filename **must** be `img/<drink-id>.webp`.
-4. App lazy-loads top 3–4 cards only; missing file ⇒ inline-SVG glass silhouette per
-   `glass` field. A missing image must never break layout or animation.
+   same set. No prompt adjustment was needed for the rest of the seed.
+
+2. **Generate in Codex with `$imagegen` / built-in `gpt-image-2`.** Make one call per
+   distinct drink. Pass these local files as style references only:
+   `img-src/margarita.png`, `img-src/mojito.png`, `img-src/negroni.png`, and optionally
+   `img-src/daiquiri.png`. Use this structured prompt, replacing bracketed fields:
+
+   > Use case: stylized-concept
+   >
+   > Asset type: portrait cocktail-card illustration for the Sipdeck app
+   >
+   > Input images: Images 1–4 are approved style references only. Match their shared
+   > visual language exactly; do not edit, combine, trace, or reproduce their
+   > drink-specific objects.
+   >
+   > Primary request: Create a brand-new illustration of a classic [DRINK] in a [GLASS].
+   >
+   > Scene/backdrop: plain warm-white (#FBF7EF) background.
+   >
+   > Subject: [DRINK-SPECIFIC COLOR, ICE AND GARNISH DETAILS], entire glass visible.
+   >
+   > Style/medium: the same hand-drawn fine ink and watercolor sketch as the references,
+   > loose confident linework, delicate transparent washes, comparable line weight and
+   > paper texture.
+   >
+   > Composition/framing: portrait 2:3 composition, single subject centered at the same
+   > visual scale as the references, generous white space.
+   >
+   > Color palette: [ONE OR TWO RESTRAINED DRINK-TRUE ACCENTS]; clear glass remains
+   > mostly paper-white.
+   >
+   > Constraints: no text, no watermark, no border, no extra objects, no cast shadow, no
+   > table or environment. [DISTINGUISH FROM THE MOST SIMILAR EXISTING DRINK.] Preserve
+   > the exact family resemblance of the approved references.
+
+   Copy each approved built-in result from its reported
+   `C:\Users\patri\.codex\generated_images\...` path to
+   `img-src/<drink-id>.png`. Leave the generated original in place. `img-src/` is
+   intentionally gitignored: source PNGs stay local and are never production assets.
+
+3. **Curate before converting.** Check subject correctness, whole-glass framing,
+   `#FBF7EF` paper, line weight, watercolor texture, whitespace, garnish accuracy and
+   distinction from similar glass/color combinations. Regenerate only an outlier, with
+   one targeted correction. The completed 10-image seed passed this review on 2026-07-18.
+
+4. **Convert approved sources.** Pillow is available as tooling and is not an app
+   dependency. Center-crop the 2:3 source to 4:5, resize to exactly 640×800 and encode
+   WebP with quality 72/method 6:
+
+   ```powershell
+   python -c "from pathlib import Path; from PIL import Image,ImageOps; name='DRINK_ID'; ImageOps.fit(Image.open(Path('img-src')/(name+'.png')).convert('RGB'),(640,800),Image.Resampling.LANCZOS).save(Path('img')/(name+'.webp'),'WEBP',quality=72,method=6)"
+   ```
+
+   Filename **must** be `img/<drink-id>.webp`; verify every output is 640×800 and
+   ≤ 80 kB. Current range is 17,672–45,038 bytes.
+
+5. **Runtime behavior.** The app only creates the top four cards, uses
+   `loading="lazy" decoding="async"`, keeps `GLASS_PH` behind the image until load and
+   hides a failed `<img>` on error. Missing art must never break layout or animation.
+   Before Wrangler deploy, temporarily move `img-src/` outside the repo root because
+   Wrangler does not honor `.gitignore`, then restore it immediately afterward.
 
 ## Immediate next steps (in order)
 
-1. Phone-viewport browser pass for filters, pantry, image loading and missing-image
-   fallback; then do the outstanding real-phone 60 fps feel check.
+1. Phone-viewport browser pass for filters, pantry, all-image deck loading and
+   missing-image fallback; then do the outstanding real-phone 60 fps feel check.
 2. BACKLOG 8: i18n polish (language toggle in settings — the string table and browser
    default already exist, this is mostly the settings controls).
-3. Finish BACKLOG 9: generate the other seed images with the frozen prompt and replace
-   the generic fallback with SVG silhouettes keyed by `glass`.
+3. Finish BACKLOG 9 by replacing the generic fallback with SVG silhouettes keyed by
+   `glass`; seed image generation is complete.
 4. BACKLOG 10: grow and review the drink seed.
 
 ## How to run / deploy
@@ -169,11 +228,12 @@ Commit messages: `sipdeck: <what>`.
 ## Verification state
 
 `node test.js`: 528 green; `node --check app.js`: green; `git diff --check`: green;
-`app.js`: 29.5 kB. Local HTTP smoke: index/app/image return 200 with `image/webp` for art;
-a missing image returns 404 and is handled by the live `<img>` error fallback. Converted
-assets were visually inspected at 640×800. Items 1–5 retain their earlier Playwright
+`app.js`: 29.5 kB. All 10 drink ids have exactly one visually inspected 640×800 WebP,
+17,672–45,038 bytes; no missing or extra production filenames. Local HTTP smoke verifies
+index/app/art responses and `image/webp`; a deliberately missing image returns 404 and is
+handled by the live `<img>` error fallback. Items 1–5 retain their earlier Playwright
 phone-viewport smoke (deck gestures/flip/recipe/favorites/settings), zero console errors.
-No controllable browser was available in the 2026-07-18 filters/pantry/image session, so
-those new flows are not yet browser-verified. Real-phone feel check NOT done. This file's
-"Current state" paragraph must be updated at the end of every working session
-(recept/Årshjul convention).
+No controllable browser was available in the 2026-07-18 filters/pantry/full-image
+sessions, so those newer flows are not yet browser-verified. Real-phone feel check NOT
+done. This file's "Current state" paragraph must be updated at the end of every working
+session (recept/Årshjul convention).

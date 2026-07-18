@@ -23,6 +23,16 @@ reference (open it in a browser); the files below are what the scaffold session
 - **`favicon.svg`** — a different, simplified mark (glass only, no card) for 16/32px,
   per the design's explicit guidance that the card doesn't read below 48px.
 
+## Cocktail artwork
+
+Cocktail illustrations are content assets, not identity source files, so they live at
+`../img/<drink-id>.webp`. The current 10-drink seed has complete 640×800 coverage. Local
+generated PNG sources live in gitignored `../img-src/`; the frozen `gpt-image-2`
+reference prompt, curation checklist and WebP conversion command live in
+`../HANDOFF.md` "Image pipeline". Do not copy illustration colors into the brand token
+system: the identity stays ink plus vermouth green while each drink supplies its own
+restrained watercolor accents.
+
 ## Locked from this session
 
 - Fonts: **Instrument Serif** (400 + italic, drink names/titles only) + **Work Sans**

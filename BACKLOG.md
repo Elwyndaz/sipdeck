@@ -29,12 +29,11 @@ Items 1–7 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
    with filters. (E1, E2)
 8. **i18n** — EN/SV string table, language toggle, browser-language default, sv typography
    rules enforced in one format layer. (F1)
-9. **Image pipeline + placeholders** — partial: Margarita, Mojito and Negroni are converted
-   to 640×800 WebP at 27–45 kB, card fronts lazy-load the top four with the generic inline
-   fallback. Still owed: per-glass SVG silhouettes and images for the other seed drinks.
-   Style prompt finalized in HANDOFF.md, WebP convert
-   step documented, lazy-load top 3–4, SVG glass-silhouette placeholder. Generate images
-   for the current seed set. (G1)
+9. **Image pipeline + placeholders** — image generation/conversion is complete for all 10
+   seed drinks: frozen `gpt-image-2` reference workflow in HANDOFF.md, exact 640×800 WebP
+   outputs at 18–45 kB, complete id coverage, and lazy loading for the top four cards.
+   Generic inline fallback is resilient. Still owed before this item is ✅: replace it
+   with SVG silhouettes keyed by `glass`. (G1)
 10. **Full drink seed** — grow drinks.json to ~80–100 (IBA list + modern classics), all
     flags/ids reviewed, images generated batch-wise. Editorial pass on `bar` flag.
 11. **PWA manifest + icons** — relative paths, standalone. Export PNGs from
@@ -67,4 +66,5 @@ Items 1–7 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
 
 - Last-write-wins sync (v1.1): fine, state has a single owner.
 - Pantry matching is id-exact: seeding discipline on ingredient ids is what makes it work.
-- No image = placeholder forever; acceptable, tracked per drink by file absence.
+- No image = placeholder forever; acceptable for future additions, tracked per drink by
+  file absence. The current 10-drink seed has complete image coverage.

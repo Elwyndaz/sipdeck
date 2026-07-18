@@ -4,6 +4,13 @@ Copy-paste prompt for the Claude design session. Fold its output into BACKLOG it
 (design tokens) and item 11 (icons). Everything inside the fence goes to the designer
 verbatim; it is written to be self-contained (the design session has no repo access).
 
+## Status
+
+The identity session is complete and its output is frozen in `design/`. The illustration
+direction described below is also implemented: all 10 seed drinks have approved
+ink-and-watercolor production art. This file remains the archival input brief; use
+`HANDOFF.md` for the executable image-generation and conversion workflow.
+
 ```
 Design the visual identity and UI design language for **Sipdeck**, a mobile-first web app
 for browsing cocktails as a swipeable card deck.
