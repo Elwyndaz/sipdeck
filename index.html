@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sipdeck</title>
 <meta name="description" content="Sipdeck. Swipe. Save. Shake.">
 <meta name="theme-color" content="#EFE8DB">
@@ -62,17 +62,18 @@
 
 /* ---- scaffold layout (BACKLOG item 1) ---- */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font:400 16px/1.5 var(--sd-font-ui);background:var(--sd-bg);color:var(--sd-ink);-webkit-font-smoothing:antialiased}
+html,body{min-height:100%}
+body{min-height:100dvh;font:400 16px/1.5 var(--sd-font-ui);background:var(--sd-bg);color:var(--sd-ink);-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
-.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem 6rem}
+.wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem calc(6rem + env(safe-area-inset-bottom))}
 header.brand{display:flex;flex-direction:column;gap:.35rem;padding:.5rem 0 1rem}
 header.brand .wordmark{color:var(--sd-ink);width:112px;height:auto;display:block}
 header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2);letter-spacing:.02em}
 
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--sd-card);
   border-top:1px solid var(--sd-line);box-shadow:var(--sd-shadow);z-index:10;
-  padding-bottom:env(safe-area-inset-bottom);transform:translateZ(0);backface-visibility:hidden}
+  padding-bottom:env(safe-area-inset-bottom)}
 .bottom-nav a{flex:1;text-align:center;padding:.75rem .25rem;font:500 .68rem/1.2 var(--sd-font-ui);
   letter-spacing:.03em;color:var(--sd-ink-2);border-top:2px solid transparent}
 .bottom-nav a.active{color:var(--sd-accent);border-top-color:var(--sd-accent)}
@@ -210,13 +211,13 @@ dl.settings dd{min-width:0}
     <div class="tagline" id="tagline"></div>
   </header>
   <main id="view" aria-live="polite"></main>
-  <nav class="bottom-nav" id="nav">
-    <a href="#/" data-match="#/"></a>
-    <a href="#/favoriter" data-match="#/favoriter"></a>
-    <a href="#/skafferi" data-match="#/skafferi"></a>
-    <a href="#/installningar" data-match="#/installningar"></a>
-  </nav>
 </div>
+<nav class="bottom-nav" id="nav">
+  <a href="#/" data-match="#/"></a>
+  <a href="#/favoriter" data-match="#/favoriter"></a>
+  <a href="#/skafferi" data-match="#/skafferi"></a>
+  <a href="#/installningar" data-match="#/installningar"></a>
+</nav>
 <script src="app.js"></script>
 </body>
 </html>

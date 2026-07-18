@@ -10,14 +10,15 @@ The 10-drink seed has a complete optimized illustration set. Every card art asse
 visually reviewed 640×800 WebP under 46 kB, generated from the frozen reference workflow
 in `HANDOFF.md`. Filters, pantry, essential-ingredient makeability, EN/SV switching and
 glass-specific missing-art fallbacks are implemented. Favorites use compact art rows and
-a continuous recipe view with checkmarks and clipboard copy; see `BACKLOG.md` for the
-remaining v1 work.
+a continuous recipe view with checkmarks, clipboard copy and mobile Back navigation. The
+bottom navigation remains viewport-fixed across views; see `BACKLOG.md` for the remaining
+v1 work.
 
 ## Run
 
 ```
 python -m http.server   # then open http://localhost:8000
-node test.js            # 562 checks (plain node asserts, no framework)
+node test.js            # 566 checks (plain node asserts, no framework)
 ```
 
 ## Docs

@@ -130,6 +130,14 @@ function normalizeState(raw, lang) {
   };
 }
 
+function favoriteIdFromHash(hash) {
+  const prefix = '#/favoriter/';
+  if (typeof hash !== 'string' || hash.indexOf(prefix) !== 0) return null;
+  const encoded = hash.slice(prefix.length);
+  if (!encoded || encoded.includes('/')) return null;
+  try { return decodeURIComponent(encoded); } catch (e) { return null; }
+}
+
 // ---------- unit engine (BACKLOG 3) — canonical ml, linear scaling, bar rounding, display ----------
 // units that never convert: qty scales linearly, no rounding beyond a sane display
 const NONCONVERTIBLE_UNITS = ['dash', 'barspoon', 'piece', 'leaf', 'slice', 'garnish', 'top'];
@@ -262,7 +270,7 @@ function drinkAsText(drink, ingredients, servings, unit, lang) {
 }
 
 if (typeof module !== 'undefined') module.exports = {
-  STRINGS, t, UNITS, detectLang, defaultState, normalizeState,
+  STRINGS, t, UNITS, detectLang, defaultState, normalizeState, favoriteIdFromHash,
   NONCONVERTIBLE_UNITS, scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
@@ -321,6 +329,7 @@ if (typeof document !== 'undefined') (function () {
   // Favorites detail state is transient and deliberately stays outside the sync-shaped blob.
   let favOpenId = null;  // id of the favorite currently opened in detail view, or null = list
   let favChecked = new Set(); // mixing progress for the open favorite; resets when it closes
+  let favHistoryEntry = false; // true only when this session opened detail from the favorite list
   let makeableOnly = false; // transient deck mode; pantry itself is the persisted source of truth
 
   function filteredDrinks() {
@@ -652,9 +661,31 @@ if (typeof document !== 'undefined') (function () {
     '#/installningar': { view: viewSettings, match: '#/installningar' },
   };
 
+  function closeFavoriteDetail() {
+    favOpenId = null;
+    favChecked = new Set();
+    if (favHistoryEntry) {
+      favHistoryEntry = false;
+      history.back();
+    } else {
+      history.replaceState(null, '', '#/favoriter');
+      render();
+    }
+  }
+
   function render() {
     const hash = location.hash || '#/';
-    const route = ROUTES[hash] || ROUTES['#/'];
+    const detailId = favoriteIdFromHash(hash);
+    const route = detailId !== null ? ROUTES['#/favoriter'] : (ROUTES[hash] || ROUTES['#/']);
+    if (route.view === viewFavorites) {
+      if (detailId !== favOpenId) favChecked = new Set();
+      favOpenId = detailId;
+      if (detailId === null) favHistoryEntry = false;
+    } else if (favOpenId !== null) {
+      favOpenId = null;
+      favChecked = new Set();
+      favHistoryEntry = false;
+    }
     $('#view').innerHTML = route.view();
     if (route.view === viewDeck && db) mountDeck();
     if (route.view === viewFavorites) $('#view').querySelectorAll('.cocktail-art').forEach(wireArt);
@@ -679,7 +710,7 @@ if (typeof document !== 'undefined') (function () {
       render();
       return;
     }
-    if (e.target.closest('#favClose')) { favOpenId = null; favChecked = new Set(); render(); return; }
+    if (e.target.closest('#favClose')) { closeFavoriteDetail(); return; }
     const favAction = e.target.closest('[data-fav-act]');
     if (favAction) {
       const s = state.settings;
@@ -706,13 +737,17 @@ if (typeof document !== 'undefined') (function () {
     if (unfavBtn) {
       const id = unfavBtn.dataset.id;
       state.favorites = state.favorites.filter(x => x !== id);
-      if (favOpenId === id) { favOpenId = null; favChecked = new Set(); }
+      const closedDetail = favOpenId === id;
       save();
-      render();
+      if (closedDetail) closeFavoriteDetail();
+      else render();
       return;
     }
     const row = e.target.closest('.fav-open');
-    if (row) { favOpenId = row.dataset.id; favChecked = new Set(); render(); }
+    if (row) {
+      favHistoryEntry = true;
+      location.hash = '#/favoriter/' + encodeURIComponent(row.dataset.id);
+    }
   });
 
   $('#view').addEventListener('change', e => {

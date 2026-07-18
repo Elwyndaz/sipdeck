@@ -189,7 +189,8 @@ This exact blob is what `PUT /state` will carry in v1.1. Never store derived dat
   swipe-free detail with the illustrated front followed by the full recipe, so no second
   flip is needed. Ingredient rows can be checked off while mixing and the scaled recipe
   can be copied as readable text. Explicit un-favorite control. Favorites survive reload
-  (localStorage); mixing checkmarks are deliberately transient.
+  (localStorage); mixing checkmarks are deliberately transient. A favorite detail has its
+  own history entry, so browser or mobile Back returns to the favorite list first.
 
 ### Epic D — Filters
 

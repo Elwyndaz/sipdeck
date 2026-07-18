@@ -2,7 +2,7 @@
 // ponytail: plain node asserts, no framework. `node test.js` to run.
 const fs = require('fs');
 const path = require('path');
-const { STRINGS, t, detectLang, defaultState, normalizeState,
+const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash,
   scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount, shuffle, advanceQueue,
   formatLineAmount, drinkAsText,
   BASE_FILTERS, matchesFilters, canMake, filterDrinks,
@@ -43,6 +43,15 @@ check((() => { try { return normalizeState(null, 'en').settings.lang === 'en'; }
   'normalizeState: null input falls back to nav lang');
 check(normalizeState({ settings: { servings: 99 } }, 'en').settings.servings === 1,
   'normalizeState: out-of-range servings falls back to 1');
+
+check(favoriteIdFromHash('#/favoriter/margarita') === 'margarita',
+  'favoriteIdFromHash: parses favorite detail route');
+check(favoriteIdFromHash('#/favoriter/corpse%20reviver') === 'corpse reviver',
+  'favoriteIdFromHash: decodes route id');
+check(favoriteIdFromHash('#/favoriter') === null,
+  'favoriteIdFromHash: favorite list is not a detail route');
+check(favoriteIdFromHash('#/favoriter/bad/id') === null,
+  'favoriteIdFromHash: nested route is rejected');
 
 // ---------- unit engine (BACKLOG 3) ----------
 // scaling

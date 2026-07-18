@@ -10,7 +10,10 @@ live stack while the outgoing card flies away; the deck view is no longer re-ren
 the next card grows with `--sd-ease-list` and the content/bottom navigation do not repaint
 at the handoff. Favorites are compact real-art rows opening a continuous illustrated
 recipe detail with transient ingredient checkmarks and readable clipboard copy, with no
-second flip. The exact persisted state blob is unchanged. `test.js`: 562 checks green.
+second flip. The bottom navigation now sits outside the content wrapper so it remains
+viewport-fixed on mobile, and favorite details use `#/favoriter/<drink-id>` so browser
+Back returns to the favorite list. The exact persisted state blob is unchanged. `test.js`:
+566 checks green.
 The outstanding phone pass was attempted again from a local `python -m http.server` on
 2026-07-19. The required Browser-plugin connection and recovery diagnostics completed,
 but its browser availability list was empty, so no new browser verification is claimed
@@ -21,8 +24,9 @@ the phone pass, then BACKLOG item 10.
 
 - `app.js` layout: pure functions top (exported), then one browser IIFE. Module vars
   `db` (fetched drinks.json), `deckQueue` (deck order, ids), `flippedId` (deck flip),
-  `favOpenId`/`favChecked` (favorite detail/mixing progress) — all transient, never in
-  the state blob.
+  `favOpenId`/`favChecked`/`favHistoryEntry` (favorite detail, mixing progress and whether
+  Close can use browser Back) — all transient, never in the state blob. Favorite detail
+  routes are parsed by the exported pure `favoriteIdFromHash()` helper.
 - Card faces use fixed paper-ink hex (`#211B12`/`#6E6455`), not `--sd-ink` — cards never
   theme-invert (design rule). Gesture tints are opacity-only overlays (composited).
 - Deck flip must animate by toggling `.flipped` on the LIVE element; a re-render rebuilds
@@ -206,11 +210,11 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-1. Phone-viewport browser pass for filters, pantry, makeable mode, all-image loading,
-   card flip/swipe, persistence, empty states, EN/SV switching and missing-image fallback;
-   then do the outstanding real-phone 60 fps feel check.
-2. BACKLOG 10: grow and review the drink seed, following the frozen image pipeline for
-   every added drink.
+1. Real-phone check that the bottom navigation remains fixed on every view and hardware
+   Back from a favorite detail returns to the favorite list, plus the outstanding full
+   phone-viewport pass and 60 fps feel check.
+2. BACKLOG 10: add the user's numbered drink selection, following the frozen image
+   pipeline for every added drink; selection is pending from the 40-drink candidate list.
 3. BACKLOG 11: PWA manifest and icon exports.
 
 ## How to run / deploy
@@ -235,8 +239,8 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 562 green; `node --check app.js`: green; `git diff --check`: green;
-`app.js`: 36.8 kB. All 10 drink ids have exactly one visually inspected 640×800 WebP,
+`node test.js`: 566 green; `node --check app.js`: green; `git diff --check`: green;
+`app.js`: 37.9 kB. All 10 drink ids have exactly one visually inspected 640×800 WebP,
 17,672–45,038 bytes; no missing or extra production filenames. Local HTTP smoke verifies
 index/app/data responses; a deliberately missing image returns 404 and the source retains
 the live `<img>` error fallback. Source inspection confirms both deck and favorite flips
@@ -252,3 +256,10 @@ none of the requested interaction checks received new browser verification, the 
 feel and redesigned favorite flow remain browser-unverified, and BACKLOG item 10 remains
 unstarted. Real-phone feel check NOT done. This file's "Current state" paragraph must be
 updated at the end of every working session (recept/Årshjul convention).
+
+Source inspection and pure-function tests on 2026-07-19 confirm favorite detail hashes
+parse safely, opening a favorite creates a history entry, and hardware Back therefore
+returns to `#/favoriter`; the explicit Close/un-favorite paths also close the detail. The
+bottom navigation was moved out of `.wrap`, its compositor transform was removed, and
+safe-area content clearance was added. Local HTTP smoke returned 200 for `/`, `app.js`
+and `drinks.json`. These two fixes are not yet verified in a controllable mobile browser.
