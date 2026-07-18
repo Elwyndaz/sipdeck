@@ -11,9 +11,11 @@ the next card grows with `--sd-ease-list` and the content/bottom navigation do n
 at the handoff. Favorites are compact real-art rows opening a continuous illustrated
 recipe detail with transient ingredient checkmarks and readable clipboard copy, with no
 second flip. The exact persisted state blob is unchanged. `test.js`: 562 checks green.
-No controllable browser was exposed in this session even after the required Browser-plugin
-diagnostics, so no new browser verification is claimed. Real-phone 60 fps feel remains
-outstanding. Next: the phone pass, then BACKLOG item 10.
+The outstanding phone pass was attempted again from a local `python -m http.server` on
+2026-07-19. The required Browser-plugin connection and recovery diagnostics completed,
+but its browser availability list was empty, so no new browser verification is claimed
+and BACKLOG item 10 was not started. Real-phone 60 fps feel remains outstanding. Next:
+the phone pass, then BACKLOG item 10.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -243,7 +245,10 @@ before `render()` causes `ensureQueue()` to reshuffle. Items 1–5 retain their 
 Playwright phone-viewport smoke (deck gestures/flip/recipe/favorites/settings), zero
 console errors. Source inspection on 2026-07-19 confirms committed swipe no longer calls
 `render()`, surviving cards change `data-depth`, and deck flip still toggles `.flipped` on
-the live element. The Browser plugin again reported no available browser after prescribed
-diagnostics, so the promotion feel and redesigned favorite flow are not browser-verified.
-Real-phone feel check NOT done. This file's "Current state" paragraph must be updated at
-the end of every working session (recept/Årshjul convention).
+the live element. On 2026-07-19 the requested phone pass was served locally from
+`http://127.0.0.1:8765/`; the server returned HTTP 200, but the Browser plugin reported
+an empty browser availability list after its prescribed recovery diagnostics. Therefore
+none of the requested interaction checks received new browser verification, the promotion
+feel and redesigned favorite flow remain browser-unverified, and BACKLOG item 10 remains
+unstarted. Real-phone feel check NOT done. This file's "Current state" paragraph must be
+updated at the end of every working session (recept/Årshjul convention).
