@@ -5,7 +5,7 @@ agent session. Story/AC references point into PRODUCT.md.
 
 ## v1 (the cut line is explicit below)
 
-Items 1–7 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 8.
+Items 1–9 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 10.
 
 1. ✅ **Scaffold** — `index.html` (inline the contents of `design/tokens.css` into
    `<style>`, inline `design/wordmark.svg` in the header), `app.js` (pure functions on
@@ -27,13 +27,13 @@ Items 1–7 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
    empty state. (D1, D2)
 7. ✅ **Pantry + "what can I make"** — grouped checklist, essential-subset match, combinable
    with filters. (E1, E2)
-8. **i18n** — EN/SV string table, language toggle, browser-language default, sv typography
-   rules enforced in one format layer. (F1)
-9. **Image pipeline + placeholders** — image generation/conversion is complete for all 10
-   seed drinks: frozen `gpt-image-2` reference workflow in HANDOFF.md, exact 640×800 WebP
-   outputs at 18–45 kB, complete id coverage, and lazy loading for the top four cards.
-   Generic inline fallback is resilient. Still owed before this item is ✅: replace it
-   with SVG silhouettes keyed by `glass`. (G1)
+8. ✅ **i18n** — EN/SV string table, language toggle, browser-language default, sv typography
+   rules enforced in one format layer. Settings persists `settings.lang`; navigation,
+   taxonomy labels, controls and accessibility labels all route through `t()`. (F1)
+9. ✅ **Image pipeline + placeholders** — frozen `gpt-image-2` reference workflow in
+   HANDOFF.md, exact 640×800 WebP outputs at 18–45 kB, complete id coverage and lazy
+   loading for the top four cards. Resilient inline SVG silhouettes are keyed by the
+   seed's `coupe`, `highball`, `rocks` and `martini` glass values. (G1)
 10. **Full drink seed** — grow drinks.json to ~80–100 (IBA list + modern classics), all
     flags/ids reviewed, images generated batch-wise. Editorial pass on `bar` flag.
 11. **PWA manifest + icons** — relative paths, standalone. Export PNGs from
@@ -66,5 +66,5 @@ Items 1–7 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
 
 - Last-write-wins sync (v1.1): fine, state has a single owner.
 - Pantry matching is id-exact: seeding discipline on ingredient ids is what makes it work.
-- No image = placeholder forever; acceptable for future additions, tracked per drink by
-  file absence. The current 10-drink seed has complete image coverage.
+- No image = the drink's glass silhouette forever; acceptable for future additions,
+  tracked per drink by file absence. The current 10-drink seed has complete image coverage.

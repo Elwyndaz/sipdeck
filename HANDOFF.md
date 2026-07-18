@@ -5,16 +5,16 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
-**BACKLOG items 1–7 done** (2026-07-18), and the image-generation portion of item 9 is
-complete for the 10-drink seed. Every drink now has visually reviewed 640×800 WebP art at
-18–45 kB, generated in one coherent ink-and-watercolor family. Card fronts lazy-load the
-top four and retain the inline SVG fallback without changing layout if future art is
-missing; item 9 only still owes silhouettes keyed by `glass`. Filters combine editorial
-`bar`, base spirit and transient makeable mode; pantry persists all 26 grouped ingredient
-choices. `test.js`: 528 checks green. Items 1–5 retain earlier phone-browser verification,
-but no controllable browser was available for the filters/pantry/full-image sessions, so
-those flows still need the phone-viewport pass. Real-phone 60 fps feel is also outstanding.
-Next: BACKLOG item 8.
+**BACKLOG items 1–9 done** (2026-07-18). The deck is now the first content on its view,
+with the redundant screen title removed and the filter panel placed below the live cards.
+Settings has a persisted English/Swedish control; UI, taxonomy and accessibility copy route
+through `t()`. The 10-drink seed retains its visually reviewed 640×800 WebPs at 18–45 kB,
+and missing art now falls back to restrained inline SVG silhouettes keyed by `glass` while
+preserving the existing lazy-load/error behavior. `test.js`: 553 checks green. No
+controllable browser was exposed in this session even after the required Browser-plugin
+diagnostics, so the outstanding phone-viewport pass still has not happened and no new
+browser verification is claimed. Real-phone 60 fps feel is also outstanding. Next:
+BACKLOG item 10 only after that browser pass confirms items 6–9.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -27,10 +27,11 @@ Next: BACKLOG item 8.
   card with the class pre-applied and snaps instead of animating.
 - `formatAmount` returns non-convertible unit labels as raw keys (`dash`); the view layer
   translates via `t('unit_' + key)`; unit `top` renders as just "toppa upp"/"top up".
-- Card fronts try `img/<drink-id>.webp` for the top four live cards and retain the favicon
-  glass monoline (`GLASS_PH`) until load or on error. All 10 current ids have art; the
-  fallback protects future additions and broken requests. Item 9 still owes per-glass
-  silhouettes. `convert()` uses 30 ml/oz (bar standard; PRODUCT.md doesn't pin it).
+- Card fronts try `img/<drink-id>.webp` for the top four live cards and retain the
+  `glassPlaceholder(drink.glass)` inline silhouette until load or on error. The current
+  seed uses `coupe`, `highball`, `rocks` and `martini`; unknown future values degrade to
+  `rocks`. All 10 current ids have art. `convert()` uses 30 ml/oz (bar standard;
+  PRODUCT.md doesn't pin it).
 - The `#view` click delegate is attached ONCE at startup (the element is never replaced);
   `#deck`/`#favDeck` listeners re-attach per render (those nodes are recreated).
 
@@ -197,13 +198,12 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-1. Phone-viewport browser pass for filters, pantry, all-image deck loading and
-   missing-image fallback; then do the outstanding real-phone 60 fps feel check.
-2. BACKLOG 8: i18n polish (language toggle in settings — the string table and browser
-   default already exist, this is mostly the settings controls).
-3. Finish BACKLOG 9 by replacing the generic fallback with SVG silhouettes keyed by
-   `glass`; seed image generation is complete.
-4. BACKLOG 10: grow and review the drink seed.
+1. Phone-viewport browser pass for filters, pantry, makeable mode, all-image loading,
+   card flip/swipe, persistence, empty states, EN/SV switching and missing-image fallback;
+   then do the outstanding real-phone 60 fps feel check.
+2. BACKLOG 10: grow and review the drink seed, following the frozen image pipeline for
+   every added drink.
+3. BACKLOG 11: PWA manifest and icon exports.
 
 ## How to run / deploy
 
@@ -227,13 +227,16 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 528 green; `node --check app.js`: green; `git diff --check`: green;
-`app.js`: 29.5 kB. All 10 drink ids have exactly one visually inspected 640×800 WebP,
+`node test.js`: 553 green; `node --check app.js`: green; `git diff --check`: green;
+`app.js`: 31.2 kB. All 10 drink ids have exactly one visually inspected 640×800 WebP,
 17,672–45,038 bytes; no missing or extra production filenames. Local HTTP smoke verifies
-index/app/art responses and `image/webp`; a deliberately missing image returns 404 and is
-handled by the live `<img>` error fallback. Items 1–5 retain their earlier Playwright
-phone-viewport smoke (deck gestures/flip/recipe/favorites/settings), zero console errors.
-No controllable browser was available in the 2026-07-18 filters/pantry/full-image
-sessions, so those newer flows are not yet browser-verified. Real-phone feel check NOT
+index/app/data responses; a deliberately missing image returns 404 and the source retains
+the live `<img>` error fallback. Source inspection confirms both deck and favorite flips
+still toggle `.flipped` on live elements, and filter/pantry changes set `deckQueue = null`
+before `render()` causes `ensureQueue()` to reshuffle. Items 1–5 retain their earlier
+Playwright phone-viewport smoke (deck gestures/flip/recipe/favorites/settings), zero
+console errors. The Browser plugin reported no available browser in this 2026-07-18
+session after its prescribed diagnostics, so filters, pantry, full-image loading, items
+8–9 and the updated deck-first layout are not browser-verified. Real-phone feel check NOT
 done. This file's "Current state" paragraph must be updated at the end of every working
 session (recept/Årshjul convention).

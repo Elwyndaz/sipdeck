@@ -5,7 +5,7 @@ const STRINGS = {
   en: {
     tagline: 'Swipe. Save. Shake.',
     nav_deck: 'Deck', nav_favorites: 'Favorites', nav_pantry: 'Pantry', nav_settings: 'Settings',
-    deck_title: 'Deck',
+    nav_label: 'Main navigation',
     deck_empty: 'No drinks yet. Deal the deck once drinks.json ships.',
     deck_loading: 'Dealing the deck...',
     deck_error: "Couldn't load the deck. Reload to try again.",
@@ -24,19 +24,23 @@ const STRINGS = {
     pantry_group_fresh: 'Fresh & mixers', pantry_group_pantry: 'Pantry staples',
     settings_title: 'Settings',
     settings_lang: 'Language', settings_unit: 'Unit', settings_servings: 'Servings',
+    language_en: 'English', language_sv: 'Swedish',
     settings_filter_bar: 'Bar-servable only', settings_filter_base: 'Base spirit',
     settings_filter_base_none: 'Any',
     base_gin: 'Gin', base_vodka: 'Vodka', base_rum: 'Rum', base_tequila: 'Tequila',
     base_whiskey: 'Whiskey', base_brandy: 'Brandy', base_other: 'Other / none',
     yes: 'Yes', no: 'No',
+    type_sour: 'Sour', type_highball: 'Highball', type_aromatic: 'Aromatic',
+    type_spirit_forward: 'Spirit-forward', type_contemporary: 'Contemporary',
     servings: 'Servings',
+    servings_decrease: 'Decrease servings', servings_increase: 'Increase servings',
     unit_dash: 'dash', unit_barspoon: 'barspoon', unit_piece: 'pc', unit_leaf: 'leaf',
     unit_slice: 'slice', unit_garnish: 'garnish', unit_top: 'top up',
   },
   sv: {
     tagline: 'Svep. Spara. Skaka.',
     nav_deck: 'Kortlek', nav_favorites: 'Favoriter', nav_pantry: 'Skafferi', nav_settings: 'Inställningar',
-    deck_title: 'Kortlek',
+    nav_label: 'Huvudnavigering',
     deck_empty: 'Inga drinkar än. Kortleken delas ut när drinks.json finns.',
     deck_loading: 'Delar ut kortleken...',
     deck_error: 'Kunde inte ladda kortleken. Ladda om sidan för att försöka igen.',
@@ -55,12 +59,16 @@ const STRINGS = {
     pantry_group_fresh: 'Färskt och blanddryck', pantry_group_pantry: 'Skafferivaror',
     settings_title: 'Inställningar',
     settings_lang: 'Språk', settings_unit: 'Enhet', settings_servings: 'Portioner',
+    language_en: 'Engelska', language_sv: 'Svenska',
     settings_filter_bar: 'Bara barserverbara', settings_filter_base: 'Bas-sprit',
     settings_filter_base_none: 'Alla',
     base_gin: 'Gin', base_vodka: 'Vodka', base_rum: 'Rom', base_tequila: 'Tequila',
     base_whiskey: 'Whisky', base_brandy: 'Brandy', base_other: 'Annan / ingen',
     yes: 'Ja', no: 'Nej',
+    type_sour: 'Sour', type_highball: 'Highball', type_aromatic: 'Aromatisk',
+    type_spirit_forward: 'Spritdominerad', type_contemporary: 'Samtida',
     servings: 'Portioner',
+    servings_decrease: 'Minska antal portioner', servings_increase: 'Öka antal portioner',
     unit_dash: 'stänk', unit_barspoon: 'barsked', unit_piece: 'st', unit_leaf: 'blad',
     unit_slice: 'skiva', unit_garnish: 'garnering', unit_top: 'toppa upp',
   },
@@ -189,6 +197,21 @@ function filterDrinks(drinks, filters, pantry) {
     .filter(drink => matchesFilters(drink, filters) && (!have || canMake(drink, have)));
 }
 
+// Restrained inline fallbacks for every glass used by the current seed. Unknown future
+// values degrade to the rocks silhouette without changing the card's dimensions.
+const GLASS_SILHOUETTES = {
+  coupe: '<path d="M18 25h60c-3 17-13 25-30 25S21 42 18 25Z"/><path d="M48 50v27M32 79h32"/>',
+  highball: '<path d="M29 14h38l-4 66H33l-4-66Z"/><path d="M34 25h28"/>',
+  rocks: '<path d="M25 35h46l-5 43H30l-5-43Z"/><path d="M30 47h36"/>',
+  martini: '<path d="M17 20h62L48 53 17 20Z"/><path d="M48 53v24M32 79h32"/>',
+};
+
+function glassPlaceholder(glass) {
+  const known = Object.prototype.hasOwnProperty.call(GLASS_SILHOUETTES, glass);
+  const key = known ? glass : 'rocks';
+  return `<svg viewBox="0 0 96 96" class="glass-ph glass-${key}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">${GLASS_SILHOUETTES[key]}</g></svg>`;
+}
+
 // Top-level: one ingredient line + servings + active display unit + lang -> display string.
 // line is either { ml } (convertible, canonical) or { qty, unit } (non-convertible, passthrough).
 // Non-convertible unit labels are returned as their raw string-table keys (e.g. "dash") for the
@@ -208,6 +231,7 @@ if (typeof module !== 'undefined') module.exports = {
   STRINGS, t, UNITS, detectLang, defaultState, normalizeState,
   NONCONVERTIBLE_UNITS, scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   shuffle, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
+  GLASS_SILHOUETTES, glassPlaceholder,
 };
 
 // ---------- app (browser only) ----------
@@ -238,10 +262,9 @@ if (typeof document !== 'undefined') (function () {
 
   // ---------- views ----------
   function viewDeck() {
-    const title = `<h1 class="screen-title">${esc(t(lang(), 'deck_title'))}</h1>`;
-    if (drinksFailed) return `${title}<p class="empty">${esc(t(lang(), 'deck_error'))}</p>`;
-    if (!db) return `${title}<p class="empty">${esc(t(lang(), 'deck_loading'))}</p>`;
-    if (!db.drinks.length) return `${title}<p class="empty">${esc(t(lang(), 'deck_empty'))}</p>`;
+    if (drinksFailed) return `<p class="empty">${esc(t(lang(), 'deck_error'))}</p>`;
+    if (!db) return `<p class="empty">${esc(t(lang(), 'deck_loading'))}</p>`;
+    if (!db.drinks.length) return `<p class="empty">${esc(t(lang(), 'deck_empty'))}</p>`;
     const f = state.settings.filters;
     const baseOptions = [`<option value="">${esc(t(lang(), 'settings_filter_base_none'))}</option>`]
       .concat(BASE_FILTERS.map(base => `<option value="${base}"${f.base === base ? ' selected' : ''}>${esc(t(lang(), 'base_' + base))}</option>`))
@@ -254,7 +277,7 @@ if (typeof document !== 'undefined') (function () {
     const matches = filteredDrinks();
     const count = `<p class="deck-count"><span class="amount">${matches.length}</span> ${esc(t(lang(), 'deck_count_label'))}</p>`;
     const deck = matches.length ? '<div class="deck" id="deck"></div>' : `<p class="empty">${esc(t(lang(), 'deck_no_matches'))}</p>`;
-    return `${title}${controls}${count}${deck}`;
+    return `${deck}${controls}${count}`;
   }
 
   // ---------- deck: the one imperative-DOM zone (drag/flip animate outside re-renders) ----------
@@ -274,12 +297,13 @@ if (typeof document !== 'undefined') (function () {
     if (!deckQueue || !deckQueue.length) deckQueue = shuffle(filteredDrinks().map(d => d.id));
   }
 
-  // Quiet fallback stays in the layout until a drink image has loaded successfully.
-  const GLASS_PH = `<svg viewBox="0 0 96 96" class="glass-ph" aria-hidden="true"><g transform="rotate(-6 48 48)" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M 16,20 L 48,57 L 80,20 Z"/><path d="M 48,57 V 78 M 30,80 H 66"/></g><circle cx="74" cy="13" r="4.5" transform="rotate(-6 48 48)" fill="#2F6B3F"/></svg>`;
-
   function ingName(id) {
     const n = db.ingredients[id];
     return n ? (n[lang()] || n.en) : id;
+  }
+
+  function taxonomyName(kind, id) {
+    return t(lang(), kind + '_' + String(id).replace(/-/g, '_'));
   }
 
   function ingLine(line) {
@@ -311,9 +335,9 @@ if (typeof document !== 'undefined') (function () {
     el.innerHTML = `
       <div class="card-inner">
         <div class="card-face card-front">
-          <div class="card-art">${GLASS_PH}<img class="cocktail-art" src="img/${esc(drink.id)}.webp" alt="" loading="lazy" decoding="async"></div>
+          <div class="card-art">${glassPlaceholder(drink.glass)}<img class="cocktail-art" src="img/${esc(drink.id)}.webp" alt="" loading="lazy" decoding="async"></div>
           <h2 class="card-name">${esc(drink.name)}</h2>
-          <div class="card-meta">${esc(drink.type)}</div>
+          <div class="card-meta">${esc(taxonomyName('type', drink.type))}</div>
           <div class="card-tags">${tags}</div>
         </div>
         <div class="card-face card-back">
@@ -321,12 +345,12 @@ if (typeof document !== 'undefined') (function () {
           <ul class="ing">${drink.ingredients.map(ingLine).join('')}</ul>
           <p class="card-method">${esc(drink.method[lang()] || drink.method.en)}</p>
           <div class="card-ctrl">
-            <div class="stepper">
-              <button data-act="dec" aria-label="−">−</button>
+            <div class="stepper" role="group" aria-label="${esc(t(lang(), 'servings'))}">
+              <button data-act="dec" aria-label="${esc(t(lang(), 'servings_decrease'))}">−</button>
               <span class="amount">${s.servings}</span>
-              <button data-act="inc" aria-label="+">+</button>
+              <button data-act="inc" aria-label="${esc(t(lang(), 'servings_increase'))}">+</button>
             </div>
-            <div class="units">${unitBtns}</div>
+            <div class="units" role="group" aria-label="${esc(t(lang(), 'settings_unit'))}">${unitBtns}</div>
           </div>
         </div>
       </div>${tint ? `
@@ -485,10 +509,10 @@ if (typeof document !== 'undefined') (function () {
     if (!rows.length) return `${title}<p class="empty">${esc(t(lang(), 'favorites_empty'))}</p>`;
     const list = rows.map(d => `
       <div class="list-card fav-row" data-id="${esc(d.id)}">
-        <div class="fav-thumb">${GLASS_PH}</div>
+        <div class="fav-thumb">${glassPlaceholder(d.glass)}</div>
         <div class="fav-info">
           <div class="name">${esc(d.name)}</div>
-          <div class="meta">${esc(d.type)}</div>
+          <div class="meta">${esc(taxonomyName('type', d.type))}</div>
         </div>
         <button class="fav-remove" data-act="unfav" data-id="${esc(d.id)}" aria-label="${esc(t(lang(), 'fav_unfavorite'))}">&times;</button>
       </div>`).join('');
@@ -520,17 +544,17 @@ if (typeof document !== 'undefined') (function () {
   function viewSettings() {
     const s = state.settings;
     const bool = v => t(lang(), v ? 'yes' : 'no');
-    const base = s.filters.base ? esc(s.filters.base) : esc(t(lang(), 'settings_filter_base_none'));
+    const base = s.filters.base ? esc(taxonomyName('base', s.filters.base)) : esc(t(lang(), 'settings_filter_base_none'));
     return `<h1 class="screen-title">${esc(t(lang(), 'settings_title'))}</h1>
       <dl class="settings">
-        <dt>${esc(t(lang(), 'settings_lang'))}</dt><dd>${esc(s.lang.toUpperCase())}</dd>
+        <dt>${esc(t(lang(), 'settings_lang'))}</dt><dd><div class="lang-toggle" role="group" aria-label="${esc(t(lang(), 'settings_lang'))}">
+          ${['en', 'sv'].map(code => `<button data-lang="${code}"${code === s.lang ? ' class="active" aria-pressed="true"' : ' aria-pressed="false"'}>${esc(t(lang(), 'language_' + code))}</button>`).join('')}
+        </div></dd>
         <dt>${esc(t(lang(), 'settings_unit'))}</dt><dd>${esc(s.unit)}</dd>
         <dt>${esc(t(lang(), 'settings_servings'))}</dt><dd>${esc(String(s.servings))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_bar'))}</dt><dd>${esc(bool(s.filters.bar))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_base'))}</dt><dd>${base}</dd>
       </dl>`;
-    // ponytail: read-only display of the state blob. Editable controls (language toggle, unit
-    // toggle, filters UI) are BACKLOG items 6/8 — the shape just needs to exist and persist now.
   }
 
   // ---------- router: hashchange -> coarse re-render per view ----------
@@ -549,6 +573,7 @@ if (typeof document !== 'undefined') (function () {
     if (route.view === viewFavorites) { const d = favDrink(); if (d) mountFavCard(d); }
     document.documentElement.lang = lang();
     $('#tagline').textContent = t(lang(), 'tagline');
+    $('#nav').setAttribute('aria-label', t(lang(), 'nav_label'));
     const navLabels = { '#/': 'nav_deck', '#/favoriter': 'nav_favorites', '#/skafferi': 'nav_pantry', '#/installningar': 'nav_settings' };
     document.querySelectorAll('#nav a').forEach(a => {
       a.textContent = t(lang(), navLabels[a.dataset.match]);
@@ -560,6 +585,13 @@ if (typeof document !== 'undefined') (function () {
   // unlike #deck/#favDeck's listeners, which are fine to re-attach per render since those nodes
   // are freshly created each time. Covers favorites row-open, close, and un-favorite (list + open card).
   $('#view').addEventListener('click', e => {
+    const langBtn = e.target.closest('[data-lang]');
+    if (langBtn) {
+      state.settings.lang = langBtn.dataset.lang;
+      save();
+      render();
+      return;
+    }
     if (e.target.closest('#favClose')) { favOpenId = null; render(); return; }
     const unfavBtn = e.target.closest('[data-act="unfav"]');
     if (unfavBtn) {

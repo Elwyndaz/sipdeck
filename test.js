@@ -2,9 +2,10 @@
 // ponytail: plain node asserts, no framework. `node test.js` to run.
 const fs = require('fs');
 const path = require('path');
-const { STRINGS, detectLang, defaultState, normalizeState,
+const { STRINGS, t, detectLang, defaultState, normalizeState,
   scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount, shuffle,
-  matchesFilters, canMake, filterDrinks } = require('./app.js');
+  BASE_FILTERS, matchesFilters, canMake, filterDrinks,
+  GLASS_SILHOUETTES, glassPlaceholder } = require('./app.js');
 
 let pass = 0, fail = 0;
 function check(cond, msg) {
@@ -16,6 +17,10 @@ check(detectLang('sv-SE') === 'sv', 'detectLang: sv-SE -> sv');
 check(detectLang('en-US') === 'en', 'detectLang: en-US -> en');
 check(detectLang(undefined) === 'en', 'detectLang: missing -> en');
 check(Object.values(STRINGS.sv).every(value => !String(value).includes('—')), 'string table sv: no em-dashes');
+check(Object.keys(STRINGS.en).every(key => key in STRINGS.sv), 'string table: every English key has Swedish copy');
+check(Object.keys(STRINGS.sv).every(key => key in STRINGS.en), 'string table: every Swedish key has English copy');
+check(t('sv', 'language_sv') === 'Svenska' && t('en', 'language_sv') === 'Swedish',
+  'string table: language labels translate');
 
 const d = defaultState('sv');
 check(d.v === 1 && d.settings.lang === 'sv' && d.settings.unit === 'cl' && d.settings.servings === 1,
@@ -110,6 +115,14 @@ check(filterDrinks(filterSeed, { bar: true, base: null }).length === 2, 'filterD
 check(filterDrinks(filterSeed, { bar: true, base: 'rum' }).length === 0, 'filterDrinks: empty combination');
 check(filterDrinks(null, {}).length === 0, 'filterDrinks: invalid input is empty');
 
+// ---------- glass placeholders (BACKLOG 9) ----------
+['coupe', 'highball', 'rocks', 'martini'].forEach(glass => {
+  check(typeof GLASS_SILHOUETTES[glass] === 'string', `glass placeholder: ${glass} silhouette exists`);
+  check(glassPlaceholder(glass).includes(`glass-${glass}`), `glass placeholder: ${glass} selects its silhouette`);
+});
+check(glassPlaceholder('unknown').includes('glass-rocks'), 'glass placeholder: unknown glass degrades to rocks');
+check(glassPlaceholder('coupe') !== glassPlaceholder('martini'), 'glass placeholder: coupe and martini differ');
+
 // ---------- pantry + makeable filter (BACKLOG 7) ----------
 const pantryDrink = { id: 'pantry-test', base: 'gin', bar: true, ingredients: [
   { id: 'gin', essential: true },
@@ -133,6 +146,14 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'drinks.json'), 'ut
 check(data.schema === 1, 'drinks.json: schema === 1');
 check(data.ingredients && typeof data.ingredients === 'object', 'drinks.json: ingredients is a map');
 check(Array.isArray(data.drinks), 'drinks.json: drinks is an array');
+new Set(data.drinks.map(drink => drink.type)).forEach(type => {
+  const key = 'type_' + type.replace(/-/g, '_');
+  check(t('en', key) !== key && t('sv', key) !== key, `i18n: drink type ${type} resolves in EN + SV`);
+});
+BASE_FILTERS.forEach(base => {
+  const key = 'base_' + base;
+  check(t('en', key) !== key && t('sv', key) !== key, `i18n: base filter ${base} resolves in EN + SV`);
+});
 
 // every ingredient map key is kebab-case with en+sv
 Object.keys(data.ingredients).forEach(id => {
