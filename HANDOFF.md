@@ -12,12 +12,13 @@ favorite detail renders the source as a small right-aligned link after the metho
 bottom navigation and history-aware favorite detail fixes remain in place, and the exact
 persisted state blob is unchanged. `test.js`: 1374 checks green. All 26 source URLs
 returned HTTP 200 on 2026-07-19.
-The outstanding phone pass was attempted from a local `python -m http.server`, but the
-Browser plugin reported no controllable browser. No new phone-browser verification is
-claimed; the fixed-nav/history changes, 16-drink batch and source-link treatment still
-need a real-phone interaction pass. Next: that pass, then continue item 10 toward the
-80–100-drink target. Feature commit `bb33c62` was pushed and deployed; cache-busted checks
-of both production URLs served the 26-drink data, source-link code/CSS and a new image.
+The outstanding phone pass was attempted again from a local `python -m http.server` on
+2026-07-19, but browser discovery returned zero controllable browser backends. No new
+phone-browser verification is claimed; the fixed-nav/history changes, 16-drink batch and
+source-link treatment still need a real-phone interaction pass. Next: that pass, then
+continue item 10 toward the 80–100-drink target. The 26-drink state at commit `2f1379c`
+was pushed and deployed; cache-busted checks of both production URLs served the drink
+data, source-link code/CSS and a new image.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -245,10 +246,12 @@ one drink at a time from the frozen reference prompt and converted at quality 72
 the original 10 images were not regenerated. All 26 recipe source URLs returned HTTP 200.
 Local HTTP smoke verifies index/app/data and a new image response. Source inspection
 confirms live-element deck promotion/flip and queue resets are unchanged. Earlier browser
-checks remain historical only: on 2026-07-19 the requested local phone pass could not run
-because the Browser plugin reported no controllable browser. The current fixed navigation,
-favorite history, expanded seed and source links therefore remain phone-browser-unverified;
-real-phone feel and console checks NOT done. Cache-busted production checks confirmed both
+checks remain historical only: on 2026-07-19 the requested local phone pass was attempted
+again from a live local Python HTTP server, but the Browser plugin reported no available
+backend and its discovery list was empty. The current fixed navigation, favorite history,
+expanded seed and source links therefore remain phone-browser-unverified; gesture feel,
+repaint behavior, mobile Back, responsive controls, missing-image behavior and console
+checks were NOT done. Cache-busted production checks confirmed both
 `https://sipdeck.pages.dev/` and `https://orgutveckling.se/sipdeck/` serve 26 drinks, the
 source-link JS/CSS markers and the 34,334-byte Frozen Strawberry Daiquiri WebP. This file's
 "Current state" paragraph must be updated at the end of every working session
