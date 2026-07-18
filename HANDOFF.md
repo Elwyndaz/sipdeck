@@ -148,8 +148,14 @@ in PRODUCT.md "Locked decisions".
 ```
 python -m http.server            # from sipdeck/ — no build step
 node test.js                     # pure-function + data validation tests
-npx wrangler pages deploy .      # Cloudflare Pages direct upload (v1 item 12)
+npx wrangler pages deploy . --project-name sipdeck --branch main   # Cloudflare Pages
 ```
+
+Live (since 2026-07-18): **https://sipdeck.pages.dev** (Cloudflare Pages, deploy =
+wrangler command above) and **https://orgutveckling.se/sipdeck/** (GitHub Pages, deploy
+= just `git push`; serves repo root off main — note the subpath, which is why all asset
+paths must stay relative). Both verified rendering with zero console errors. Delete
+`.playwright-mcp/` before wrangler deploys — wrangler doesn't read .gitignore.
 
 ## Git
 
