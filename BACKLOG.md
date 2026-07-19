@@ -61,10 +61,11 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     ingredient, set the drink to `bar: false`. Record a concise decision and blocking
     ingredient(s) for every reviewed drink, add regression coverage for the final allowlist,
     and do not change recipes, ingredients or the 92-drink seed. (D1)
-14. **Performance pass + deploy (partially complete)** — static budgets, local HTTP smoke
-    and the Cloudflare Pages direct upload pass. The required throttled-phone trace and
-    live mobile smoke remain pending because neither Chrome DevTools MCP nor a controllable
-    browser backend was available on 2026-07-19.
+14. ✅ **Performance pass + deploy** (done 2026-07-19) — static budgets, local HTTP smoke and
+    Cloudflare Pages upload, plus the throttled-phone trace and live mobile smoke via
+    Playwright CDP against both production origins: cold 4G load 1,8 s / LCP 1,9 s
+    (budget < 2,5 s), repeat 0,3–0,4 s (budget < 1 s), full interaction/wheel/console pass
+    green. Details in HANDOFF.md "v1 close-out". **v1 cut is closed.**
 
 ——————————— **v1 CUT — everything below ships after v1 is live** ———————————
 

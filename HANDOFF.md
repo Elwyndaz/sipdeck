@@ -239,18 +239,32 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-1. BACKLOG 13: research a normal-bar ingredient baseline and audit all 57 current
-   `bar: true` drinks, documenting each decision and blocking ingredient without changing
-   any recipe or the seed.
-2. Configure the `chrome-devtools` MCP and run BACKLOG 14's throttled 4G phone trace against
-   production; verify the < 1 s repeat/< 2,5 s first-visit interaction budgets.
-3. When a controllable browser is available, run the full phone-viewport pass, including
-   fixed navigation, pointer/keyboard swipe, flip,
-   live-element behavior, missing-image fallback, favorite detail/Back, controls,
-   installability, persistence, links and console. Include both wheel languages, all five
-   moods, sound/mute, re-spin/New wheel, exact landing, dark mode, landscape and reduced
-   motion. Claim only what a controllable browser verifies.
-4. If both checks pass, mark BACKLOG 14 complete and close the v1 cut.
+v1 is closed (BACKLOG 1–14 ✅ on 2026-07-19). Next: v1.1 — BACKLOG 15 (accounts + sync)
+and 16 (deep links).
+
+## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
+
+BACKLOG 13: strict normal-bar audit done per BAR-AUDIT.md — 37 drinks stay `bar: true`,
+20 flipped to false (blocking essentials documented per drink); the exact allowlist is
+under regression in test.js (4,303 checks green). Recipes, ingredients and the seed are
+untouched.
+
+BACKLOG 14: throttled phone trace and live mobile smoke ran via Playwright CDP (Chrome
+DevTools MCP was still unavailable; CDP `Network.emulateNetworkConditions` 150 ms RTT /
+1,6 Mbps down / 750 kbps up + 4x CPU throttle, 390x844 viewport, cold cache) against both
+production origins after the audit deploy. sipdeck.pages.dev: cold load event 1 790 ms,
+LCP 1 928 ms, wall-to-deck 1 830 ms; repeat visit 429 ms wall. orgutveckling.se/sipdeck/:
+cold load 1 642 ms, LCP 1 520 ms; repeat 302 ms. Budgets (< 2,5 s first, < 1 s repeat)
+hold on both. Live smoke, all green with zero console/page errors: fixed bottom nav +
+all four routes, pointer-drag save, ArrowRight save/ArrowLeft skip, flip with stepper and
+oz toggle, missing-image fallback (bogus src hides img, silhouette remains), favorite
+detail + Back, persistence across reload, EN/SV toggle, installable manifest + 512 icon,
+wheel in both languages: five moods apply with 12 sectors, full-motion spin 7,5 s with
+exact pointer/winning-sector landing, re-spin + New wheel relabel/reset, mute aria state,
+reduced-motion fast path < 1,5 s, level-5 forced water with safety note and changing
+repeat copy, dark-scheme render and landscape reachability. One smoke-harness gotcha:
+`#wheelMood` listens on `change` (fires on release), not `input` — dispatch `change` when
+driving it synthetically.
 
 ## How to run / deploy
 
