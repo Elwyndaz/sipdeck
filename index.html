@@ -25,7 +25,7 @@
   --sd-accent: #2F6B3F;        /* vermouth green */
   --sd-accent-pressed: #24522F;
   --sd-save: var(--sd-accent); /* swipe right — saving IS the brand action */
-  --sd-skip: #8A5A21;          /* swipe left — bitters amber, neutral not punitive */
+  --sd-skip: #A03B2E;          /* swipe left — muted brick red, still gesture feedback not error */
   --sd-line: rgba(33,27,18,.14);
   --sd-shadow: 0 1px 2px rgba(33,27,18,.06), 0 12px 32px -12px rgba(33,27,18,.25);
 
@@ -49,7 +49,7 @@
     --sd-ink-2: #A79B87;
     --sd-accent: #7FB56F;
     --sd-accent-pressed: #9CCB8A; /* pressed goes LIGHTER on dark */
-    --sd-skip: #D8A659;
+    --sd-skip: #DE8070;
     --sd-line: rgba(237,229,214,.16);
     --sd-shadow: 0 2px 4px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.6);
     /* --sd-card intentionally unchanged — the illustrations are painted on warm-white
@@ -153,7 +153,7 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
 .tint{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;
   transition:opacity var(--sd-t-micro) linear}
 .tint-save{box-shadow:inset 0 0 0 3px #2F6B3F}
-.tint-skip{box-shadow:inset 0 0 0 3px #8A5A21}
+.tint-skip{box-shadow:inset 0 0 0 3px #A03B2E}
 dl.settings{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;font-size:.95rem}
 dl.settings dt{color:var(--sd-ink-2)}
 dl.settings dd{min-width:0}

@@ -80,7 +80,7 @@ color. Baked-in specifics:
 - **Color** (`design/tokens.css`): paper bg `#EFE8DB` / card `#FBF7EF` (cards are always
   this color, light or dark theme — the illustrations are painted on that paper) / ink
   `#211B12` / accent (vermouth green) `#2F6B3F`, doubling as the **save** gesture color /
-  skip (bitters amber) `#8A5A21`, explicitly neutral, never reused for errors. Dark mode
+  skip (muted brick red) `#A03B2E` — gesture feedback only, never reused for errors. Dark mode
   is in scope, activates automatically via `prefers-color-scheme` (no manual toggle in
   v1 — YAGNI). All pairs verified WCAG AA or better.
 - **Typography**: **Instrument Serif** (400 + italic) for drink names and screen titles

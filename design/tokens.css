@@ -19,7 +19,7 @@
   --sd-accent: #2F6B3F;        /* vermouth green */
   --sd-accent-pressed: #24522F;
   --sd-save: var(--sd-accent); /* swipe right — saving IS the brand action */
-  --sd-skip: #8A5A21;          /* swipe left — bitters amber, neutral not punitive */
+  --sd-skip: #A03B2E;          /* swipe left — muted brick red, still gesture feedback not error */
   --sd-line: rgba(33,27,18,.14);
   --sd-shadow: 0 1px 2px rgba(33,27,18,.06), 0 12px 32px -12px rgba(33,27,18,.25);
 
@@ -43,7 +43,7 @@
     --sd-ink-2: #A79B87;
     --sd-accent: #7FB56F;
     --sd-accent-pressed: #9CCB8A; /* pressed goes LIGHTER on dark */
-    --sd-skip: #D8A659;
+    --sd-skip: #DE8070;
     --sd-line: rgba(237,229,214,.16);
     --sd-shadow: 0 2px 4px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.6);
     /* --sd-card intentionally unchanged — the illustrations are painted on warm-white
