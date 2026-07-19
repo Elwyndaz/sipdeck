@@ -313,3 +313,7 @@ WebPs are validated as 512×512, 8,228–24,592 bytes. Local HTTP returned 200 w
 MIME types for `/`, `app.js`, `wheel.json`, water and bottle art. Browser discovery was
 retried after the build and again returned `[]`; no live wheel interaction or console claim
 is made.
+
+Wheel deploy on 2026-07-19: commit `dcce071` pushed to main; Cloudflare Pages deployed via
+wrangler from a staging copy excluding `img-src/`. Both production origins returned 200 for
+`wheel.json` and wheel art after deployment.
