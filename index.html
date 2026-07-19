@@ -84,6 +84,7 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
 .wheel-entry:focus-visible{outline:3px solid var(--sd-accent);outline-offset:3px}
 .wheel-entry[hidden]{display:none}
 .wheel-symbol{width:46px;height:46px;flex:0 0 46px;display:block;view-transition-name:wheel-shared}
+.wheel-symbol .wheel-sector:nth-of-type(even){fill:#ece1cd}
 
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--sd-card);
   border-top:1px solid var(--sd-line);box-shadow:var(--sd-shadow);z-index:10;
@@ -336,9 +337,11 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
     <a class="wheel-entry" id="wheelEntry" href="#/hjul" hidden>
       <svg class="wheel-symbol" viewBox="0 0 100 100" aria-hidden="true">
         <path class="wheel-sector" d="M50 50L37.32 2.67A49 49 0 0 1 62.68 2.67Z"/><path class="wheel-sector" d="M50 50L62.68 2.67A49 49 0 0 1 84.65 15.35Z"/><path class="wheel-sector" d="M50 50L84.65 15.35A49 49 0 0 1 97.33 37.32Z"/><path class="wheel-sector" d="M50 50L97.33 37.32A49 49 0 0 1 97.33 62.68Z"/><path class="wheel-sector" d="M50 50L97.33 62.68A49 49 0 0 1 84.65 84.65Z"/><path class="wheel-sector" d="M50 50L84.65 84.65A49 49 0 0 1 62.68 97.33Z"/><path class="wheel-sector" d="M50 50L62.68 97.33A49 49 0 0 1 37.32 97.33Z"/><path class="wheel-sector" d="M50 50L37.32 97.33A49 49 0 0 1 15.35 84.65Z"/><path class="wheel-sector" d="M50 50L15.35 84.65A49 49 0 0 1 2.67 62.68Z"/><path class="wheel-sector" d="M50 50L2.67 62.68A49 49 0 0 1 2.67 37.32Z"/><path class="wheel-sector" d="M50 50L2.67 37.32A49 49 0 0 1 15.35 15.35Z"/><path class="wheel-sector" d="M50 50L15.35 15.35A49 49 0 0 1 37.32 2.67Z"/>
+        <circle class="wheel-art-ring" cx="50" cy="26" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="29.22" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="74" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="50" cy="74" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="26" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="29.22" r="5.7"/>
         <circle class="wheel-rim" cx="50" cy="50" r="49"/>
         <circle class="wheel-hub" cx="50" cy="50" r="10"/>
         <circle class="wheel-hub-dot" cx="50" cy="50" r="3"/>
+        <path fill="#2f6b3f" d="M42 0h16l-8 13z"/>
       </svg>
       <span id="wheelEntryLabel"></span>
     </a>

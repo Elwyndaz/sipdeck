@@ -331,3 +331,10 @@ cocktail's name links to its recipe detail (`#/favoriter/<id>` via `.fav-open`),
 result. Verified in a Playwright phone viewport (390x760): live start, two spins, compact
 result on-screen, cocktail link -> detail -> back with state kept, zero console messages.
 app.js is 59,856 bytes; 4,264 tests green (six new source guards).
+
+Shot-card and mini-wheel pass on 2026-07-19: `img/hot-shot.webp` and `img/b-52.webp` were
+regenerated from masters with the glass at 42% of the 800px canvas height (the old cards
+had the shot filling the frame like a tumbler; wheel shots use 60% of their square 512
+canvas). The home-entry mini symbol gained the twelve art rings, a green pointer wedge and
+a stronger alternating sector fill (`#ece1cd`, scoped to `.wheel-symbol`) so it reads as
+the prize wheel rather than a blank disc.
