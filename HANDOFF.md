@@ -320,12 +320,14 @@ wrangler from a staging copy excluding `img-src/`. Both production origins retur
 
 Wheel polish on 2026-07-19 (user feedback): the wheel now opens live on the first mood
 (Pigg) instead of the empty intro state, and the home-entry mini symbol is the same
-twelve-sector disc as the big wheel (neutral-mark icons removed). Shot outcomes render
-smaller in sectors (art radius 4.1 vs 5.3) and padded in the result box. Spin duration is
+twelve-sector disc as the big wheel (neutral-mark icons removed). The three shot WebPs in
+`img-wheel/` were regenerated from their `img-src/` masters with the subject scaled to 60%
+of the 512 canvas (same paper pad, q72/m6), so shots read as shot glasses everywhere the
+art is used; a first in-app radius hack was reverted in favor of this. Spin duration is
 6,2-7,4 s (was 5-6 s). The result box lost its button row: the controls button and hub
 relabel to "Snurra igen" and "Nytt hjul" joins the controls row after a spin. A landed
 cocktail's name links to its recipe detail (`#/favoriter/<id>` via `.fav-open`), and
 `resetWheelVisit` is skipped while a detail is open so Tillbaka returns to the intact
 result. Verified in a Playwright phone viewport (390x760): live start, two spins, compact
 result on-screen, cocktail link -> detail -> back with state kept, zero console messages.
-app.js is 59,996 bytes; 4,265 tests green (seven new source guards).
+app.js is 59,856 bytes; 4,264 tests green (six new source guards).

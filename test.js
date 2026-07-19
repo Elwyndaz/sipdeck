@@ -229,8 +229,6 @@ check(appSource.includes('navigator.vibrate(18)') && appSource.includes('wheelMu
   'wheel feedback: one landing haptic and visit-local sound default');
 check(appSource.includes('!wheelMoodId && wheelData && db'),
   'wheel start: opens live on the first mood, no empty intro wheel');
-check(appSource.includes("entry.category === 'shot' ? 4.1 : 5.3"),
-  'wheel art: shot outcomes rendered smaller than full glasses');
 check(appSource.split("wheelResult ? 'wheel_respin' : 'wheel_spin'").length === 3,
   'wheel respin: hub and controls button relabel in place of a result-box button row');
 check(!appSource.includes('wheel-result-actions'),

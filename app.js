@@ -839,8 +839,7 @@ if (typeof document !== 'undefined') (function () {
       const rotation = flip ? degrees + 180 : degrees;
       const x = flip ? 6 : 94, anchor = flip ? 'start' : 'end';
       const label = localText(entry.sector);
-      const artR = entry.category === 'shot' ? 4.1 : 5.3; // shots drawn smaller
-      return `<path class="wheel-sector" data-sector="${index}" d="${wheelSectorPath(index)}"/><circle class="wheel-art-ring" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.7"/><image class="wheel-art" href="${esc(entry.art)}" x="${(cx - artR).toFixed(3)}" y="${(cy - artR).toFixed(3)}" width="${artR * 2}" height="${artR * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-art-${index})"/><text class="wheel-sector-label" x="${x}" y="50.9" text-anchor="${anchor}" transform="rotate(${rotation} 50 50)">${esc(label)}</text>`;
+      return `<path class="wheel-sector" data-sector="${index}" d="${wheelSectorPath(index)}"/><circle class="wheel-art-ring" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.7"/><image class="wheel-art" href="${esc(entry.art)}" x="${(cx - 5.3).toFixed(3)}" y="${(cy - 5.3).toFixed(3)}" width="10.6" height="10.6" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-art-${index})"/><text class="wheel-sector-label" x="${x}" y="50.9" text-anchor="${anchor}" transform="rotate(${rotation} 50 50)">${esc(label)}</text>`;
     }).join('');
     const choices = lineup.map(entry => localText(entry.sector)).join(', ');
     return `<svg viewBox="0 0 100 100" role="img" aria-label="${esc(choices)}"><defs>${defs}</defs>${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
@@ -861,7 +860,7 @@ if (typeof document !== 'undefined') (function () {
     const name = entry.kind === 'cocktail'
       ? `<button class="fav-open" data-id="${esc(entry.outcomeId)}">${esc(localText(entry.result))} ›</button>`
       : esc(localText(entry.result));
-    return `<img class="wheel-result-art${entry.category === 'shot' ? ' shot' : ''}" src="${esc(entry.art)}" alt="">
+    return `<img class="wheel-result-art" src="${esc(entry.art)}" alt="">
       <div><p class="wheel-result-label">${esc(t(lang(), 'wheel_result'))}</p>
       <h2 class="wheel-result-name">${name}</h2>${safety}</div>`;
   }
