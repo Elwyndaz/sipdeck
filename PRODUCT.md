@@ -58,6 +58,12 @@ lists). Personal + friends first, but every decision assumes it goes public late
   Codex built-in `gpt-image-2` generates one drink at a time using the approved first
   images as style-only references; production filename = `img/<drink-id>.webp`.
   Lazy-load only the top 3–4 cards. SVG placeholder until an image exists.
+- **Spinning wheel**: a starting-page "Pick for me" / "Välj åt mig" entry opens the
+  full-screen `#/hjul` individual order chooser. Its five-step drunkenness slider is
+  visit-local, never persisted. The wheel always shows exactly 12 honest sectors;
+  lower levels favor stronger choices, level 4 removes shots and adds water/Red Bull,
+  and level 5 visibly has seven water sectors and is hard-coded to land on water.
+  Vocabulary is "spinning wheel", never roulette; avoid casino visual language.
 
 ## Visual identity (locked 2026-07-18)
 
@@ -257,6 +263,22 @@ mixable drinks.**
 - Firebase Auth (email+password and/or Google), identity only. Logged-out = full app.
 - Whole-state blob PUT (debounced ~800 ms) to Worker + D1; on login/load server state wins
   if present, else local uploads. Last-write-wins. `DELETE /account` = GDPR wipe.
+
+### Epic J — Spinning wheel
+
+**J1. As an individual orderer, I want a polished wheel to choose my next normal bar order.**
+- The starting-page mini-wheel expands into a full-screen route with a graceful fallback
+  when View Transitions are unavailable. A required five-step EN/SV mood slider builds a
+  12-sector lineup from current `bar: true` cocktails and the wheel-only catalog.
+- Every normal spin preselects one eligible visible sector and animates that exact sector
+  to the pointer in 5–6 seconds. The highest level may show non-water decoys but only its
+  seven visible water sectors are eligible. Re-spin keeps the lineup; New wheel rebuilds it.
+- Sound starts on for each wheel visit and has a visible mute control. Ticks, one landing
+  haptic and the result card progressively enhance the tactile feel. Reduced motion skips
+  rotation and reveals the result quickly. Results/history do not persist or change the
+  exact `sipdeck` localStorage blob.
+- Wheel-only art is committed as 512×512 WebP under `img-wheel/`; reusable portrait PNG
+  masters and 640×800 card-ready variants remain local under gitignored `img-src/`.
 
 ## Non-goals (v1)
 

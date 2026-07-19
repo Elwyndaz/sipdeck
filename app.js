@@ -6,6 +6,13 @@ const STRINGS = {
     tagline: 'Swipe. Save. Shake.',
     nav_deck: 'Deck', nav_favorites: 'Favorites', nav_pantry: 'Pantry', nav_settings: 'Settings',
     nav_label: 'Main navigation',
+    wheel_entry: 'Pick for me', wheel_title: 'Pick for me', wheel_back: 'Back',
+    wheel_mute: 'Mute wheel sound', wheel_unmute: 'Turn wheel sound on',
+    wheel_intro: 'How are you feeling?', wheel_choose: 'Choose a mood to build your wheel.',
+    wheel_mood_label: 'Drunkenness level', wheel_spin: 'Spin', wheel_respin: 'Re-spin',
+    wheel_new: 'New wheel', wheel_result: 'Your order',
+    wheel_loading: 'Preparing the wheel...', wheel_error: "Couldn't load the wheel. Reload to try again.",
+    wheel_spinning: 'The wheel is spinning', wheel_ready: 'Wheel ready to spin',
     deck_empty: 'No drinks yet. Deal the deck once drinks.json ships.',
     deck_loading: 'Dealing the deck...',
     deck_error: "Couldn't load the deck. Reload to try again.",
@@ -42,6 +49,13 @@ const STRINGS = {
     unit_slice: 'slice', unit_garnish: 'garnish', unit_top: 'top up',
   },
   sv: {
+    wheel_entry: 'Välj åt mig', wheel_title: 'Välj åt mig', wheel_back: 'Tillbaka',
+    wheel_mute: 'Stäng av hjulljudet', wheel_unmute: 'Slå på hjulljudet',
+    wheel_intro: 'Hur känns det?', wheel_choose: 'Välj en känsla för att bygga ditt hjul.',
+    wheel_mood_label: 'Berusningsnivå', wheel_spin: 'Snurra', wheel_respin: 'Snurra igen',
+    wheel_new: 'Nytt hjul', wheel_result: 'Din beställning',
+    wheel_loading: 'Förbereder hjulet...', wheel_error: 'Kunde inte ladda hjulet. Ladda om sidan för att försöka igen.',
+    wheel_spinning: 'Hjulet snurrar', wheel_ready: 'Hjulet är redo att snurra',
     tagline: 'Svep. Spara. Skaka.',
     nav_deck: 'Kortlek', nav_favorites: 'Favoriter', nav_pantry: 'Skafferi', nav_settings: 'Inställningar',
     nav_label: 'Huvudnavigering',
@@ -81,8 +95,6 @@ const STRINGS = {
     unit_slice: 'skiva', unit_garnish: 'garnering', unit_top: 'toppa upp',
   },
 };
-// No em-dashes; decimal comma / space thousands separator rules apply once numbers show up
-// (unit engine, BACKLOG 3) — nothing here needs them yet.
 function t(lang, key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
 
 // ---------- pure functions (exported for test.js) ----------
@@ -106,9 +118,6 @@ function defaultState(lang) {
   };
 }
 
-// Validates/migrates whatever was in localStorage into the exact blob shape from PRODUCT.md
-// "State" — never throws (a corrupt/foreign blob just falls back to defaults), never stores
-// derived data. `lang` is the navigator-detected fallback for a missing/invalid settings.lang.
 function normalizeState(raw, lang) {
   const d = defaultState(lang);
   if (!raw || typeof raw !== 'object') return d;
@@ -139,28 +148,22 @@ function favoriteIdFromHash(hash) {
 }
 
 // ---------- unit engine (BACKLOG 3) — canonical ml, linear scaling, bar rounding, display ----------
-// units that never convert: qty scales linearly, no rounding beyond a sane display
 const NONCONVERTIBLE_UNITS = ['dash', 'barspoon', 'piece', 'leaf', 'slice', 'garnish', 'top'];
 
-// scaled = ml x servings (linear, servings 1-8 per PRODUCT.md)
 function scaleMl(ml, servings) { return ml * servings; }
 
-// ponytail: PRODUCT.md pins rounding but not the ml/oz factor; 30 ml/oz is the standard bar
-// pour conversion, used here since nothing else is specified.
 function convert(ml, unit) {
   if (unit === 'cl') return ml / 10;
   if (unit === 'oz') return ml / 30;
   return ml; // ml passthrough
 }
 
-// bar rounding AFTER scaling+conversion: oz -> nearest 1/4, cl -> nearest 0.5, ml -> nearest 5
 function roundForUnit(value, unit) {
   if (unit === 'oz') return Math.round(value * 4) / 4;
   if (unit === 'cl') return Math.round(value * 2) / 2;
   return Math.round(value / 5) * 5; // ml
 }
 
-// sv: decimal comma + space thousands; en: decimal point + comma thousands. No em-dashes.
 function formatNumber(value, lang) {
   const [intPart, decPart] = (Math.round(value * 100) / 100).toFixed(2).split('.');
   const dec = decPart.replace(/0+$/, '');
@@ -169,8 +172,6 @@ function formatNumber(value, lang) {
   return dec ? grouped + (lang === 'sv' ? ',' : '.') + dec : grouped;
 }
 
-// oz vulgar-fraction display: value already rounded to nearest 1/4. Zero whole part shows
-// just the fraction (e.g. "¾", not "0¾").
 const OZ_FRACTIONS = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
 function formatOz(value, lang) {
   const whole = Math.floor(value);
@@ -180,7 +181,6 @@ function formatOz(value, lang) {
   return whole === 0 ? fracChar : formatNumber(whole, lang) + fracChar;
 }
 
-// Fisher-Yates, returns a new array; rng injectable so tests can be deterministic.
 function shuffle(arr, rng) {
   const a = arr.slice(), r = rng || Math.random;
   for (let i = a.length - 1; i > 0; i--) {
@@ -227,8 +227,141 @@ function filterDrinks(drinks, filters, pantry) {
     .filter(drink => matchesFilters(drink, filters) && (!have || canMake(drink, have)));
 }
 
-// Restrained inline fallbacks for every glass used by the current seed. Unknown future
-// values degrade to the rocks silhouette without changing the card's dimensions.
+// ---------- spinning wheel: pure catalog, weighting and geometry ----------
+function wheelRng(rng) {
+  const n = Number((rng || Math.random)());
+  return Number.isFinite(n) ? Math.max(0, Math.min(0.999999999, n)) : 0;
+}
+
+function weightedSampleUnique(items, count, weightFn, rng) {
+  const pool = (Array.isArray(items) ? items : []).slice();
+  const picked = [];
+  while (pool.length && picked.length < count) {
+    const weights = pool.map(item => Math.max(0, Number(weightFn(item)) || 0));
+    const total = weights.reduce((sum, weight) => sum + weight, 0);
+    if (total <= 0) break;
+    let target = wheelRng(rng) * total;
+    let index = weights.length - 1;
+    for (let i = 0; i < weights.length; i++) {
+      target -= weights[i];
+      if (target < 0) { index = i; break; }
+    }
+    picked.push(pool.splice(index, 1)[0]);
+  }
+  return picked;
+}
+
+function wheelCocktailWeight(drink, mood) {
+  if (!drink || drink.bar !== true) return 0;
+  const strong = Array.isArray(drink.tags) && drink.tags.includes('strong');
+  return strong ? Number(mood && mood.strongWeight) || 0 : 1;
+}
+
+function wheelDrinkName(drink) {
+  if (!drink) return { en: '', sv: '' };
+  if (typeof drink.name === 'string') return { en: drink.name, sv: drink.name };
+  return { en: drink.name.en || drink.name.sv || drink.id, sv: drink.name.sv || drink.name.en || drink.id };
+}
+
+function buildSpinLineup(wheel, moodId, drinks, rng) {
+  if (!wheel || !Array.isArray(wheel.moods) || !wheel.outcomes) return [];
+  const mood = wheel.moods.find(item => item.id === moodId);
+  if (!mood || !Array.isArray(mood.slots) || mood.slots.length !== 12) return [];
+  const useBottle = moodId === 'fresh' && mood.slots.includes('flex') && wheelRng(rng) < 1 / 3;
+  const cocktailCount = mood.slots.filter(slot => slot === 'cocktail').length +
+    (mood.slots.includes('flex') && !useBottle ? 1 : 0);
+  const cocktailPool = (Array.isArray(drinks) ? drinks : [])
+    .filter(drink => wheelCocktailWeight(drink, mood) > 0);
+  let cocktailPicks = weightedSampleUnique(
+    cocktailPool, cocktailCount, drink => wheelCocktailWeight(drink, mood), rng);
+  while (cocktailPicks.length < cocktailCount && cocktailPool.length) {
+    cocktailPicks = cocktailPicks.concat(weightedSampleUnique(
+      cocktailPool, Math.min(cocktailCount - cocktailPicks.length, cocktailPool.length),
+      drink => wheelCocktailWeight(drink, mood), rng));
+  }
+  let cocktailIndex = 0;
+  const categoryPools = {};
+  const categoryIndexes = {};
+  const artIndexes = {};
+  Object.keys(wheel.outcomes).forEach(id => {
+    const outcome = wheel.outcomes[id];
+    (categoryPools[outcome.category] || (categoryPools[outcome.category] = [])).push(id);
+  });
+  Object.keys(categoryPools).forEach(category => {
+    categoryPools[category] = shuffle(categoryPools[category], rng);
+    categoryIndexes[category] = 0;
+  });
+  function simpleEntry(id) {
+    const outcome = wheel.outcomes[id];
+    if (!outcome) return null;
+    const arts = Array.isArray(outcome.art) ? outcome.art : [];
+    const artIndex = artIndexes[id] || 0;
+    artIndexes[id] = artIndex + 1;
+    return {
+      kind: 'simple', outcomeId: id, category: outcome.category,
+      sector: outcome.sector, result: outcome.result,
+      art: arts.length ? arts[artIndex % arts.length] : '',
+      eligible: !mood.forcedOutcome || id === mood.forcedOutcome,
+    };
+  }
+  function takeCategory(category) {
+    const pool = categoryPools[category] || [];
+    if (!pool.length) return null;
+    const index = categoryIndexes[category] || 0;
+    categoryIndexes[category] = index + 1;
+    return simpleEntry(pool[index % pool.length]);
+  }
+  function takeCocktail() {
+    const drink = cocktailPicks[cocktailIndex++];
+    if (!drink) return null;
+    const name = wheelDrinkName(drink);
+    return {
+      kind: 'cocktail', outcomeId: drink.id, category: 'cocktail',
+      sector: name, result: name, art: `img/${drink.id}.webp`,
+      eligible: !mood.forcedOutcome,
+    };
+  }
+  let lineup = mood.slots.map(slot => {
+    if (slot === 'cocktail') return takeCocktail();
+    if (slot === 'flex') return useBottle ? takeCategory('bottle') : takeCocktail();
+    return takeCategory(slot);
+  }).filter(Boolean);
+  if (lineup.length !== 12) return [];
+  const offset = Math.floor(wheelRng(rng) * lineup.length);
+  lineup = lineup.slice(offset).concat(lineup.slice(0, offset));
+  return lineup.map((entry, index) => Object.assign({ key: `${entry.kind}-${entry.outcomeId}-${index}` }, entry));
+}
+
+function selectWheelIndex(lineup, rng) {
+  const eligible = (Array.isArray(lineup) ? lineup : [])
+    .map((entry, index) => ({ entry, index })).filter(item => item.entry.eligible !== false);
+  if (!eligible.length) return -1;
+  return eligible[Math.floor(wheelRng(rng) * eligible.length)].index;
+}
+
+function wheelLandingRotation(current, index, rng, count) {
+  const sectors = count || 12;
+  const step = 360 / sectors;
+  const halfSafe = step * 0.34;
+  const offset = (wheelRng(rng) * 2 - 1) * halfSafe;
+  const desired = ((-index * step - offset) % 360 + 360) % 360;
+  const currentMod = ((current % 360) + 360) % 360;
+  const travel = ((desired - currentMod) % 360 + 360) % 360;
+  const turns = 6 + Math.floor(wheelRng(rng) * 4);
+  return current + turns * 360 + travel;
+}
+
+function wheelSectorPath(index, count, radius) {
+  const sectors = count || 12, r = radius || 49;
+  const step = 360 / sectors, start = -90 + index * step - step / 2, end = start + step;
+  const point = angle => {
+    const rad = angle * Math.PI / 180;
+    return [50 + r * Math.cos(rad), 50 + r * Math.sin(rad)];
+  };
+  const a = point(start), b = point(end);
+  return `M50 50L${a[0].toFixed(3)} ${a[1].toFixed(3)}A${r} ${r} 0 0 1 ${b[0].toFixed(3)} ${b[1].toFixed(3)}Z`;
+}
+
 const GLASS_SILHOUETTES = {
   coupe: '<path d="M18 25h60c-3 17-13 25-30 25S21 42 18 25Z"/><path d="M48 50v27M32 79h32"/>',
   highball: '<path d="M29 14h38l-4 66H33l-4-66Z"/><path d="M34 25h28"/>',
@@ -242,10 +375,6 @@ function glassPlaceholder(glass) {
   return `<svg viewBox="0 0 96 96" class="glass-ph glass-${key}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">${GLASS_SILHOUETTES[key]}</g></svg>`;
 }
 
-// Top-level: one ingredient line + servings + active display unit + lang -> display string.
-// line is either { ml } (convertible, canonical) or { qty, unit } (non-convertible, passthrough).
-// Non-convertible unit labels are returned as their raw string-table keys (e.g. "dash") for the
-// caller to translate — the card back (item 4) owns rendering/translation, not this pure layer.
 function formatAmount(line, servings, unit, lang) {
   if (typeof line.ml === 'number') {
     const rounded = roundForUnit(convert(scaleMl(line.ml, servings), unit), unit);
@@ -280,6 +409,8 @@ if (typeof module !== 'undefined') module.exports = {
   NONCONVERTIBLE_UNITS, scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, swipeDirectionForKey, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
+  weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
+  wheelLandingRotation, wheelSectorPath,
   GLASS_SILHOUETTES, glassPlaceholder,
 };
 
@@ -293,21 +424,53 @@ if (typeof document !== 'undefined') (function () {
   let raw = null;
   try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { raw = null; }
   let state = normalizeState(raw, lang0);
-  // ponytail: save is synchronous + unconditional, no debounce — that's a v1.1/server concern
-  // (PRODUCT.md's 800ms debounce is for PUT /state, not this localStorage write).
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
   save(); // persist first-run defaults immediately
 
   function lang() { return state.settings.lang; }
 
-  // ponytail: drinks data is fetched once into a module-level var, never the state blob
-  // (state stays the sync-shaped PRODUCT.md object only). Coarse re-render on load/error.
   let db = null;       // null = loading; {ingredients, drinks} once fetch resolves
   let drinksFailed = false;
   fetch('drinks.json').then(r => r.json()).then(data => {
     db = { ingredients: data.ingredients || {}, drinks: Array.isArray(data.drinks) ? data.drinks : [] };
     render();
   }).catch(() => { drinksFailed = true; render(); });
+
+  let wheelData = null, wheelFailed = false, wheelPromise = null;
+  let wheelMoodId = null, wheelLineup = null, wheelResult = null;
+  let wheelRotation = 0, wheelSpinning = false, wheelMuted = false, wheelLevel5Spins = 0;
+  let wheelVisitActive = false, wheelOpenedFromHome = false, wheelAnimation = null;
+
+  function loadWheelData() {
+    if (wheelPromise) return wheelPromise;
+    wheelPromise = fetch('wheel.json').then(r => {
+      if (!r.ok) throw new Error('wheel data');
+      return r.json();
+    }).then(data => {
+      wheelData = data;
+      wheelFailed = false;
+      if ((location.hash || '#/') === '#/hjul') render();
+      return data;
+    }).catch(() => {
+      wheelFailed = true;
+      if ((location.hash || '#/') === '#/hjul') render();
+    });
+    return wheelPromise;
+  }
+
+  function resetWheelVisit() {
+    if (wheelAnimation) wheelAnimation.cancel();
+    wheelAnimation = null;
+    wheelMoodId = null;
+    wheelLineup = null;
+    wheelResult = null;
+    wheelRotation = 0;
+    wheelSpinning = false;
+    wheelMuted = false;
+    wheelLevel5Spins = 0;
+    wheelVisitActive = false;
+    wheelOpenedFromHome = false;
+  }
 
   // ---------- views ----------
   function viewDeck() {
@@ -332,7 +495,6 @@ if (typeof document !== 'undefined') (function () {
   // ---------- deck: the one imperative-DOM zone (drag/flip animate outside re-renders) ----------
   let deckQueue = null; // drink ids, [0] = top card; survives view switches, reshuffles on exhaustion
   let flippedId = null; // top-card id when showing the recipe back
-  // Favorites detail state is transient and deliberately stays outside the sync-shaped blob.
   let favOpenId = null;  // id of the favorite currently opened in detail view, or null = list
   let favChecked = new Set(); // mixing progress for the open favorite; resets when it closes
   let favHistoryEntry = false; // true only when this session opened detail from the favorite list
@@ -371,7 +533,6 @@ if (typeof document !== 'undefined') (function () {
     return `${glassPlaceholder(drink.glass)}<img class="cocktail-art" src="img/${esc(drink.id)}.webp" alt="" loading="lazy" decoding="async" draggable="false">`;
   }
 
-  // opts: { flipped, tint } — both optional; the deck uses the defaults.
   function buildCard(drink, depth, opts) {
     opts = opts || {};
     const flipped = 'flipped' in opts ? opts.flipped : (depth === 0 && flippedId === drink.id);
@@ -422,7 +583,6 @@ if (typeof document !== 'undefined') (function () {
     ensureQueue();
     const byId = {};
     db.drinks.forEach(d => { byId[d.id] = d; });
-    // back-to-front so the top card paints last (natural stacking, no z-index bookkeeping)
     const visible = deckQueue.slice(0, 4);
     for (let i = visible.length - 1; i >= 0; i--) deckEl.appendChild(buildCard(byId[visible[i]], i));
     deckEl.addEventListener('click', e => {
@@ -438,8 +598,6 @@ if (typeof document !== 'undefined') (function () {
     attachDrag(deckEl.querySelector('.card[data-depth="0"]'));
   }
 
-  // Promote the existing live cards while the committed card flies away. This preserves
-  // their computed depth transforms, so depth 1 -> 0 animates instead of snapping after render().
   function promoteDeck(leavingCard) {
     const deckEl = $('#deck');
     if (!deckEl) return;
@@ -490,7 +648,6 @@ if (typeof document !== 'undefined') (function () {
       const dt = e.timeStamp - lastT;
       if (dt > 0) { vx = (e.clientX - lastX) / dt; lastX = e.clientX; lastT = e.timeStamp; }
       card.style.transform = `translate(${dx}px, ${dy * 0.4}px) rotate(${dx * 0.04}deg)`;
-      // edge tint past 30% of the commit threshold, before release (design spec)
       const p = dx / threshold();
       const a = Math.abs(p) < 0.3 ? 0 : Math.min(1, (Math.abs(p) - 0.3) / 0.7);
       tintSave.style.opacity = p > 0 ? a : 0;
@@ -658,6 +815,102 @@ if (typeof document !== 'undefined') (function () {
     return `${title}<p class="pantry-intro">${esc(t(lang(), 'pantry_intro'))}</p>${fieldsets}`;
   }
 
+  function wheelMood() { return wheelData && wheelData.moods.find(mood => mood.id === wheelMoodId) || null; }
+  function localText(value) { return value && (value[lang()] || value.en) || ''; }
+  function wheelWordmark() { return '<span class="wheel-top-wordmark"><img src="design/wordmark.svg" alt="Sipdeck"></span>'; }
+
+  function neutralWheelSvg() {
+    const sectors = Array.from({ length: 12 }, (_, index) =>
+      `<path class="wheel-sector" d="${wheelSectorPath(index)}"/>`).join('');
+    return `<svg class="wheel-neutral" viewBox="0 0 100 100" aria-hidden="true">${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><g class="neutral-mark"><path d="M42 29h16l-8 11-8-11Zm8 11v9m-7 3h14"/><path d="M35 62h9l-1.3 11h-6.4L35 62Zm1.5 3h6"/><path d="M64 66c0 3-2.2 5.2-5 5.2S54 69 54 66c0-2.5 3.4-6.7 5-8.7 1.6 2 5 6.2 5 8.7Z"/></g><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
+  }
+
+  function wheelSvgMarkup(lineup) {
+    if (!Array.isArray(lineup) || lineup.length !== 12) return neutralWheelSvg();
+    const defs = lineup.map((entry, index) => {
+      const angle = (-90 + index * 30) * Math.PI / 180;
+      const cx = 50 + 24 * Math.cos(angle), cy = 50 + 24 * Math.sin(angle);
+      return `<clipPath id="wheel-art-${index}"><circle cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.3"/></clipPath>`;
+    }).join('');
+    const sectors = lineup.map((entry, index) => {
+      const degrees = -90 + index * 30, angle = degrees * Math.PI / 180;
+      const cx = 50 + 24 * Math.cos(angle), cy = 50 + 24 * Math.sin(angle);
+      const normalized = (degrees + 360) % 360, flip = normalized > 90 && normalized < 270;
+      const rotation = flip ? degrees + 180 : degrees;
+      const x = flip ? 6 : 94, anchor = flip ? 'start' : 'end';
+      const label = localText(entry.sector);
+      return `<path class="wheel-sector" data-sector="${index}" d="${wheelSectorPath(index)}"/><circle class="wheel-art-ring" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.7"/><image class="wheel-art" href="${esc(entry.art)}" x="${(cx - 5.3).toFixed(3)}" y="${(cy - 5.3).toFixed(3)}" width="10.6" height="10.6" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-art-${index})"/><text class="wheel-sector-label" x="${x}" y="50.9" text-anchor="${anchor}" transform="rotate(${rotation} 50 50)">${esc(label)}</text>`;
+    }).join('');
+    const choices = lineup.map(entry => localText(entry.sector)).join(', ');
+    return `<svg viewBox="0 0 100 100" role="img" aria-label="${esc(choices)}"><defs>${defs}</defs>${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
+  }
+
+  function wheelSupportingCopy(mood) {
+    if (!mood) return t(lang(), 'wheel_choose');
+    if (mood.id === 'shitfaced' && wheelLevel5Spins > 0 && Array.isArray(mood.repeatCopy)) {
+      return localText(mood.repeatCopy[Math.min(wheelLevel5Spins - 1, mood.repeatCopy.length - 1)]);
+    }
+    return localText(mood.copy);
+  }
+
+  function wheelResultMarkup(entry, mood) {
+    if (!entry) return '';
+    const safety = mood && mood.forcedOutcome && mood.safety
+      ? `<p class="wheel-result-note">${esc(localText(mood.safety))}</p>` : '';
+    return `<img class="wheel-result-art" src="${esc(entry.art)}" alt="">
+      <div><p class="wheel-result-label">${esc(t(lang(), 'wheel_result'))}</p>
+      <h2 class="wheel-result-name">${esc(localText(entry.result))}</h2>${safety}</div>
+      <div class="wheel-result-actions">
+        <button class="wheel-action primary" data-wheel-act="spin">${esc(t(lang(), 'wheel_respin'))}</button>
+        <button class="wheel-action" data-wheel-act="new">${esc(t(lang(), 'wheel_new'))}</button>
+        <button class="wheel-action" data-wheel-act="back">${esc(t(lang(), 'wheel_back'))}</button>
+      </div>`;
+  }
+
+  function viewWheel() {
+    loadWheelData();
+    const mood = wheelMood();
+    const moods = wheelData && Array.isArray(wheelData.moods) ? wheelData.moods : [];
+    const moodIndex = mood ? moods.indexOf(mood) : -1;
+    const heading = mood
+      ? `<h1><span class="wheel-emoji" aria-hidden="true">${esc(mood.emoji)}</span>${esc(localText(mood.name))}</h1>
+         <p>${esc(wheelSupportingCopy(mood))}</p>`
+      : `<h1>${esc(t(lang(), 'wheel_intro'))}</h1><p>${esc(t(lang(), 'wheel_choose'))}</p>`;
+    const stops = moods.length === 5 ? moods.map(item => `<span aria-hidden="true">${esc(item.emoji)}</span>`).join('')
+      : '<span>•</span><span>•</span><span>•</span><span>•</span><span>•</span>';
+    const loading = !wheelData && !wheelFailed;
+    const status = wheelFailed ? t(lang(), 'wheel_error') : (loading ? t(lang(), 'wheel_loading') : '');
+    const canSpin = !!(mood && wheelLineup && !wheelSpinning);
+    const disc = wheelLineup ? wheelSvgMarkup(wheelLineup) : neutralWheelSvg();
+    const result = wheelResult ? wheelResultMarkup(wheelResult, mood) : '';
+    return `<section class="wheel-screen">
+      <header class="wheel-topbar">
+        <button class="wheel-back" data-wheel-act="back">‹ ${esc(t(lang(), 'wheel_back'))}</button>
+        ${wheelWordmark()}
+        <button class="wheel-sound" data-wheel-act="sound" aria-label="${esc(t(lang(), wheelMuted ? 'wheel_unmute' : 'wheel_mute'))}"
+          aria-pressed="${wheelMuted ? 'true' : 'false'}">${wheelMuted ? '🔇' : '🔊'}</button>
+      </header>
+      <div class="wheel-body">
+        <div class="wheel-heading">${heading}</div>
+        <div class="wheel-stage" id="wheelStage">
+          <div class="wheel-pointer" id="wheelPointer" aria-hidden="true"></div>
+          <div class="wheel-disc" id="wheelDisc" style="transform:rotate(${wheelRotation}deg)">${disc}</div>
+          <button class="wheel-hub-button" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), 'wheel_spin'))}</button>
+        </div>
+        <section class="wheel-controls${mood ? '' : ' unset'}">
+          <p class="wheel-controls-title">${esc(status || t(lang(), 'wheel_mood_label'))}</p>
+          <input class="wheel-range" id="wheelMood" type="range" min="1" max="5" step="1" value="${moodIndex >= 0 ? moodIndex + 1 : 3}"
+            aria-label="${esc(t(lang(), 'wheel_mood_label'))}" aria-valuetext="${esc(mood ? localText(mood.name) : t(lang(), 'wheel_choose'))}"
+            ${wheelData && db && !wheelSpinning ? '' : 'disabled'}>
+          <div class="wheel-stops">${stops}</div>
+          ${wheelResult ? '' : `<div class="wheel-actions"><button class="wheel-action primary" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), 'wheel_spin'))}</button></div>`}
+        </section>
+        <section class="wheel-result" id="wheelResult" aria-live="polite"${wheelResult ? '' : ' hidden'}>${result}</section>
+        <p class="wheel-live" id="wheelLive" aria-live="polite">${esc(canSpin ? t(lang(), 'wheel_ready') : status)}</p>
+      </div>
+    </section>`;
+  }
+
   function viewSettings() {
     const s = state.settings;
     const bool = v => t(lang(), v ? 'yes' : 'no');
@@ -674,9 +927,172 @@ if (typeof document !== 'undefined') (function () {
       </dl>`;
   }
 
+  function random01() {
+    if (window.crypto && window.crypto.getRandomValues) {
+      const value = new Uint32Array(1);
+      window.crypto.getRandomValues(value);
+      return value[0] / 4294967296;
+    }
+    return Math.random();
+  }
+
+  function selectWheelMood(value) {
+    if (!wheelData || !db || wheelSpinning) return;
+    const mood = wheelData.moods[Number(value) - 1];
+    if (!mood) return;
+    wheelMoodId = mood.id;
+    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+    wheelResult = null;
+    wheelRotation = 0;
+    render();
+    const spin = $('#view [data-wheel-act="spin"]');
+    if (spin) spin.focus();
+  }
+
+  function newWheel() {
+    if (!wheelData || !db || !wheelMoodId || wheelSpinning) return;
+    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+    wheelResult = null;
+    wheelRotation = 0;
+    render();
+  }
+
+  function closeWheel() {
+    if (wheelOpenedFromHome) history.back();
+    else {
+      history.replaceState(null, '', '#/');
+      renderRoute();
+    }
+  }
+
+  let wheelAudio = null;
+  function audioContext() {
+    if (wheelMuted) return null;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    if (!wheelAudio) wheelAudio = new AudioCtx();
+    if (wheelAudio.state === 'suspended') wheelAudio.resume();
+    return wheelAudio;
+  }
+
+  function wheelTone(frequency, duration, volume, delay) {
+    const context = audioContext();
+    if (!context) return;
+    const start = context.currentTime + (delay || 0);
+    const oscillator = context.createOscillator(), gain = context.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(Math.max(0.0001, volume), start);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    oscillator.connect(gain); gain.connect(context.destination);
+    oscillator.start(start); oscillator.stop(start + duration);
+  }
+
+  function tickWheel() {
+    wheelTone(920, .025, .018, 0);
+    const pointer = $('#wheelPointer');
+    if (!pointer) return;
+    pointer.classList.remove('tick');
+    void pointer.offsetWidth;
+    pointer.classList.add('tick');
+  }
+
+  function landingSound() {
+    wheelTone(390, .12, .035, 0);
+    wheelTone(560, .18, .028, .07);
+  }
+
+  function renderedRotation(element) {
+    const transform = getComputedStyle(element).transform;
+    if (!transform || transform === 'none') return 0;
+    const match = transform.match(/^matrix\(([^)]+)\)$/);
+    if (!match) return 0;
+    const values = match[1].split(',').map(Number);
+    return Math.atan2(values[1], values[0]) * 180 / Math.PI;
+  }
+
+  function finishWheelSpin(index, endRotation, reduced) {
+    const disc = $('#wheelDisc'), stage = $('#wheelStage'), mood = wheelMood();
+    if (!disc || !stage || !wheelLineup || !wheelLineup[index]) return;
+    if (!reduced) {
+      disc.style.transform = `rotate(${endRotation}deg)`;
+      wheelRotation = endRotation;
+    }
+    wheelAnimation = null;
+    wheelSpinning = false;
+    wheelResult = wheelLineup[index];
+    if (mood && mood.id === 'shitfaced') wheelLevel5Spins++;
+    stage.classList.add('wheel-win');
+    const winning = disc.querySelector(`[data-sector="${index}"]`);
+    if (winning) winning.dataset.winning = 'true';
+    const result = $('#wheelResult');
+    if (result) {
+      result.innerHTML = wheelResultMarkup(wheelResult, mood);
+      result.hidden = false;
+    }
+    const controlsActions = $('#view .wheel-controls .wheel-actions');
+    if (controlsActions) controlsActions.hidden = true;
+    const hub = $('#view .wheel-hub-button');
+    if (hub) { hub.disabled = false; hub.textContent = t(lang(), 'wheel_respin'); }
+    const range = $('#wheelMood');
+    if (range) range.disabled = false;
+    const copy = $('#view .wheel-heading p');
+    if (copy && mood) copy.textContent = wheelSupportingCopy(mood);
+    const live = $('#wheelLive');
+    if (live) live.textContent = localText(wheelResult.result);
+    $('#view .wheel-result-art')?.addEventListener('error', e => { e.currentTarget.hidden = true; }, { once: true });
+    landingSound();
+    if (navigator.vibrate) navigator.vibrate(18);
+  }
+
+  function spinWheel() {
+    if (wheelSpinning || !wheelLineup || wheelLineup.length !== 12) return;
+    const disc = $('#wheelDisc'), stage = $('#wheelStage');
+    if (!disc || !stage) return;
+    const index = selectWheelIndex(wheelLineup, random01);
+    if (index < 0) return;
+    wheelSpinning = true;
+    wheelResult = null;
+    stage.classList.remove('wheel-win');
+    disc.querySelectorAll('[data-winning]').forEach(item => item.removeAttribute('data-winning'));
+    const result = $('#wheelResult');
+    if (result) { result.hidden = true; result.innerHTML = ''; }
+    $('#view').querySelectorAll('[data-wheel-act="spin"],#wheelMood').forEach(control => { control.disabled = true; });
+    const live = $('#wheelLive');
+    if (live) live.textContent = t(lang(), 'wheel_spinning');
+    audioContext(); // unlock Web Audio from the explicit user gesture
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !disc.animate) {
+      setTimeout(() => finishWheelSpin(index, wheelRotation, true), 180);
+      return;
+    }
+    const end = wheelLandingRotation(wheelRotation, index, random01, 12);
+    const travel = end - wheelRotation, duration = 5000 + Math.round(random01() * 1000);
+    wheelAnimation = disc.animate([
+      { transform: `rotate(${wheelRotation}deg)`, offset: 0, easing: 'cubic-bezier(.45,0,1,1)' },
+      { transform: `rotate(${wheelRotation + travel * .08}deg)`, offset: .12, easing: 'cubic-bezier(.08,.58,.12,1)' },
+      { transform: `rotate(${end}deg)`, offset: 1 },
+    ], { duration, fill: 'forwards' });
+    let lastSector = null, raf = 0;
+    const watchTicks = () => {
+      if (!wheelSpinning || !disc.isConnected) return;
+      const angle = ((-renderedRotation(disc) % 360) + 360) % 360;
+      const sector = Math.floor((angle + 15) / 30) % 12;
+      if (lastSector !== null && sector !== lastSector) tickWheel();
+      lastSector = sector;
+      raf = requestAnimationFrame(watchTicks);
+    };
+    raf = requestAnimationFrame(watchTicks);
+    wheelAnimation.finished.then(() => {
+      cancelAnimationFrame(raf);
+      finishWheelSpin(index, end, false);
+    }).catch(() => cancelAnimationFrame(raf));
+  }
+
   // ---------- router: hashchange -> coarse re-render per view ----------
   const ROUTES = {
     '#/': { view: viewDeck, match: '#/' },
+    '#/hjul': { view: viewWheel, match: null },
     '#/favoriter': { view: viewFavorites, match: '#/favoriter' },
     '#/skafferi': { view: viewPantry, match: '#/skafferi' },
     '#/installningar': { view: viewSettings, match: '#/installningar' },
@@ -698,6 +1114,10 @@ if (typeof document !== 'undefined') (function () {
     const hash = location.hash || '#/';
     const detailId = favoriteIdFromHash(hash);
     const route = detailId !== null ? ROUTES['#/favoriter'] : (ROUTES[hash] || ROUTES['#/']);
+    const isWheel = route.view === viewWheel;
+    if (isWheel && !wheelVisitActive) wheelVisitActive = true;
+    else if (!isWheel && wheelVisitActive) resetWheelVisit();
+    document.body.classList.toggle('wheel-mode', isWheel);
     if (route.view === viewFavorites) {
       if (detailId !== favOpenId) favChecked = new Set();
       favOpenId = detailId;
@@ -712,6 +1132,9 @@ if (typeof document !== 'undefined') (function () {
     if (route.view === viewFavorites) $('#view').querySelectorAll('.cocktail-art').forEach(wireArt);
     document.documentElement.lang = lang();
     $('#tagline').textContent = t(lang(), 'tagline');
+    $('#wheelEntryLabel').textContent = t(lang(), 'wheel_entry');
+    $('#wheelEntry').setAttribute('aria-label', t(lang(), 'wheel_entry'));
+    $('#wheelEntry').hidden = route.view !== viewDeck;
     $('#nav').setAttribute('aria-label', t(lang(), 'nav_label'));
     const navLabels = { '#/': 'nav_deck', '#/favoriter': 'nav_favorites', '#/skafferi': 'nav_pantry', '#/installningar': 'nav_settings' };
     document.querySelectorAll('#nav a').forEach(a => {
@@ -720,10 +1143,27 @@ if (typeof document !== 'undefined') (function () {
     });
   }
 
-  // #view itself is never replaced (only its innerHTML), so this delegate is attached once —
-  // unlike #deck/#favDeck's listeners, which are fine to re-attach per render since those nodes
-  // are freshly created each time. Covers favorites row-open, close, and un-favorite (list + open card).
+  function renderRoute() {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced && document.startViewTransition) document.startViewTransition(() => render());
+    else render();
+  }
+
   $('#view').addEventListener('click', async e => {
+    const wheelAction = e.target.closest('[data-wheel-act]');
+    if (wheelAction) {
+      const action = wheelAction.dataset.wheelAct;
+      if (action === 'spin') spinWheel();
+      else if (action === 'new') newWheel();
+      else if (action === 'back') closeWheel();
+      else if (action === 'sound') {
+        wheelMuted = !wheelMuted;
+        wheelAction.textContent = wheelMuted ? '🔇' : '🔊';
+        wheelAction.setAttribute('aria-pressed', wheelMuted ? 'true' : 'false');
+        wheelAction.setAttribute('aria-label', t(lang(), wheelMuted ? 'wheel_unmute' : 'wheel_mute'));
+      }
+      return;
+    }
     const langBtn = e.target.closest('[data-lang]');
     if (langBtn) {
       state.settings.lang = langBtn.dataset.lang;
@@ -772,6 +1212,11 @@ if (typeof document !== 'undefined') (function () {
   });
 
   $('#view').addEventListener('change', e => {
+    const control = e.target.closest('#wheelMood');
+    if (control) selectWheelMood(control.value);
+  });
+
+  $('#view').addEventListener('change', e => {
     const control = e.target.closest('[data-fav-ing]');
     if (!control) return;
     if (control.checked) favChecked.add(control.dataset.favIng);
@@ -801,7 +1246,8 @@ if (typeof document !== 'undefined') (function () {
     save();
   });
 
-  window.addEventListener('hashchange', render);
+  $('#wheelEntry').addEventListener('click', () => { wheelOpenedFromHome = true; });
+  window.addEventListener('hashchange', renderRoute);
   window.addEventListener('keydown', e => {
     const dir = swipeDirectionForKey(e.key);
     if (!dir || e.defaultPrevented || e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;

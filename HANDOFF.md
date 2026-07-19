@@ -5,18 +5,21 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
-**BACKLOG items 1–11 done; item 12 next; item 13 partially verified** (updated 2026-07-19).
-The approved 92-drink/123-ingredient seed and complete production artwork remain intact. Card pointer
-gestures now suppress native image dragging and text selection; Arrow Left/Right use the
-same live skip/save path with focus continuity. Sazerac, Bee's Knees and Bellini are now
-`bar: false`, consistent with the existing treatment of specialty Peychaud's bitters,
-honey syrup and purée recipes; no recipe was changed. The exact persisted state blob is
-unchanged. A relative standalone manifest and seven finalized PNG icon exports complete
-item 11 without adding a service worker. `test.js`: 4101 checks green. Static size budgets,
-local HTTP smoke, deployment and production-origin smoke pass. Chrome DevTools MCP and
-browser discovery were both unavailable, so no throttled-phone trace, live interaction pass
-or browser-console result is claimed. Before the final performance gate, item 12 must apply
-the user's stricter normal, non-specialist-bar standard to all 57 current `bar: true` drinks.
+**BACKLOG items 1–12 done; item 13 next; item 14 partially verified** (updated 2026-07-19).
+The approved 92-drink/123-ingredient seed and complete card artwork remain intact. Sipdeck
+now has a localized, full-screen `#/hjul` spinning wheel opened by the starting-page "Pick
+for me" / "Välj åt mig" mini-wheel. Its five required visit-local moods build exactly 12
+visible sectors, use the current `bar: true` cocktail pool plus normal simple orders, and
+apply the locked strength/water progression. Shitfaced/Kanon visibly has seven water sectors,
+five non-water decoys and is guaranteed to land on water, with progressively firmer repeat
+copy. Re-spin keeps the lineup; New wheel replaces it. Sound/mute, ticking, one landing
+haptic, reduced-motion behavior and exact outcome geometry are implemented without changing
+the persisted `sipdeck` blob. Thirteen new 512×512 production illustrations are committed;
+their portrait masters and card-ready variants remain local under gitignored `img-src/`.
+`test.js`: 4258 checks green; `app.js` remains below 60 kB. Local HTTP and static checks
+pass. Browser discovery again returned `[]`, so the live phone/console and measured
+performance gate is still not claimed. Item 13 must now perform the strict normal-bar audit
+before item 14's remaining browser gate can close the v1 cut.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -47,6 +50,13 @@ the user's stricter normal, non-specialist-bar standard to all 57 current `bar: 
 - The `#view` click/change delegates are attached ONCE at startup (the element is never
   replaced). `#deck` listeners attach when the view is rendered and survive successive
   swipes; each newly promoted top card only gets its pointer handlers once.
+- Wheel catalog/copy/slot ownership lives in lazy-loaded `wheel.json`; pure selection and
+  SVG geometry helpers remain at the top of `app.js` for deterministic Node coverage. All
+  wheel state (`wheelMoodId`, lineup, result, sound and repeat count) is visit-local module
+  state. Never add any of it to localStorage or the v1.1 sync blob.
+- Normal spins select an eligible visible sector before animating six to nine turns to that
+  sector. Level 5 marks only water sectors eligible even though decoys remain visible. Keep
+  the visible-sector/result relationship honest if geometry or sector count changes.
 
 ## Name & brand
 
@@ -209,6 +219,17 @@ in PRODUCT.md "Locked decisions".
    converted together with the frozen quality 72/method 6 pipeline. Do not regenerate any
    current source unless a future task explicitly replaces this reviewed set.
 
+   **Wheel extension (2026-07-19).** The reviewed inventory is `beer`, `cider`, `red-wine`,
+   `white-wine`, `sparkling-wine`, `jagermeister-shot`, `fernet-shot`, `tequila-shot`,
+   `red-bull`, `water-plain`, `water-lemon`, `water-lime`, and `bottle-sparkling`. Generate
+   these one at a time from the same four style references at 1024×1536. Preserve each PNG
+   as `img-src/<id>.png`, plus a card-ready 640×800 quality-72/method-6 WebP as
+   `img-src/<id>-card.webp`. For the committed wheel asset, detect the non-paper subject
+   bounding box, add about 30 source pixels of breathing room, then use `ImageOps.pad` to
+   512×512 on `(251,247,239)` and save quality 72/method 6 to `img-wheel/<id>.webp`.
+   Padding rather than a blind square crop is required so tall glasses and the full bottle
+   remain intact. All 13 current outputs are 8,228–24,592 bytes.
+
 5. **Runtime behavior.** The app only creates the top four cards, uses
    `loading="lazy" decoding="async"`, keeps `glassPlaceholder(drink.glass)` behind the
    image until load and hides a failed `<img>` on error. Missing art must never break
@@ -218,16 +239,18 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-1. BACKLOG 12: research a normal-bar ingredient baseline and audit all 57 current
+1. BACKLOG 13: research a normal-bar ingredient baseline and audit all 57 current
    `bar: true` drinks, documenting each decision and blocking ingredient without changing
    any recipe or the seed.
-2. Configure the `chrome-devtools` MCP and run BACKLOG 13's throttled 4G phone trace against
+2. Configure the `chrome-devtools` MCP and run BACKLOG 14's throttled 4G phone trace against
    production; verify the < 1 s repeat/< 2,5 s first-visit interaction budgets.
 3. When a controllable browser is available, run the full phone-viewport pass, including
    fixed navigation, pointer/keyboard swipe, flip,
    live-element behavior, missing-image fallback, favorite detail/Back, controls,
-   installability, persistence, links and console. Claim only what a controllable browser verifies.
-4. If both checks pass, mark BACKLOG 13 complete and close the v1 cut.
+   installability, persistence, links and console. Include both wheel languages, all five
+   moods, sound/mute, re-spin/New wheel, exact landing, dark mode, landscape and reduced
+   motion. Claim only what a controllable browser verifies.
+4. If both checks pass, mark BACKLOG 14 complete and close the v1 cut.
 
 ## How to run / deploy
 
@@ -253,7 +276,7 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 4101 green; `node --check app.js`: green; `git diff --check`: green. The
+`node test.js`: 4258 green; `node --check app.js`: green; `git diff --check`: green. The
 92-drink dataset validates with 123 normalized ingredients, and all 92 current recipe
 source URLs returned HTTP 200. All 92 production filenames exactly match the drink ids;
 every WebP is 640×800 and 10,834–57,952 bytes. The 26 preexisting production files are
@@ -275,9 +298,18 @@ save; source guards disable native image drag and card text selection; all seven
 have their required dimensions; the manifest uses relative `id`, `start_url` and `scope`,
 standalone display, finalized shell colors and no service worker. Local HTTP returned 200
 with correct MIME types for the document, app, data, manifest and representative icons.
-`app.js` is 39,534 bytes unminified (< 60 kB), uses one production JS file and two font
-families. The worst-case uncompressed document/app/data/four-largest-image sum is 378,496
+`app.js` is 59,745 bytes unminified (< 60 kB), uses one production JS file and two font
+families. The worst-case uncompressed document/app/data/four-largest-image sum is 408,432
 bytes. Chrome DevTools MCP was not configured and browser discovery returned `[]`, so item
-13's measured phone performance and live mobile interaction/console checks remain open.
+14's measured phone performance and live mobile interaction/console checks remain open.
 Both production origins returned the updated manifest, representative icons, 92-drink data
 and corrected bar flags after deployment.
+
+Wheel verification on 2026-07-19: deterministic tests cover all five exact 12-sector
+lineups, strong-cocktail weights, shot/water progression, level-5 forced-water eligibility,
+six-to-nine-turn landing geometry, repeat copy, EN/SV catalog completeness, route/motion/
+accessibility source guards and unchanged persisted-state shape. All 13 committed Wheel
+WebPs are validated as 512×512, 8,228–24,592 bytes. Local HTTP returned 200 with correct
+MIME types for `/`, `app.js`, `wheel.json`, water and bottle art. Browser discovery was
+retried after the build and again returned `[]`; no live wheel interaction or console claim
+is made.

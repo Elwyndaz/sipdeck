@@ -12,7 +12,9 @@ makeability, EN/SV switching and glass-specific missing-art fallbacks are implem
 Favorites use compact art rows and a continuous recipe view with checkmarks, clipboard
 copy, published-recipe links and mobile Back navigation. Card gestures suppress native
 image/text dragging and also support Arrow Left/Right. A relative web app manifest and the
-finalized icon set make the app installable without a service worker. See `HANDOFF.md` for
+finalized icon set make the app installable without a service worker. The starting page also
+opens a tactile EN/SV spinning wheel that adapts 12 visible choices to a five-step mood
+slider while keeping its sound, result and history visit-local. See `HANDOFF.md` for
 the current verification state and `BACKLOG.md` for the remaining v1 work.
 
 ## Run
@@ -33,5 +35,7 @@ node test.js            # plain node asserts, no framework
 
 - `img/<drink-id>.webp` — committed production card art, exactly 640×800 and ≤ 80 kB
 - `img-src/<drink-id>.png` — local generated source, intentionally gitignored
+- `img-wheel/<wheel-item>.webp` — committed 512×512 wheel art; reusable portrait masters
+  and card-ready 640×800 variants stay local in `img-src/`
 - `HANDOFF.md` "Image pipeline" — exact references, prompt template, curation,
   conversion and deployment handling

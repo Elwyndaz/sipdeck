@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "outcomes": {
+    "beer": {
+      "category": "beer-cider",
+      "sector": { "en": "Beer", "sv": "Öl" },
+      "result": { "en": "A beer", "sv": "En öl" },
+      "art": ["img-wheel/beer.webp"]
+    },
+    "cider": {
+      "category": "beer-cider",
+      "sector": { "en": "Cider", "sv": "Cider" },
+      "result": { "en": "A cider", "sv": "En cider" },
+      "art": ["img-wheel/cider.webp"]
+    },
+    "red-wine": {
+      "category": "wine",
+      "sector": { "en": "Red wine", "sv": "Rött vin" },
+      "result": { "en": "A glass of red wine", "sv": "Ett glas rött vin" },
+      "art": ["img-wheel/red-wine.webp"]
+    },
+    "white-wine": {
+      "category": "wine",
+      "sector": { "en": "White wine", "sv": "Vitt vin" },
+      "result": { "en": "A glass of white wine", "sv": "Ett glas vitt vin" },
+      "art": ["img-wheel/white-wine.webp"]
+    },
+    "sparkling-wine": {
+      "category": "wine",
+      "sector": { "en": "Sparkling", "sv": "Bubbel" },
+      "result": { "en": "A glass of sparkling wine", "sv": "Ett glas bubbel" },
+      "art": ["img-wheel/sparkling-wine.webp"]
+    },
+    "jagermeister-shot": {
+      "category": "shot",
+      "sector": { "en": "Jäger", "sv": "Jäger" },
+      "result": { "en": "A Jägermeister shot", "sv": "En Jägershot" },
+      "art": ["img-wheel/jagermeister-shot.webp"]
+    },
+    "fernet-shot": {
+      "category": "shot",
+      "sector": { "en": "Fernet", "sv": "Fernet" },
+      "result": { "en": "A Fernet shot", "sv": "En Fernetshot" },
+      "art": ["img-wheel/fernet-shot.webp"]
+    },
+    "tequila-shot": {
+      "category": "shot",
+      "sector": { "en": "Tequila", "sv": "Tequila" },
+      "result": { "en": "A tequila shot", "sv": "En tequilashot" },
+      "art": ["img-wheel/tequila-shot.webp"]
+    },
+    "red-bull": {
+      "category": "red-bull",
+      "sector": { "en": "Red Bull", "sv": "Red Bull" },
+      "result": { "en": "Red Bull with ice", "sv": "Red Bull med is" },
+      "art": ["img-wheel/red-bull.webp"]
+    },
+    "water": {
+      "category": "water",
+      "sector": { "en": "Water", "sv": "Vatten" },
+      "result": { "en": "A glass of water", "sv": "Ett glas vatten" },
+      "art": [
+        "img-wheel/water-plain.webp",
+        "img-wheel/water-lemon.webp",
+        "img-wheel/water-lime.webp"
+      ]
+    },
+    "bottle-sparkling": {
+      "category": "bottle",
+      "sector": { "en": "Bottle!", "sv": "Flaska!" },
+      "result": {
+        "en": "A bottle of sparkling wine for the table",
+        "sv": "En flaska bubbel till bordet"
+      },
+      "art": ["img-wheel/bottle-sparkling.webp"]
+    }
+  },
+  "moods": [
+    {
+      "id": "fresh",
+      "emoji": "🥳",
+      "name": { "en": "Fresh", "sv": "Pigg" },
+      "copy": { "en": "The whole wheel is in play.", "sv": "Hela hjulet är med." },
+      "strongWeight": 2,
+      "slots": [
+        "cocktail", "shot", "beer-cider", "cocktail", "wine", "shot",
+        "cocktail", "beer-cider", "cocktail", "shot", "cocktail", "flex"
+      ]
+    },
+    {
+      "id": "groove",
+      "emoji": "😎",
+      "name": { "en": "In the groove", "sv": "På gång" },
+      "copy": {
+        "en": "The party has found its rhythm.",
+        "sv": "Festen har hittat rytmen."
+      },
+      "strongWeight": 1,
+      "slots": [
+        "cocktail", "shot", "beer-cider", "cocktail", "wine", "beer-cider",
+        "cocktail", "shot", "beer-cider", "cocktail", "wine", "cocktail"
+      ]
+    },
+    {
+      "id": "tipsy",
+      "emoji": "🤪",
+      "name": { "en": "Tipsy", "sv": "Salongs" },
+      "copy": {
+        "en": "One foot on the dance floor.",
+        "sv": "Ena foten på dansgolvet."
+      },
+      "strongWeight": 0.5,
+      "slots": [
+        "cocktail", "beer-cider", "wine", "cocktail", "shot", "beer-cider",
+        "cocktail", "wine", "beer-cider", "cocktail", "wine", "cocktail"
+      ]
+    },
+    {
+      "id": "wobbly",
+      "emoji": "🫠",
+      "name": { "en": "A bit wobbly", "sv": "Lite vinglig" },
+      "copy": {
+        "en": "No shots. Water joins the party.",
+        "sv": "Inga shots. Vattnet gör entré."
+      },
+      "strongWeight": 0,
+      "slots": [
+        "water", "cocktail", "beer-cider", "red-bull", "wine", "cocktail",
+        "water", "beer-cider", "wine", "red-bull", "cocktail", "beer-cider"
+      ]
+    },
+    {
+      "id": "shitfaced",
+      "emoji": "🥴",
+      "name": { "en": "Shitfaced", "sv": "Kanon" },
+      "copy": {
+        "en": "There's a day tomorrow, too.",
+        "sv": "Det är en dag imorgon också."
+      },
+      "repeatCopy": [
+        {
+          "en": "You know where this will land.",
+          "sv": "Du vet var den kommer att landa."
+        },
+        {
+          "en": "You should really drink water.",
+          "sv": "Du borde verkligen dricka vatten."
+        }
+      ],
+      "safety": {
+        "en": "Water won't sober you up. Don't drive.",
+        "sv": "Vatten gör dig inte nykter. Kör inte."
+      },
+      "strongWeight": 1,
+      "forcedOutcome": "water",
+      "slots": [
+        "water", "cocktail", "water", "beer-cider", "water", "wine",
+        "water", "red-bull", "water", "beer-cider", "water", "water"
+      ]
+    }
+  ]
+}

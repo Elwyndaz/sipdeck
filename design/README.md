@@ -14,6 +14,8 @@ reference (open it in a browser); the files below are what the scaffold session
 - **`wordmark.svg`** — logotype. Uses `stroke="currentColor"`, so it must be inlined as
   an `<svg>` in the HTML (not `<img src>`) to inherit `--sd-ink`/dark-mode ink. Only the
   i-dot is a fixed accent fill. Minimum display width 90px; below that, use an icon file.
+  The wheel top bar is the sole external-`img` exception: it sits at 90px on permanent
+  `#FBF7EF` paper, where the SVG's default black `currentColor` is the intended ink.
 - **`icon.svg`** — master mark (ghost card + top card + garnish), viewBox 0 0 96 96.
   Source for the 512/192/apple-touch/maskable exports: render on a solid `#FBF7EF`
   square for standard icons, full-bleed for maskable (the mark already sits in the
@@ -37,6 +39,12 @@ reference prompt, curation checklist and WebP conversion command live in
 `../HANDOFF.md` "Image pipeline". Do not copy illustration colors into the brand token
 system: the identity stays ink plus vermouth green while each drink supplies its own
 restrained watercolor accents.
+
+The spinning wheel adds 13 committed square illustrations under `../img-wheel/`. They use
+the same approved references and visual direction, but are content-aware cropped/padded to
+512×512 so the entire subject remains legible in a small circular sector. Their 1024×1536
+PNG masters and 640×800 card-ready WebP variants remain in gitignored `../img-src/` for
+future drink-card reuse. The inventory and conversion command are frozen in `HANDOFF.md`.
 
 ## Locked from this session
 

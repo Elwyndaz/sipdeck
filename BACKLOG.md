@@ -5,7 +5,7 @@ agent session. Story/AC references point into PRODUCT.md.
 
 ## v1 (the cut line is explicit below)
 
-Items 1–11 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item 12.
+Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item 13.
 
 1. ✅ **Scaffold** — `index.html` (inline the contents of `design/tokens.css` into
    `<style>`, inline `design/wordmark.svg` in the header), `app.js` (pure functions on
@@ -46,7 +46,13 @@ Items 1–11 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     `design/icon.svg` (192/512/apple-touch/maskable, on `#FBF7EF` except maskable which
     is full-bleed) and from `design/favicon.svg` (16/32) — see `design/README.md` for
     which file backs which size; don't rescale `icon.svg` down to 48/16. (H1)
-12. **Strict normal-bar audit** — research the reliably stocked baseline at representative
+12. ✅ **Spinning wheel + artwork pipeline** — a starting-page mini-wheel opens the
+    localized full-screen `#/hjul` order chooser. Five visit-local drunkenness levels build
+    exactly 12 visible sectors with tested contents/weights; the highest level shows seven
+    water sectors and always lands on water. Includes exact landing geometry, re-spin/New
+    wheel behavior, sound/mute, ticking, one landing haptic, reduced-motion handling,
+    repeat safety copy and 13 optimized illustrations with reusable local masters. (J1)
+13. **Strict normal-bar audit** — research the reliably stocked baseline at representative
     ordinary, non-specialist bars, then reassess every drink currently marked `bar: true`.
     Review all essential ingredients drink by drink; IBA status and cocktail-bar availability
     are not sufficient. If a normal bar is unlikely to stock or routinely prep even one
@@ -54,7 +60,7 @@ Items 1–11 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     ingredient, set the drink to `bar: false`. Record a concise decision and blocking
     ingredient(s) for every reviewed drink, add regression coverage for the final allowlist,
     and do not change recipes, ingredients or the 92-drink seed. (D1)
-13. **Performance pass + deploy (partially complete)** — static budgets, local HTTP smoke
+14. **Performance pass + deploy (partially complete)** — static budgets, local HTTP smoke
     and the Cloudflare Pages direct upload pass. The required throttled-phone trace and
     live mobile smoke remain pending because neither Chrome DevTools MCP nor a controllable
     browser backend was available on 2026-07-19.
@@ -63,11 +69,11 @@ Items 1–11 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 
 ## v1.1
 
-13. **Accounts + sync** — copy recept worker pattern, minimal: Firebase project, Worker +
+15. **Accounts + sync** — copy recept worker pattern, minimal: Firebase project, Worker +
     D1 `users(id, firebase_uid UNIQUE, state)`, `GET/PUT /state` + `DELETE /account`,
     JWT verification code lifted from recept worker, debounced PUT, server-wins-on-load,
     logged-out untouched. (I1)
-14. **Deep links** — `#/drink/<id>` opens a card directly (shareable).
+16. **Deep links** — `#/drink/<id>` opens a card directly (shareable).
 
 ## v2 / ideas (unordered)
 

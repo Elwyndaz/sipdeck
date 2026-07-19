@@ -7,6 +7,8 @@ const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash
   swipeDirectionForKey,
   formatLineAmount, drinkAsText,
   BASE_FILTERS, matchesFilters, canMake, filterDrinks,
+  weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
+  wheelLandingRotation, wheelSectorPath,
   GLASS_SILHOUETTES, glassPlaceholder } = require('./app.js');
 
 let pass = 0, fail = 0;
@@ -44,6 +46,8 @@ check((() => { try { return normalizeState(null, 'en').settings.lang === 'en'; }
   'normalizeState: null input falls back to nav lang');
 check(normalizeState({ settings: { servings: 99 } }, 'en').settings.servings === 1,
   'normalizeState: out-of-range servings falls back to 1');
+check(!('wheel' in normalizeState({ wheel: { mood: 'fresh' } }, 'en')),
+  'normalizeState: wheel visit state never enters the persisted blob');
 
 check(favoriteIdFromHash('#/favoriter/margarita') === 'margarita',
   'favoriteIdFromHash: parses favorite detail route');
@@ -153,8 +157,76 @@ check(filterDrinks(null, {}).length === 0, 'filterDrinks: invalid input is empty
 check(swipeDirectionForKey('ArrowLeft') === -1, 'keyboard swipe: left skips');
 check(swipeDirectionForKey('ArrowRight') === 1, 'keyboard swipe: right saves');
 check(swipeDirectionForKey('Enter') === 0, 'keyboard swipe: unrelated keys are ignored');
+
+// ---------- spinning wheel ----------
+const wheelData = JSON.parse(fs.readFileSync(path.join(__dirname, 'wheel.json'), 'utf8'));
+const wheelFixture = Array.from({ length: 10 }, (_, i) => ({
+  id: `drink-${i}`, name: `Drink ${i}`, bar: true,
+  tags: i < 3 ? ['strong'] : [],
+}));
+const sampleSource = ['a', 'b', 'c'];
+const sample = weightedSampleUnique(sampleSource, 2, () => 1, () => 0);
+check(sample.join() === 'a,b', 'wheel weighted sample: deterministic unique picks');
+check(sampleSource.join() === 'a,b,c', 'wheel weighted sample: does not mutate source');
+check(wheelCocktailWeight(wheelFixture[0], { strongWeight: 2 }) === 2,
+  'wheel cocktail weight: strong mood multiplier');
+check(wheelCocktailWeight(wheelFixture[0], { strongWeight: 0 }) === 0,
+  'wheel cocktail weight: strong cocktails can be excluded');
+check(wheelCocktailWeight({ bar: false, tags: [] }, { strongWeight: 2 }) === 0,
+  'wheel cocktail weight: non-bar cocktail never qualifies');
+
+const lineups = Object.fromEntries(wheelData.moods.map(mood => [
+  mood.id, buildSpinLineup(wheelData, mood.id, wheelFixture, () => 0.2),
+]));
+Object.entries(lineups).forEach(([mood, lineup]) => {
+  check(lineup.length === 12, `wheel lineup ${mood}: exactly 12 visible sectors`);
+});
+check(lineups.fresh.filter(item => item.category === 'shot').length === 3,
+  'wheel lineup fresh: three shot sectors');
+check(lineups.fresh.filter(item => item.category === 'bottle').length === 1,
+  'wheel lineup fresh: bottle appears when flex draw is below one third');
+check(lineups.groove.filter(item => item.category === 'shot').length === 2,
+  'wheel lineup groove: two shot sectors');
+check(lineups.tipsy.filter(item => item.category === 'shot').length === 1,
+  'wheel lineup tipsy: one shot sector');
+check(lineups.wobbly.every(item => item.category !== 'shot'),
+  'wheel lineup wobbly: no shot sectors');
+check(lineups.wobbly.filter(item => item.category === 'water').length === 2,
+  'wheel lineup wobbly: water is introduced with two sectors');
+check(lineups.wobbly.filter(item => item.kind === 'cocktail').every(item =>
+  !wheelFixture.find(drink => drink.id === item.outcomeId).tags.includes('strong')),
+  'wheel lineup wobbly: strong-tagged cocktails excluded');
+check(lineups.shitfaced.filter(item => item.category === 'water').length === 7,
+  'wheel lineup shitfaced: seven visible water sectors');
+check(lineups.shitfaced.filter(item => item.eligible === false).length === 5,
+  'wheel lineup shitfaced: five visible non-water decoys');
+check(lineups.shitfaced[selectWheelIndex(lineups.shitfaced, () => 0.99)].category === 'water',
+  'wheel selection shitfaced: forced result always chooses water');
+check(lineups.groove[selectWheelIndex(lineups.groove, () => 0.99)].eligible,
+  'wheel selection normal mood: selected visible sector is eligible');
+
+const landing = wheelLandingRotation(17, 4, (() => { const values = [0.5, 0]; return () => values.shift(); })(), 12);
+const landedCenter = ((-landing % 360) + 360) % 360;
+const expectedCenter = 4 * 30;
+const landingError = Math.abs((((landedCenter - expectedCenter) + 540) % 360) - 180);
+check(landing >= 17 + 6 * 360, 'wheel landing: travels at least six full rotations');
+check(landingError <= 10.2, 'wheel landing: finishes safely inside selected sector');
+check(wheelSectorPath(0, 12).startsWith('M50 50L'), 'wheel SVG: sector path starts at hub');
+check(wheelSectorPath(0, 12) !== wheelSectorPath(1, 12), 'wheel SVG: adjacent sector paths differ');
+
 const appSource = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
 const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+check(Buffer.byteLength(appSource) < 60000, 'bundle budget: app.js stays under 60 kB unminified');
+check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
+  'wheel route: starting-page entry and router target are wired');
+check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),
+  'wheel transition: mini-wheel expands through progressive View Transitions');
+check(appSource.includes("matchMedia('(prefers-reduced-motion: reduce)')"),
+  'wheel accessibility: reduced motion is honored');
+check(appSource.includes('aria-live="polite"') && appSource.includes('aria-valuetext='),
+  'wheel accessibility: result and slider meaning are announced');
+check(appSource.includes('navigator.vibrate(18)') && appSource.includes('wheelMuted = false'),
+  'wheel feedback: one landing haptic and visit-local sound default');
 check(appSource.includes('draggable="false"'), 'pointer swipe: artwork disables native image dragging');
 check(appSource.includes('e.preventDefault(); // own the gesture'), 'pointer swipe: card owns pointer gesture');
 check(htmlSource.includes('user-select:none;-webkit-user-select:none'), 'pointer swipe: card text selection disabled');
@@ -192,6 +264,48 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'drinks.json'), 'ut
 check(data.schema === 1, 'drinks.json: schema === 1');
 check(data.ingredients && typeof data.ingredients === 'object', 'drinks.json: ingredients is a map');
 check(Array.isArray(data.drinks), 'drinks.json: drinks is an array');
+check(wheelData.schema === 1, 'wheel.json: schema === 1');
+check(Array.isArray(wheelData.moods) && wheelData.moods.length === 5,
+  'wheel.json: exact five-mood ladder');
+check(wheelData.outcomes && Object.keys(wheelData.outcomes).length === 11,
+  'wheel.json: exact wheel-only outcome catalog');
+check(wheelData.moods.map(mood => mood.id).join() === 'fresh,groove,tipsy,wobbly,shitfaced',
+  'wheel.json: canonical mood order');
+wheelData.moods.forEach(mood => {
+  check(Array.isArray(mood.slots) && mood.slots.length === 12,
+    `wheel.json mood ${mood.id}: exactly 12 sector slots`);
+  check(mood.name && mood.name.en && mood.name.sv, `wheel.json mood ${mood.id}: EN + SV name`);
+  check(mood.copy && mood.copy.en && mood.copy.sv, `wheel.json mood ${mood.id}: EN + SV copy`);
+  check(!String(mood.name.sv).includes('â€”') && !String(mood.copy.sv).includes('â€”'),
+    `wheel.json mood ${mood.id}: Swedish copy has no em-dash`);
+});
+check(wheelData.moods.find(mood => mood.id === 'shitfaced').forcedOutcome === 'water',
+  'wheel.json: highest mood forces water');
+check(wheelData.moods.find(mood => mood.id === 'shitfaced').repeatCopy.length === 2,
+  'wheel.json: highest mood has second and third-spin copy');
+const wheelArt = new Set();
+Object.entries(wheelData.outcomes).forEach(([id, outcome]) => {
+  check(outcome.sector && outcome.sector.en && outcome.sector.sv,
+    `wheel.json outcome ${id}: short EN + SV sector label`);
+  check(outcome.result && outcome.result.en && outcome.result.sv,
+    `wheel.json outcome ${id}: full EN + SV result name`);
+  check(Array.isArray(outcome.art) && outcome.art.length > 0,
+    `wheel.json outcome ${id}: artwork declared`);
+  (outcome.art || []).forEach(file => {
+    wheelArt.add(file);
+    check(/^img-wheel\/[a-z0-9-]+\.webp$/.test(file), `wheel artwork path: ${file}`);
+    check(fs.existsSync(path.join(__dirname, file)), `wheel artwork exists: ${file}`);
+    const image = fs.readFileSync(path.join(__dirname, file));
+    const marker = image.indexOf(Buffer.from([0x9d, 0x01, 0x2a]));
+    check(image.toString('ascii', 0, 4) === 'RIFF' && image.toString('ascii', 8, 12) === 'WEBP',
+      `wheel artwork format: ${file} is WebP`);
+    check(marker >= 0 && (image.readUInt16LE(marker + 3) & 0x3fff) === 512 &&
+      (image.readUInt16LE(marker + 5) & 0x3fff) === 512,
+    `wheel artwork dimensions: ${file} is 512x512`);
+    check(image.length <= 30000, `wheel artwork budget: ${file} is at most 30 kB`);
+  });
+});
+check(wheelArt.size === 13, 'wheel.json: exact 13-image wheel artwork inventory');
 ['sazerac', 'bees-knees', 'bellini'].forEach(id => {
   const drink = data.drinks.find(item => item.id === id);
   check(drink && drink.bar === false, `bar-ready editorial exception: ${id}`);
