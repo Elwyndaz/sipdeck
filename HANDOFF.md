@@ -317,3 +317,15 @@ is made.
 Wheel deploy on 2026-07-19: commit `dcce071` pushed to main; Cloudflare Pages deployed via
 wrangler from a staging copy excluding `img-src/`. Both production origins returned 200 for
 `wheel.json` and wheel art after deployment.
+
+Wheel polish on 2026-07-19 (user feedback): the wheel now opens live on the first mood
+(Pigg) instead of the empty intro state, and the home-entry mini symbol is the same
+twelve-sector disc as the big wheel (neutral-mark icons removed). Shot outcomes render
+smaller in sectors (art radius 4.1 vs 5.3) and padded in the result box. Spin duration is
+6,2-7,4 s (was 5-6 s). The result box lost its button row: the controls button and hub
+relabel to "Snurra igen" and "Nytt hjul" joins the controls row after a spin. A landed
+cocktail's name links to its recipe detail (`#/favoriter/<id>` via `.fav-open`), and
+`resetWheelVisit` is skipped while a detail is open so Tillbaka returns to the intact
+result. Verified in a Playwright phone viewport (390x760): live start, two spins, compact
+result on-screen, cocktail link -> detail -> back with state kept, zero console messages.
+app.js is 59,996 bytes; 4,265 tests green (seven new source guards).

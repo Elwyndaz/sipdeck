@@ -260,7 +260,6 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
 @keyframes wheel-pointer-tick{50%{transform:translateX(-50%) rotate(7deg);transform-origin:50% 10%}}
 .wheel-win .wheel-sector[data-winning="true"]{filter:brightness(.92);stroke:#2f6b3f;stroke-width:1.1}
 .wheel-neutral{opacity:.58}
-.wheel-neutral .neutral-mark{fill:none;stroke:#6e6455;stroke-width:.8;stroke-linecap:round;stroke-linejoin:round}
 .wheel-controls{width:min(100%,430px);padding:.8rem 1rem 1rem;border:1px solid var(--sd-line);
   border-radius:16px;background:var(--sd-bg);
   background:color-mix(in srgb,var(--sd-bg) 72%,transparent);backdrop-filter:blur(8px)}
@@ -281,14 +280,15 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
   color:var(--sd-ink);font:600 .78rem/1 var(--sd-font-ui)}
 .wheel-action.primary{min-width:8.5rem;background:var(--sd-accent);border-color:var(--sd-accent);color:var(--sd-bg)}
 .wheel-action:disabled{opacity:.42;cursor:not-allowed}
-.wheel-result{width:min(100%,430px);margin:.7rem auto 0;padding:.8rem 1rem;background:var(--sd-card);color:#211b12;
-  border-radius:16px;box-shadow:var(--sd-shadow);display:grid;grid-template-columns:64px 1fr;align-items:center;gap:.8rem}
+.wheel-result{width:min(100%,430px);margin:.6rem auto 0;padding:.6rem .9rem;background:var(--sd-card);color:#211b12;
+  border-radius:16px;box-shadow:var(--sd-shadow);display:grid;grid-template-columns:56px 1fr;align-items:center;gap:.7rem}
 .wheel-result[hidden]{display:none}
-.wheel-result-art{width:64px;height:64px;border-radius:12px;object-fit:contain;background:#fbf7ef}
+.wheel-result-art{width:56px;height:56px;border-radius:12px;object-fit:contain;background:#fbf7ef}
+.wheel-result-art.shot{padding:7px}
 .wheel-result-label{font:600 .66rem/1.2 var(--sd-font-ui);color:#6e6455;text-transform:uppercase;letter-spacing:.08em}
 .wheel-result-name{font:400 1.35rem/1.12 var(--sd-font-display);margin-top:.12rem}
+.wheel-result-name .fav-open{padding:0;text-align:left;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .wheel-result-note{font:500 .72rem/1.35 var(--sd-font-ui);color:#6e6455;margin-top:.25rem}
-.wheel-result-actions{grid-column:1/-1;display:flex;justify-content:center;gap:.45rem;flex-wrap:wrap}
 .wheel-live{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 ::view-transition-group(wheel-shared){animation-duration:560ms;animation-timing-function:var(--sd-ease-list)}
 
@@ -335,18 +335,11 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
       <div class="tagline" id="tagline"></div>
     </div>
     <a class="wheel-entry" id="wheelEntry" href="#/hjul" hidden>
-      <svg class="wheel-symbol" viewBox="0 0 64 64" aria-hidden="true">
-        <circle cx="32" cy="32" r="28" fill="#FBF7EF" stroke="#211B12" stroke-width="1.8"/>
-        <g fill="none" stroke="#6E6455" stroke-width="1.1">
-          <path d="M32 4v56M7.8 18l48.4 28M7.8 46l48.4-28"/>
-        </g>
-        <g fill="none" stroke="#211B12" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M25 13h8l-4 5-4-5Zm4 5v3m-3 0h6"/>
-          <path d="M45 28h6l-1 8h-4l-1-8Zm1 2h4"/>
-          <path d="M22 44c0 2.4-1.8 4.2-4 4.2s-4-1.8-4-4.2c0-2 2.7-5.4 4-7 1.3 1.6 4 5 4 7Z"/>
-        </g>
-        <circle cx="32" cy="32" r="6" fill="#FBF7EF" stroke="#211B12" stroke-width="1.6"/>
-        <circle cx="32" cy="32" r="2.6" fill="#2F6B3F"/>
+      <svg class="wheel-symbol" viewBox="0 0 100 100" aria-hidden="true">
+        <path class="wheel-sector" d="M50 50L37.32 2.67A49 49 0 0 1 62.68 2.67Z"/><path class="wheel-sector" d="M50 50L62.68 2.67A49 49 0 0 1 84.65 15.35Z"/><path class="wheel-sector" d="M50 50L84.65 15.35A49 49 0 0 1 97.33 37.32Z"/><path class="wheel-sector" d="M50 50L97.33 37.32A49 49 0 0 1 97.33 62.68Z"/><path class="wheel-sector" d="M50 50L97.33 62.68A49 49 0 0 1 84.65 84.65Z"/><path class="wheel-sector" d="M50 50L84.65 84.65A49 49 0 0 1 62.68 97.33Z"/><path class="wheel-sector" d="M50 50L62.68 97.33A49 49 0 0 1 37.32 97.33Z"/><path class="wheel-sector" d="M50 50L37.32 97.33A49 49 0 0 1 15.35 84.65Z"/><path class="wheel-sector" d="M50 50L15.35 84.65A49 49 0 0 1 2.67 62.68Z"/><path class="wheel-sector" d="M50 50L2.67 62.68A49 49 0 0 1 2.67 37.32Z"/><path class="wheel-sector" d="M50 50L2.67 37.32A49 49 0 0 1 15.35 15.35Z"/><path class="wheel-sector" d="M50 50L15.35 15.35A49 49 0 0 1 37.32 2.67Z"/>
+        <circle class="wheel-rim" cx="50" cy="50" r="49"/>
+        <circle class="wheel-hub" cx="50" cy="50" r="10"/>
+        <circle class="wheel-hub-dot" cx="50" cy="50" r="3"/>
       </svg>
       <span id="wheelEntryLabel"></span>
     </a>

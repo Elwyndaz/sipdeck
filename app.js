@@ -822,7 +822,7 @@ if (typeof document !== 'undefined') (function () {
   function neutralWheelSvg() {
     const sectors = Array.from({ length: 12 }, (_, index) =>
       `<path class="wheel-sector" d="${wheelSectorPath(index)}"/>`).join('');
-    return `<svg class="wheel-neutral" viewBox="0 0 100 100" aria-hidden="true">${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><g class="neutral-mark"><path d="M42 29h16l-8 11-8-11Zm8 11v9m-7 3h14"/><path d="M35 62h9l-1.3 11h-6.4L35 62Zm1.5 3h6"/><path d="M64 66c0 3-2.2 5.2-5 5.2S54 69 54 66c0-2.5 3.4-6.7 5-8.7 1.6 2 5 6.2 5 8.7Z"/></g><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
+    return `<svg class="wheel-neutral" viewBox="0 0 100 100" aria-hidden="true">${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
   }
 
   function wheelSvgMarkup(lineup) {
@@ -839,7 +839,8 @@ if (typeof document !== 'undefined') (function () {
       const rotation = flip ? degrees + 180 : degrees;
       const x = flip ? 6 : 94, anchor = flip ? 'start' : 'end';
       const label = localText(entry.sector);
-      return `<path class="wheel-sector" data-sector="${index}" d="${wheelSectorPath(index)}"/><circle class="wheel-art-ring" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.7"/><image class="wheel-art" href="${esc(entry.art)}" x="${(cx - 5.3).toFixed(3)}" y="${(cy - 5.3).toFixed(3)}" width="10.6" height="10.6" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-art-${index})"/><text class="wheel-sector-label" x="${x}" y="50.9" text-anchor="${anchor}" transform="rotate(${rotation} 50 50)">${esc(label)}</text>`;
+      const artR = entry.category === 'shot' ? 4.1 : 5.3; // shots drawn smaller
+      return `<path class="wheel-sector" data-sector="${index}" d="${wheelSectorPath(index)}"/><circle class="wheel-art-ring" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="5.7"/><image class="wheel-art" href="${esc(entry.art)}" x="${(cx - artR).toFixed(3)}" y="${(cy - artR).toFixed(3)}" width="${artR * 2}" height="${artR * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#wheel-art-${index})"/><text class="wheel-sector-label" x="${x}" y="50.9" text-anchor="${anchor}" transform="rotate(${rotation} 50 50)">${esc(label)}</text>`;
     }).join('');
     const choices = lineup.map(entry => localText(entry.sector)).join(', ');
     return `<svg viewBox="0 0 100 100" role="img" aria-label="${esc(choices)}"><defs>${defs}</defs>${sectors}<circle class="wheel-rim" cx="50" cy="50" r="49"/><circle class="wheel-hub" cx="50" cy="50" r="10"/><circle class="wheel-hub-dot" cx="50" cy="50" r="3"/></svg>`;
@@ -857,18 +858,24 @@ if (typeof document !== 'undefined') (function () {
     if (!entry) return '';
     const safety = mood && mood.forcedOutcome && mood.safety
       ? `<p class="wheel-result-note">${esc(localText(mood.safety))}</p>` : '';
-    return `<img class="wheel-result-art" src="${esc(entry.art)}" alt="">
+    const name = entry.kind === 'cocktail'
+      ? `<button class="fav-open" data-id="${esc(entry.outcomeId)}">${esc(localText(entry.result))} ›</button>`
+      : esc(localText(entry.result));
+    return `<img class="wheel-result-art${entry.category === 'shot' ? ' shot' : ''}" src="${esc(entry.art)}" alt="">
       <div><p class="wheel-result-label">${esc(t(lang(), 'wheel_result'))}</p>
-      <h2 class="wheel-result-name">${esc(localText(entry.result))}</h2>${safety}</div>
-      <div class="wheel-result-actions">
-        <button class="wheel-action primary" data-wheel-act="spin">${esc(t(lang(), 'wheel_respin'))}</button>
-        <button class="wheel-action" data-wheel-act="new">${esc(t(lang(), 'wheel_new'))}</button>
-        <button class="wheel-action" data-wheel-act="back">${esc(t(lang(), 'wheel_back'))}</button>
-      </div>`;
+      <h2 class="wheel-result-name">${name}</h2>${safety}</div>`;
+  }
+
+  function wheelActionsMarkup(canSpin) {
+    return `<button class="wheel-action primary" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), wheelResult ? 'wheel_respin' : 'wheel_spin'))}</button>${wheelResult ? `<button class="wheel-action" data-wheel-act="new">${esc(t(lang(), 'wheel_new'))}</button>` : ''}`;
   }
 
   function viewWheel() {
     loadWheelData();
+    if (!wheelMoodId && wheelData && db) { // default to first mood
+      wheelMoodId = wheelData.moods[0].id;
+      wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+    }
     const mood = wheelMood();
     const moods = wheelData && Array.isArray(wheelData.moods) ? wheelData.moods : [];
     const moodIndex = mood ? moods.indexOf(mood) : -1;
@@ -895,15 +902,15 @@ if (typeof document !== 'undefined') (function () {
         <div class="wheel-stage" id="wheelStage">
           <div class="wheel-pointer" id="wheelPointer" aria-hidden="true"></div>
           <div class="wheel-disc" id="wheelDisc" style="transform:rotate(${wheelRotation}deg)">${disc}</div>
-          <button class="wheel-hub-button" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), 'wheel_spin'))}</button>
+          <button class="wheel-hub-button" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), wheelResult ? 'wheel_respin' : 'wheel_spin'))}</button>
         </div>
         <section class="wheel-controls${mood ? '' : ' unset'}">
           <p class="wheel-controls-title">${esc(status || t(lang(), 'wheel_mood_label'))}</p>
-          <input class="wheel-range" id="wheelMood" type="range" min="1" max="5" step="1" value="${moodIndex >= 0 ? moodIndex + 1 : 3}"
+          <input class="wheel-range" id="wheelMood" type="range" min="1" max="5" step="1" value="${moodIndex >= 0 ? moodIndex + 1 : 1}"
             aria-label="${esc(t(lang(), 'wheel_mood_label'))}" aria-valuetext="${esc(mood ? localText(mood.name) : t(lang(), 'wheel_choose'))}"
             ${wheelData && db && !wheelSpinning ? '' : 'disabled'}>
           <div class="wheel-stops">${stops}</div>
-          ${wheelResult ? '' : `<div class="wheel-actions"><button class="wheel-action primary" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), 'wheel_spin'))}</button></div>`}
+          <div class="wheel-actions">${wheelActionsMarkup(canSpin)}</div>
         </section>
         <section class="wheel-result" id="wheelResult" aria-live="polite"${wheelResult ? '' : ' hidden'}>${result}</section>
         <p class="wheel-live" id="wheelLive" aria-live="polite">${esc(canSpin ? t(lang(), 'wheel_ready') : status)}</p>
@@ -1031,7 +1038,7 @@ if (typeof document !== 'undefined') (function () {
       result.hidden = false;
     }
     const controlsActions = $('#view .wheel-controls .wheel-actions');
-    if (controlsActions) controlsActions.hidden = true;
+    if (controlsActions) controlsActions.innerHTML = wheelActionsMarkup(true);
     const hub = $('#view .wheel-hub-button');
     if (hub) { hub.disabled = false; hub.textContent = t(lang(), 'wheel_respin'); }
     const range = $('#wheelMood');
@@ -1067,7 +1074,7 @@ if (typeof document !== 'undefined') (function () {
       return;
     }
     const end = wheelLandingRotation(wheelRotation, index, random01, 12);
-    const travel = end - wheelRotation, duration = 5000 + Math.round(random01() * 1000);
+    const travel = end - wheelRotation, duration = 6200 + Math.round(random01() * 1200);
     wheelAnimation = disc.animate([
       { transform: `rotate(${wheelRotation}deg)`, offset: 0, easing: 'cubic-bezier(.45,0,1,1)' },
       { transform: `rotate(${wheelRotation + travel * .08}deg)`, offset: .12, easing: 'cubic-bezier(.08,.58,.12,1)' },
@@ -1116,7 +1123,7 @@ if (typeof document !== 'undefined') (function () {
     const route = detailId !== null ? ROUTES['#/favoriter'] : (ROUTES[hash] || ROUTES['#/']);
     const isWheel = route.view === viewWheel;
     if (isWheel && !wheelVisitActive) wheelVisitActive = true;
-    else if (!isWheel && wheelVisitActive) resetWheelVisit();
+    else if (!isWheel && wheelVisitActive && detailId === null) resetWheelVisit(); // survives fav detail peek
     document.body.classList.toggle('wheel-mode', isWheel);
     if (route.view === viewFavorites) {
       if (detailId !== favOpenId) favChecked = new Set();
