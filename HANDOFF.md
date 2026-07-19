@@ -5,20 +5,20 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
-**BACKLOG items 1–9 done; item 10 in progress** (updated 2026-07-19). The reviewed seed
-now contains 26 drinks: the original 10 plus the user's selected 16-drink batch, each
-with a curated 640×800 production image. Every published recipe has a specific source;
-favorite detail renders the source as a small right-aligned link after the method. The
-bottom navigation and history-aware favorite detail fixes remain in place, and the exact
-persisted state blob is unchanged. `test.js`: 1374 checks green. All 26 source URLs
-returned HTTP 200 on 2026-07-19.
+**BACKLOG items 1–9 done; item 10 in progress** (updated 2026-07-19). `drinks.json` now
+contains the complete user-approved 92-drink seed: the reviewed 26 plus 66 standard and
+common additions, with normalized ingredient data, EN/SV methods and direct published
+recipe links. The original 26 still have curated 640×800 production art. Of the new 66,
+only `img-src/manhattan.png` has been generated so far; it passed visual review but has
+not yet been converted. Do not regenerate it or any existing image. The remaining 65
+source PNGs and all 66 new production WebPs are outstanding. The exact persisted state
+blob is unchanged. `test.js`: 4070 checks green. All 92 source URLs returned HTTP 200.
 The outstanding phone pass was attempted again from a local `python -m http.server` on
 2026-07-19, but browser discovery returned zero controllable browser backends. No new
-phone-browser verification is claimed; the fixed-nav/history changes, 16-drink batch and
-source-link treatment still need a real-phone interaction pass. Next: that pass, then
-continue item 10 toward the 80–100-drink target. The 26-drink state at commit `2f1379c`
-was pushed and deployed; cache-busted checks of both production URLs served the drink
-data, source-link code/CSS and a new image.
+phone-browser verification is claimed; the fixed-nav/history changes and source-link
+treatment still need a real-phone interaction pass. The 92-drink data checkpoint is local
+commit `a5314e0`; it has not been pushed or deployed. Production still serves the earlier
+26-drink state from commit `1f53dbb`.
 
 ## Implementation notes for the next session (things the code assumes)
 
@@ -40,8 +40,9 @@ data, source-link code/CSS and a new image.
 - Card fronts try `img/<drink-id>.webp` for the top four live cards and retain the
   `glassPlaceholder(drink.glass)` inline silhouette until load or on error. The current
   seed uses `coupe`, `highball`, `rocks` and `martini`; unknown future values degrade to
-  `rocks`. All 26 current ids have art. `convert()` uses 30 ml/oz (bar standard;
-  PRODUCT.md doesn't pin it).
+  `rocks`. The original 26 ids have production art; the 66 new ids currently use the
+  placeholder. Manhattan alone has a new source PNG pending conversion. `convert()` uses
+  30 ml/oz (bar standard; PRODUCT.md doesn't pin it).
 - The `#view` click/change delegates are attached ONCE at startup (the element is never
   replaced). `#deck` listeners attach when the view is rendered and survive successive
   swipes; each newly promoted top card only gets its pointer handlers once.
@@ -201,6 +202,14 @@ in PRODUCT.md "Locked decisions".
    Filename **must** be `img/<drink-id>.webp`; verify every output is 640×800 and
    ≤ 80 kB. Current range is 15,010–45,038 bytes across 26 production images.
 
+   **Active 66-drink expansion checkpoint (2026-07-19).** Recipe/data work is complete
+   in local commit `a5314e0`. `img-src/manhattan.png` is the only generated image from
+   this batch and must not be regenerated. Continue with the other 65 drinks in
+   `drinks.json` order, one built-in image-generation call per drink, using Margarita,
+   Mojito, Negroni and Daiquiri strictly as style references. Curate each source before
+   conversion, then convert Manhattan and all 65 new sources together with the frozen
+   quality 72/method 6 command.
+
 5. **Runtime behavior.** The app only creates the top four cards, uses
    `loading="lazy" decoding="async"`, keeps `glassPlaceholder(drink.glass)` behind the
    image until load and hides a failed `<img>` on error. Missing art must never break
@@ -210,12 +219,14 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-1. Real-phone check that the bottom navigation remains fixed on every view and hardware
-   Back from a favorite detail returns to the favorite list, plus the outstanding full
-   phone-viewport pass, source-link behavior and 60 fps feel check.
-2. BACKLOG 10: continue from the reviewed 26-drink seed toward 80–100 drinks in another
-   user-selected batch, following the frozen image pipeline for every addition.
-3. BACKLOG 11: PWA manifest and icon exports.
+1. BACKLOG 10 images: keep `img-src/manhattan.png`, generate and curate the remaining 65
+   approved sources one drink at a time, then convert all 66 new sources to production
+   WebP. Never regenerate the original 26 or Manhattan.
+2. Run the full local phone-viewport browser pass, including fixed navigation, swipe/flip
+   live-element behavior, missing-image fallback, favorite detail/Back, controls,
+   persistence, links and console. Claim only what a controllable browser verifies.
+3. Complete BACKLOG 10 documentation, verification, commit, push and deployment.
+4. BACKLOG 11: PWA manifest and icon exports.
 
 ## How to run / deploy
 
@@ -239,21 +250,21 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 1374 green; `node --check app.js`: green; `git diff --check`: green.
-All 26 drink ids have exactly one visually inspected 640×800 WebP, 15,010–45,038 bytes;
-there are no missing or extra production filenames. The 16 new source PNGs were generated
-one drink at a time from the frozen reference prompt and converted at quality 72/method 6;
-the original 10 images were not regenerated. All 26 recipe source URLs returned HTTP 200.
-Local HTTP smoke verifies index/app/data and a new image response. Source inspection
+`node test.js`: 4070 green; `node --check app.js`: green; `git diff --check`: green.
+The 92-drink dataset validates with 123 normalized ingredients, and all 92 current recipe
+source URLs returned HTTP 200 after replacing blocked/dead links. The original 26 drink ids
+still have exactly one visually inspected 640×800 WebP, 15,010–45,038 bytes; the original
+10 images were not regenerated. The new batch has one visually reviewed source only,
+`img-src/manhattan.png`; there are no new production WebPs yet. Local HTTP smoke and the
+full browser pass must be repeated after image completion. Source inspection
 confirms live-element deck promotion/flip and queue resets are unchanged. Earlier browser
 checks remain historical only: on 2026-07-19 the requested local phone pass was attempted
 again from a live local Python HTTP server, but the Browser plugin reported no available
 backend and its discovery list was empty. The current fixed navigation, favorite history,
 expanded seed and source links therefore remain phone-browser-unverified; gesture feel,
 repaint behavior, mobile Back, responsive controls, missing-image behavior and console
-checks were NOT done. Cache-busted production checks confirmed both
-`https://sipdeck.pages.dev/` and `https://orgutveckling.se/sipdeck/` serve 26 drinks, the
-source-link JS/CSS markers and the 34,334-byte Frozen Strawberry Daiquiri WebP. This file's
+checks were NOT done. The 92-drink checkpoint is committed locally as `a5314e0` but is not
+pushed or deployed; both production URLs still serve the earlier 26-drink state. This file's
 "Current state" paragraph must be updated at the end of every working session
 (recept/Årshjul convention).
 

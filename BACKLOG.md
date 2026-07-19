@@ -37,11 +37,13 @@ Items 1–9 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
    HANDOFF.md, exact 640×800 WebP outputs at 18–45 kB, complete id coverage and lazy
    loading for the top four cards. Resilient inline SVG silhouettes are keyed by the
    seed's `coupe`, `highball`, `rocks` and `martini` glass values. (G1)
-10. **Full drink seed (in progress: 26 drinks)** — grow drinks.json to ~80–100 (IBA list
-    + modern classics), all flags/ids reviewed, images generated batch-wise. The first
-    user-selected 16-drink expansion was completed 2026-07-19 with specific published
-    recipe links and curated production art; continue in user-selected batches. Editorial
-    pass on `bar` flag.
+10. **Full drink seed (in progress: 92 recipes, 26 production images)** — the target
+    recipe set is complete: the reviewed 26 plus the user's approved 66-drink standard and
+    common expansion, with normalized ids, EN/SV methods, reviewed `bar` flags and direct
+    published sources. Data checkpoint: local commit `a5314e0`. Image work is incomplete:
+    `img-src/manhattan.png` is generated and reviewed but not converted; generate the
+    remaining 65 sources one at a time, then convert and verify all 66 new WebPs. Never
+    regenerate the original 26 or Manhattan.
 11. **PWA manifest + icons** — relative paths, standalone. Export PNGs from
     `design/icon.svg` (192/512/apple-touch/maskable, on `#FBF7EF` except maskable which
     is full-bleed) and from `design/favicon.svg` (16/32) — see `design/README.md` for
@@ -73,4 +75,5 @@ Items 1–9 ✅ done 2026-07-18 (see HANDOFF.md "Current state"). Next up: item 
 - Last-write-wins sync (v1.1): fine, state has a single owner.
 - Pantry matching is id-exact: seeding discipline on ingredient ids is what makes it work.
 - No image = the drink's glass silhouette forever; acceptable for future additions,
-  tracked per drink by file absence. The current 26-drink seed has complete image coverage.
+  tracked per drink by file absence. The original 26 have complete production coverage;
+  the 66-drink expansion is intentionally on placeholders until its image batch is done.

@@ -26,8 +26,9 @@ reference (open it in a browser); the files below are what the scaffold session
 ## Cocktail artwork
 
 Cocktail illustrations are content assets, not identity source files, so they live at
-`../img/<drink-id>.webp`. The current 10-drink seed has complete 640×800 coverage. Local
-generated PNG sources live in gitignored `../img-src/`; the frozen `gpt-image-2`
+`../img/<drink-id>.webp`. The original 26-drink set has complete 640×800 coverage; the
+66-drink expansion is in progress as recorded in `../HANDOFF.md`. Local generated PNG
+sources live in gitignored `../img-src/`; the frozen `gpt-image-2`
 reference prompt, curation checklist and WebP conversion command live in
 `../HANDOFF.md` "Image pipeline". Do not copy illustration colors into the brand token
 system: the identity stays ink plus vermouth green while each drink supplies its own

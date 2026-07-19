@@ -6,19 +6,19 @@ build, no dependencies. English + Swedish.
 
 ## Current state
 
-The 26-drink seed has a complete optimized illustration set. Every card art asset is a
-visually reviewed 640×800 WebP under 46 kB, generated from the frozen reference workflow
-in `HANDOFF.md`. Filters, pantry, essential-ingredient makeability, EN/SV switching and
-glass-specific missing-art fallbacks are implemented. Favorites use compact art rows and
-a continuous recipe view with checkmarks, clipboard copy, published-recipe links and
-mobile Back navigation. The bottom navigation remains viewport-fixed across views; see
-`BACKLOG.md` for the remaining v1 work.
+The complete seed contains 92 reviewed recipes. The original 26 have optimized,
+visually reviewed 640×800 WebP illustrations under 46 kB; art generation for the 66-drink
+expansion is in progress, with Manhattan's source PNG complete. Filters, pantry,
+essential-ingredient makeability, EN/SV switching and glass-specific missing-art
+fallbacks are implemented. Favorites use compact art rows and a continuous recipe view
+with checkmarks, clipboard copy, published-recipe links and mobile Back navigation. See
+`HANDOFF.md` for the exact image checkpoint and `BACKLOG.md` for the remaining v1 work.
 
 ## Run
 
 ```
 python -m http.server   # then open http://localhost:8000
-node test.js            # 1374 checks (plain node asserts, no framework)
+node test.js            # plain node asserts, no framework
 ```
 
 ## Docs
