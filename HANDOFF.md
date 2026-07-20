@@ -14,7 +14,8 @@ viewport (390×760) against local HTTP: direct load of a valid id, saving from t
 deep-link view, list pickup, Back-to-deck fallback, and an invalid id degrading
 gracefully to the favorites list — all with zero console errors. `app.js` is 59,995
 bytes (still under the 60 kB budget; the budget is tight, watch it on the next change).
-`node test.js`: 4,308 checks green (5 new deep-link tests). Previous paragraph, superseded
+`node test.js`: 4,308 checks green (5 new deep-link tests). Committed (`3cb2d5f`), pushed,
+and deployed to both production origins on 2026-07-20. Previous paragraph, superseded
 below in "v1 close-out", kept for history:
 
 **BACKLOG items 1–12 done; item 13 next; item 14 partially verified** (updated 2026-07-19).
@@ -400,4 +401,8 @@ via the deep link, and an unknown id degrades to the favorites list with zero co
 errors (existing "skip ids not in db" pattern already covered it, unchanged). `app.js` is
 59,995 bytes — 5 bytes under the 60 kB test.js budget; the margin is thin, watch it on
 the next app.js change. 4,308 tests green (5 new: `drinkIdFromHash` parsing/decoding/
-rejection cases). No production deploy yet for this change — local-only until deployed.
+rejection cases). Committed as `3cb2d5f`, pushed to main, and deployed: wrangler upload to
+Cloudflare Pages (`img-src/` moved out of the repo root first, restored after) plus the
+`git push` that updates the GitHub Pages origin. Both origins reverified after deploy —
+`app.js` on each serves `drinkIdFromHash`, and a Playwright load of
+`https://sipdeck.pages.dev/#/drink/margarita` produced zero console errors.
