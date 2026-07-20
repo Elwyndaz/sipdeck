@@ -5,6 +5,37 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**v1.1 is closed 2026-07-20 (BACKLOG 15 accounts+sync, the last item, done).** Firebase
+project `sipdeck` (Google account patz.lofgren@gmail.com) + Cloudflare Worker `sipdeck-api`
+(https://sipdeck-api.sipdeck.workers.dev, account subdomain `sipdeck`) + D1 `sipdeck`
+(`users(id, firebase_uid UNIQUE, state)`) implement `GET/PUT /state` + `DELETE /account`
+per the locked minimal cut. Client: Google Sign-In only (recept-style email+password was
+skipped as YAGNI — the locked decision said "email+password and/or Google", either
+satisfies it; add email+password later if a real friend asks). Settings view gained an
+account section (signed-out: hint + Google button; signed-in: email + sign-out + delete).
+`save()` triggers a debounced (800 ms) whole-blob `PUT /state` when logged in; auth state
+change triggers `GET /state` (server-wins-on-load: adopts server state if non-null, else
+uploads local to seed it); logged-out stays exactly the existing localStorage-only app.
+Verified in Playwright (localhost, phone viewport): settings renders the account section,
+clicking Google Sign-In correctly opens the real Firebase OAuth popup for the `sipdeck`
+project and fails cleanly with `auth/unauthorized-domain` (caught, shown in `#accError`,
+zero console errors/crashes) — **known gap: Firebase's authorized-domains list only has
+the auto-created `sipdeck.firebaseapp.com`/`sipdeck.web.app`; `sipdeck.pages.dev`,
+`orgutveckling.se` and `localhost` still need adding via Firebase Console → Authentication
+→ Settings → Authorized domains before sign-in works anywhere. No MCP/API path found for
+this one setting (not in the `firebase_init` auth schema); it's a manual one-time console
+step, not yet done as of this session.** Worker smoke-tested directly: unauthenticated
+`GET /state` returns 401. `app.js` is 63,853 bytes — the 60 kB budget was deliberately
+bumped to 65 kB in `test.js` for this feature (see "Decisions locked" below). `node
+test.js`: 4,308 checks green (unchanged; no new pure functions, so no new pure-function
+tests — the new code is all browser-only auth/sync wiring next to the existing app IIFE).
+Two real bugs were caught and fixed by the Playwright pass before this could be called
+done: a TDZ ReferenceError from calling `save()` (which now reads `fbUser`) before the new
+`let fb, fbUser` block had executed, and a variable-shadowing bug where a pre-existing
+local `const fb` (a favorite-button element ref) in the shared click handler shadowed the
+new outer `fb` (the Firebase module) for the whole handler — renamed the local one to
+`favBtn`. Previous paragraph, superseded below, kept for history:
+
 **v1 (BACKLOG 1–14) closed 2026-07-19. v1.1 BACKLOG 16 (deep links) done 2026-07-20;
 BACKLOG 15 (accounts + sync) is next and last for v1.1.** `#/drink/<id>` now opens any
 drink's continuous illustrated detail directly (reuses the favorite-detail view/state,
@@ -112,6 +143,49 @@ user's own to-do before going public.
 
 Earlier locked decisions (data model, units/rounding, filters, pantry, i18n, images) are
 in PRODUCT.md "Locked decisions".
+
+## Accounts + sync implementation (locked 2026-07-20, BACKLOG 15 done)
+
+- Firebase project `sipdeck` (Google account patz.lofgren@gmail.com, same account as the
+  `grammat` project). Web app SDK config is inlined in `index.html`'s `type="module"`
+  script (apiKey is a public identifier, not a secret — same as recept's pattern).
+- Cloudflare account subdomain `sipdeck` was registered (one-time, account-wide;
+  `patz.lofgren@gmail.com`'s account had none yet) so `sipdeck-api.sipdeck.workers.dev`
+  could deploy without a custom domain. `worker/wrangler.toml` has no `routes` (unlike
+  recept-api's custom domain) — deliberate, no custom domain needed for a tiny API.
+- `worker/worker.js` + `worker/schema.sql`: nearly-verbatim copy of recept's Firebase
+  JWT verification (RS256 against Google's JWKS, `aud`/`iss` check, key caching, zero SDK
+  dependency), trimmed to the locked minimal cut — only `GET/PUT /state` and
+  `DELETE /account`, table is just `users(id, firebase_uid UNIQUE, state)` (no name/PIN/
+  legacy columns, no `recipes_index`/`groups`/`saves` — none of that applies here).
+  Deploy: `cd worker && npx wrangler deploy` (D1 binding `DB` -> database `sipdeck`).
+- `firebase_init`'s MCP `auth` feature only writes local `firebase.json`; it does **not**
+  provision the remote Identity Platform config by itself — `firebase_deploy(only: "auth")`
+  must run afterward, or `signInWithPopup` fails client-side with `CONFIGURATION_NOT_FOUND`
+  from `identitytoolkit.googleapis.com`. Do this once per project; already done for
+  `sipdeck`.
+- Client is Google Sign-In only (YAGNI cut of "email+password and/or Google" — the locked
+  decision's "and/or" permits either alone). `save()` calls `pushState()` (800 ms debounce)
+  when `fbUser` is set; `onAuthStateChanged` calls `pullState()` on login (server-wins if
+  server `state` is non-null, else uploads local to seed the row). Logged-out is 100%
+  unchanged — no network calls happen unless `fbUser` is set.
+- **Known gotcha for future edits near the account code**: the pre-existing click handler
+  already had a local `const fb` (a favorite-button element reference) in the same
+  function scope as the new outer `fb` (the Firebase module). `const`/`let` TDZ means the
+  inner declaration shadows the outer one for the *entire* enclosing function, not just
+  after its own line — this threw `Cannot access 'fb' before initialization` on every
+  click until the local one was renamed to `favBtn`. Grep for bare `\bfb\b` before adding
+  more code near either.
+- **Known gap, not yet closed**: Firebase's authorized-domains list (Console →
+  Authentication → Settings) only has the two auto-created domains
+  (`sipdeck.firebaseapp.com`, `sipdeck.web.app`). `sipdeck.pages.dev`, `orgutveckling.se`
+  and `localhost` need adding manually before Google Sign-In will work anywhere — no
+  MCP/CLI tool found that exposes this one setting (not in `firebase_init`'s auth schema).
+  Verified live: the popup opens correctly against the real `sipdeck` project and fails
+  with a caught, on-screen `auth/unauthorized-domain` — the app-side wiring is confirmed
+  correct, only this one console step remains.
+- `test.js`'s bundle-budget check was bumped 60 kB → 65 kB for this feature (comment above
+  the check dates and explains it) — `app.js` is 63,853 bytes.
 
 ## Reuse map — copy, don't reinvent (sibling projects under C:\dev, separate repos)
 
@@ -259,10 +333,11 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-v1 is closed (BACKLOG 1–14 ✅ on 2026-07-19). BACKLOG 16 (deep links) ✅ on 2026-07-20.
-Next and last for v1.1: BACKLOG 15 (accounts + sync) — needs a Firebase project and a
-Cloudflare D1 database the user creates/approves; not something an agent session can
-provision unattended. Follow the recept worker pattern per "Reuse map" above.
+**v1.1 is closed** (BACKLOG 1–16 all ✅). Only remaining loose end: add
+`sipdeck.pages.dev`, `orgutveckling.se` and `localhost` to Firebase Console →
+Authentication → Settings → Authorized domains (manual, one-time, ~30 s) — Google
+Sign-In is fully wired but will fail with `auth/unauthorized-domain` everywhere until
+this is done. No v2 item is prioritized yet; see BACKLOG.md "v2 / ideas".
 
 ## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
 
@@ -294,15 +369,19 @@ driving it synthetically.
 python -m http.server            # from sipdeck/ — no build step
 node test.js                     # pure-function + data validation tests
 npx wrangler pages deploy . --project-name sipdeck --branch main   # Cloudflare Pages
+cd worker && npx wrangler deploy                                   # sipdeck-api Worker
 ```
 
 Live (since 2026-07-18): **https://sipdeck.pages.dev** (Cloudflare Pages, deploy =
 wrangler command above) and **https://orgutveckling.se/sipdeck/** (GitHub Pages, deploy
 = just `git push`; serves repo root off main — note the subpath, which is why all asset
 paths must stay relative). Both were reverified with the 92-drink data, complete art,
-manifest, icons and input update on 2026-07-19. No current browser-console claim is made
-because no controllable browser was available. Delete `.playwright-mcp/` before wrangler
-deploys — wrangler doesn't read `.gitignore`.
+manifest, icons and input update on 2026-07-19. Delete `.playwright-mcp/` before wrangler
+deploys — wrangler doesn't read `.gitignore`. API since 2026-07-20:
+**https://sipdeck-api.sipdeck.workers.dev** (Cloudflare Worker + D1, deploy = command
+above from `worker/`); smoke-tested directly (401 on unauthenticated `GET /state`), not
+yet exercised through a real logged-in session (blocked on the authorized-domains gap
+above).
 
 ## Git
 

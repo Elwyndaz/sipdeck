@@ -69,12 +69,14 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 
 ——————————— **v1 CUT — everything below ships after v1 is live** ———————————
 
-## v1.1
+## v1.1 — closed 2026-07-20 (both items done)
 
-15. **Accounts + sync** — copy recept worker pattern, minimal: Firebase project, Worker +
-    D1 `users(id, firebase_uid UNIQUE, state)`, `GET/PUT /state` + `DELETE /account`,
-    JWT verification code lifted from recept worker, debounced PUT, server-wins-on-load,
-    logged-out untouched. (I1)
+15. ✅ **Accounts + sync** (done 2026-07-20) — Firebase project `sipdeck` + Cloudflare Worker
+    `sipdeck-api` + D1 `users(id, firebase_uid UNIQUE, state)`, `GET/PUT /state` +
+    `DELETE /account`, JWT verification lifted nearly verbatim from recept's worker,
+    debounced (800 ms) whole-blob PUT, server-wins-on-load, logged-out untouched.
+    Google Sign-In only (email/password skipped as YAGNI for a "Patrik + friends" v1.1 —
+    the locked decision said "email+password and/or Google", either satisfies it).
 16. ✅ **Deep links** (done 2026-07-20) — `#/drink/<id>` opens the continuous illustrated
     detail directly (reuses the favorite-detail view), with a Save/Remove favorite toggle
     and a Back that returns to the deck (not the favorites list) when reached this way.

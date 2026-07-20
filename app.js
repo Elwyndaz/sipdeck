@@ -48,6 +48,10 @@ const STRINGS = {
     servings_decrease: 'Decrease servings', servings_increase: 'Increase servings',
     unit_dash: 'dash', unit_barspoon: 'barspoon', unit_piece: 'pc', unit_leaf: 'leaf',
     unit_slice: 'slice', unit_garnish: 'garnish', unit_top: 'top up',
+    account_title: 'Account', account_hint: 'Sign in to sync favorites and pantry across devices.',
+    account_google: 'Sign in with Google', account_signed_in_as: 'Signed in as',
+    account_signout: 'Sign out', account_delete: 'Delete account',
+    account_delete_confirm: 'Delete your account and all synced data? This cannot be undone.',
   },
   sv: {
     wheel_entry: 'Välj åt mig', wheel_title: 'Välj åt mig', wheel_back: 'Tillbaka',
@@ -95,6 +99,10 @@ const STRINGS = {
     servings_decrease: 'Minska antal portioner', servings_increase: 'Öka antal portioner',
     unit_dash: 'stänk', unit_barspoon: 'barsked', unit_piece: 'st', unit_leaf: 'blad',
     unit_slice: 'skiva', unit_garnish: 'garnering', unit_top: 'toppa upp',
+    account_title: 'Konto', account_hint: 'Logga in för att synka favoriter och skafferi mellan enheter.',
+    account_google: 'Logga in med Google', account_signed_in_as: 'Inloggad som',
+    account_signout: 'Logga ut', account_delete: 'Radera konto',
+    account_delete_confirm: 'Radera ditt konto och all synkad data? Går inte att ångra.',
   },
 };
 function t(lang, key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
@@ -427,10 +435,43 @@ if (typeof document !== 'undefined') (function () {
   let raw = null;
   try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { raw = null; }
   let state = normalizeState(raw, lang0);
-  function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  // ---------- accounts + sync (BACKLOG 15): Firebase Auth identity + Worker/D1 state blob.
+  // Logged out = untouched, unchanged localStorage-only behavior. ----------
+  let fb = null, fbUser = null, pushTimer = null;
+  const API = 'https://sipdeck-api.sipdeck.workers.dev';
+
+  function save() { localStorage.setItem(KEY, JSON.stringify(state)); if (fbUser) pushState(); }
   save(); // persist first-run defaults immediately
 
   function lang() { return state.settings.lang; }
+
+  async function authedFetch(path, opts) {
+    const token = await fbUser.getIdToken();
+    const headers = Object.assign({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, (opts && opts.headers) || {});
+    return fetch(API + path, Object.assign({}, opts, { headers }));
+  }
+  async function pullState() { // server-wins-on-load; empty server state uploads local instead
+    try {
+      const res = await authedFetch('/state');
+      const data = await res.json();
+      if (data.state) { state = normalizeState(data.state, lang()); localStorage.setItem(KEY, JSON.stringify(state)); }
+      else pushState();
+    } catch (e) { /* offline/blocked: stay on local state */ }
+  }
+  function pushState() { // debounced whole-blob PUT, last-write-wins
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => {
+      if (fbUser) authedFetch('/state', { method: 'PUT', body: JSON.stringify(state) }).catch(() => {});
+    }, 800);
+  }
+  function initFirebase() {
+    fb.onAuthStateChanged(fb.auth, async user => {
+      fbUser = user;
+      if (user) await pullState();
+      render();
+    });
+  }
 
   let db = null;       // null = loading; {ingredients, drinks} once fetch resolves
   let drinksFailed = false;
@@ -920,6 +961,25 @@ if (typeof document !== 'undefined') (function () {
     </section>`;
   }
 
+  function accountSection() {
+    if (!fb) return '';
+    if (fbUser) return `<section class="account">
+      <h2>${esc(t(lang(), 'account_title'))}</h2>
+      <p>${esc(t(lang(), 'account_signed_in_as'))} ${esc(fbUser.email || fbUser.displayName || '')}</p>
+      <div class="account-actions">
+        <button data-acc="signout">${esc(t(lang(), 'account_signout'))}</button>
+        <button data-acc="delete">${esc(t(lang(), 'account_delete'))}</button>
+      </div>
+      <p id="accError" class="warn" hidden></p>
+    </section>`;
+    return `<section class="account">
+      <h2>${esc(t(lang(), 'account_title'))}</h2>
+      <p>${esc(t(lang(), 'account_hint'))}</p>
+      <button data-acc="google">${esc(t(lang(), 'account_google'))}</button>
+      <p id="accError" class="warn" hidden></p>
+    </section>`;
+  }
+
   function viewSettings() {
     const s = state.settings;
     const bool = v => t(lang(), v ? 'yes' : 'no');
@@ -933,7 +993,7 @@ if (typeof document !== 'undefined') (function () {
         <dt>${esc(t(lang(), 'settings_servings'))}</dt><dd>${esc(String(s.servings))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_bar'))}</dt><dd>${esc(bool(s.filters.bar))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_base'))}</dt><dd>${base}</dd>
-      </dl>`;
+      </dl>${accountSection()}`;
   }
 
   function random01() {
@@ -1159,6 +1219,22 @@ if (typeof document !== 'undefined') (function () {
   }
 
   $('#view').addEventListener('click', async e => {
+    const accBtn = e.target.closest('[data-acc]');
+    if (accBtn) {
+      const errEl = $('#accError');
+      try {
+        const action = accBtn.dataset.acc;
+        if (action === 'google') await fb.signInWithPopup(fb.auth, new fb.GoogleAuthProvider());
+        else if (action === 'signout') await fb.signOut(fb.auth);
+        else if (action === 'delete' && confirm(t(lang(), 'account_delete_confirm'))) {
+          await authedFetch('/account', { method: 'DELETE' });
+          await fbUser.delete();
+        }
+      } catch (err) { // ponytail: raw Firebase message, no i18n error map; add one if real users hit this often
+        if (errEl) { errEl.textContent = err.message; errEl.hidden = false; }
+      }
+      return;
+    }
     const wheelAction = e.target.closest('[data-wheel-act]');
     if (wheelAction) {
       const action = wheelAction.dataset.wheelAct;
@@ -1203,9 +1279,9 @@ if (typeof document !== 'undefined') (function () {
       setTimeout(() => { if (copyBtn.isConnected) copyBtn.textContent = t(lang(), 'copy_recipe'); }, 2500);
       return;
     }
-    const fb = e.target.closest('[data-act="fav"]');
-    if (fb) {
-      const id = fb.dataset.id;
+    const favBtn = e.target.closest('[data-act="fav"]');
+    if (favBtn) {
+      const id = favBtn.dataset.id;
       if (state.favorites.includes(id)) state.favorites = state.favorites.filter(x => x !== id);
       else state.favorites.push(id);
       save();
@@ -1255,6 +1331,8 @@ if (typeof document !== 'undefined') (function () {
   });
 
   $('#wheelEntry').addEventListener('click', () => { wheelOpenedFromHome = true; });
+  if (window.fb) { fb = window.fb; initFirebase(); }
+  else window.addEventListener('fb-ready', () => { fb = window.fb; initFirebase(); }, { once: true });
   window.addEventListener('hashchange', renderRoute);
   window.addEventListener('keydown', e => {
     const dir = swipeDirectionForKey(e.key);

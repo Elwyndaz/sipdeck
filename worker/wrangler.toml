@@ -1,0 +1,8 @@
+name = "sipdeck-api"
+main = "worker.js"
+compatibility_date = "2026-07-06"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sipdeck"
+database_id = "ffdfc07e-e916-4085-b379-140069fd43fc"
