@@ -92,6 +92,28 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     (using a pre-fetched token for the fire-and-forget D1 cleanup after), so a failed
     Firebase call leaves the D1 row fully intact instead.
 
+## v1.2 — planned (2026-07-20)
+
+18. **Email + password sign-in** — add as a second sign-in method alongside Google, same
+    Firebase project, zero Worker/D1 changes (`worker.js` verifies the Firebase ID token,
+    identical shape regardless of provider). Reverses the BACKLOG 15 YAGNI cut: that decision
+    assumed a "Patrik + friends" v1.1 audience where "add later if a real friend asks" was
+    the right bar; it no longer holds because the user plans to post sipdeck on an AI forum,
+    a concrete anticipated audience that includes people who can't or won't use Google
+    sign-in (no Google account, work SSO lock-in, or just don't want to link random apps to
+    it). Do before that launch, not after. Copy recept's pattern nearly verbatim
+    (`recept/app.js` lines ~1157-1179: `createUserWithEmailAndPassword`,
+    `signInWithEmailAndPassword`, `sendPasswordResetEmail`, all Firebase client SDK, same
+    `esc()`-escaped rendering). Steps: enable Email/Password sign-in method in sipdeck's
+    Firebase console (Authentication → Sign-in method), possibly `firebase_deploy(only:
+    "auth")` afterward (same provisioning gotcha Google hit in BACKLOG 15); add email +
+    password fields and Login/Register/Forgot-password controls to `accountSection()`;
+    check the 65 kB `app.js` budget (`app.js` was 64,066 bytes as of BACKLOG 17's follow-up
+    fix, ~1 kB of headroom left, budget will likely need another bump in `test.js` — it was
+    already raised once, 60 kB → 65 kB, for the whole accounts feature); `node test.js`
+    green; Playwright-verify register/login/forgot-password same rigor as the Google flow
+    got (BACKLOG 15's HANDOFF.md notes); update HANDOFF.md/BACKLOG.md, commit, push, deploy.
+
 ## v2 / ideas (unordered)
 
 - Richer filter UI over existing tags: style, strength, **alcohol-free mode**.

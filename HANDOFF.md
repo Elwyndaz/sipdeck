@@ -366,7 +366,12 @@ in PRODUCT.md "Locked decisions".
 ## Immediate next steps (in order)
 
 **v1.1 is fully closed** (BACKLOG 1–17 all ✅, done 2026-07-20, including the account-deletion
-ordering fix). No v2 item is prioritized yet; see BACKLOG.md "v2 / ideas".
+ordering fix). Next up: **BACKLOG 18, email + password sign-in** (v1.2, planned 2026-07-20) —
+the user intends to post sipdeck on an AI forum, which reverses the earlier "Google-only,
+add email/password if a friend asks" YAGNI call from a real anticipated audience, not
+speculation. Full plan (Firebase console step, `accountSection()` UI, byte-budget check,
+verification, recept's file/line reference to copy the pattern from) is in BACKLOG.md under
+"v1.2 — planned". No other v2 item is prioritized; see BACKLOG.md "v2 / ideas".
 
 ## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
 
