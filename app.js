@@ -951,12 +951,12 @@ if (typeof document !== 'undefined') (function () {
           aria-pressed="${wheelMuted ? 'true' : 'false'}">${wheelMuted ? '🔇' : '🔊'}</button>
       </header>
       <div class="wheel-body">
-        <div class="wheel-heading">${heading}</div>
         <div class="wheel-stage" id="wheelStage">
           <div class="wheel-pointer" id="wheelPointer" aria-hidden="true"></div>
           <div class="wheel-disc" id="wheelDisc" style="transform:rotate(${wheelRotation}deg)">${disc}</div>
           <button class="wheel-hub-button" data-wheel-act="spin"${canSpin ? '' : ' disabled'}>${esc(t(lang(), wheelResult ? 'wheel_respin' : 'wheel_spin'))}</button>
         </div>
+        <div class="wheel-heading">${heading}</div>
         <section class="wheel-controls${mood ? '' : ' unset'}">
           <p class="wheel-controls-title">${esc(status || t(lang(), 'wheel_mood_label'))}</p>
           <input class="wheel-range" id="wheelMood" type="range" min="1" max="5" step="1" value="${moodIndex >= 0 ? moodIndex + 1 : 1}"
