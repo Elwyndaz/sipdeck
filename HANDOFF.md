@@ -17,15 +17,19 @@ account section (signed-out: hint + Google button; signed-in: email + sign-out +
 change triggers `GET /state` (server-wins-on-load: adopts server state if non-null, else
 uploads local to seed it); logged-out stays exactly the existing localStorage-only app.
 Verified in Playwright (localhost, phone viewport): settings renders the account section,
-clicking Google Sign-In correctly opens the real Firebase OAuth popup for the `sipdeck`
-project and fails cleanly with `auth/unauthorized-domain` (caught, shown in `#accError`,
-zero console errors/crashes) — **known gap: Firebase's authorized-domains list only has
-the auto-created `sipdeck.firebaseapp.com`/`sipdeck.web.app`; `sipdeck.pages.dev`,
-`orgutveckling.se` and `localhost` still need adding via Firebase Console → Authentication
-→ Settings → Authorized domains before sign-in works anywhere. No MCP/API path found for
-this one setting (not in the `firebase_init` auth schema); it's a manual one-time console
-step, not yet done as of this session.** Worker smoke-tested directly: unauthenticated
-`GET /state` returns 401. `app.js` is 63,853 bytes — the 60 kB budget was deliberately
+clicking Google Sign-In opens the real Firebase OAuth popup for the `sipdeck` project.
+First pass failed cleanly with `auth/unauthorized-domain` (caught, shown in `#accError`,
+zero console errors/crashes) because Firebase's authorized-domains list only had the two
+auto-created domains — user added `sipdeck.pages.dev`, `orgutveckling.se` and `localhost`
+via Firebase Console → Authentication → Settings → Authorized domains (no MCP/API path
+was found for this one setting; it's console-only). Re-verified same session: the popup
+now proceeds all the way to Google's real account chooser
+(`accounts.google.com/v3/signin/identifier`) instead of stopping at the domain check —
+**this gap is closed.** Completing an actual login with real credentials was left to the
+user, not attempted here. (Two benign console errors — `Cross-Origin-Opener-Policy policy
+would block the window.closed call` — are a known cosmetic quirk of the Firebase Auth SDK's
+popup-close polling under COOP, not an app bug.) Worker smoke-tested directly:
+unauthenticated `GET /state` returns 401. `app.js` is 63,853 bytes — the 60 kB budget was deliberately
 bumped to 65 kB in `test.js` for this feature (see "Decisions locked" below). `node
 test.js`: 4,308 checks green (unchanged; no new pure functions, so no new pure-function
 tests — the new code is all browser-only auth/sync wiring next to the existing app IIFE).
@@ -176,14 +180,11 @@ in PRODUCT.md "Locked decisions".
   after its own line — this threw `Cannot access 'fb' before initialization` on every
   click until the local one was renamed to `favBtn`. Grep for bare `\bfb\b` before adding
   more code near either.
-- **Known gap, not yet closed**: Firebase's authorized-domains list (Console →
-  Authentication → Settings) only has the two auto-created domains
-  (`sipdeck.firebaseapp.com`, `sipdeck.web.app`). `sipdeck.pages.dev`, `orgutveckling.se`
-  and `localhost` need adding manually before Google Sign-In will work anywhere — no
-  MCP/CLI tool found that exposes this one setting (not in `firebase_init`'s auth schema).
-  Verified live: the popup opens correctly against the real `sipdeck` project and fails
-  with a caught, on-screen `auth/unauthorized-domain` — the app-side wiring is confirmed
-  correct, only this one console step remains.
+- Firebase's authorized-domains list (Console → Authentication → Settings) needed
+  `sipdeck.pages.dev`, `orgutveckling.se` and `localhost` added manually — no MCP/CLI tool
+  exposes this one setting (not in `firebase_init`'s auth schema), it's console-only. Done
+  2026-07-20; re-verified the popup now reaches Google's real account chooser instead of
+  stopping at `auth/unauthorized-domain`.
 - `test.js`'s bundle-budget check was bumped 60 kB → 65 kB for this feature (comment above
   the check dates and explains it) — `app.js` is 63,853 bytes.
 - Deployed 2026-07-20: committed (`77ffb2f`), pushed, `sipdeck-api` Worker deployed, and
@@ -338,11 +339,11 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-**v1.1 is closed** (BACKLOG 1–16 all ✅). Only remaining loose end: add
-`sipdeck.pages.dev`, `orgutveckling.se` and `localhost` to Firebase Console →
-Authentication → Settings → Authorized domains (manual, one-time, ~30 s) — Google
-Sign-In is fully wired but will fail with `auth/unauthorized-domain` everywhere until
-this is done. No v2 item is prioritized yet; see BACKLOG.md "v2 / ideas".
+**v1.1 is closed** (BACKLOG 1–16 all ✅, including the authorized-domains step — done
+2026-07-20). Next up: BACKLOG 17, a dedicated security review of the accounts+sync surface
+(JWT verification in `worker.js`, D1 access, `/account` deletion, the new client auth/sync
+code) using the installed `security-review` skill/plugin. No v2 item is prioritized yet
+beyond that; see BACKLOG.md "v2 / ideas".
 
 ## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
 
@@ -384,9 +385,11 @@ paths must stay relative). Both were reverified with the 92-drink data, complete
 manifest, icons and input update on 2026-07-19. Delete `.playwright-mcp/` before wrangler
 deploys — wrangler doesn't read `.gitignore`. API since 2026-07-20:
 **https://sipdeck-api.sipdeck.workers.dev** (Cloudflare Worker + D1, deploy = command
-above from `worker/`); smoke-tested directly (401 on unauthenticated `GET /state`), not
-yet exercised through a real logged-in session (blocked on the authorized-domains gap
-above).
+above from `worker/`); smoke-tested directly (401 on unauthenticated `GET /state`).
+Authorized domains fixed 2026-07-20 (see "Accounts + sync implementation" above); an
+actual end-to-end logged-in session (real Google credentials completing `GET`/`PUT
+/state` against the live Worker) has still not been exercised — that's the user's own
+first real login to try.
 
 ## Git
 
