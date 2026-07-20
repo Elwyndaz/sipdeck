@@ -5,6 +5,31 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**v1.2 is closed 2026-07-20 (BACKLOG 18, email + password sign-in).** Second sign-in method
+alongside Google, same Firebase project `sipdeck`, zero Worker/D1 changes (JWT verification
+in `worker.js` is provider-agnostic). Firebase console step done via MCP instead of the
+console UI: `firebase_init` with `auth.providers.emailPassword: true`, then
+`firebase_deploy(only: "auth")` to provision the remote Identity Platform config (same
+provisioning gotcha Google's provider hit in BACKLOG 15 — `firebase_init` only writes local
+config, `firebase_deploy` pushes it remotely). `accountSection()` in `app.js` gained an
+`#emailForm` (email + password inputs, Log in/Create account/Forgot password buttons) next
+to the existing Google button, shown only when logged out; the logged-in view (email,
+sign-out, delete) is unchanged. Event wiring: a `submit` delegate on `#view` for
+`#emailForm` (mirrors the existing once-attached delegate pattern) calls
+`createUserWithEmailAndPassword`/`signInWithEmailAndPassword` based on `e.submitter.dataset.mode`;
+a new `forgot` branch in the existing `data-acc` click delegate calls
+`sendPasswordResetEmail` and reuses `#accError` for the success message. No Firebase
+error-code → i18n translation map was added — matches the existing ponytail decision on the
+Google/delete flow (raw `err.message`, add a map only if real users hit it often).
+`app.js` grew to 66,096 bytes, so the `test.js` bundle budget was bumped again (65 kB → 67
+kB, comment dated in `test.js`). `node test.js`: 4,308 green. Playwright-verified on local
+HTTP (phone viewport, 390×760): register with a fresh email → immediately signed in;
+sign out → form reappears; log in with the same credentials → signed in again; forgot
+password with the email field filled → "Återställningsmejl skickat." success message;
+delete account (confirm dialog accepted via Playwright's dialog handler) → back to the
+logged-out form. Zero console errors/warnings at every step. The test account was deleted
+at the end, no leftover row. Previous paragraph, superseded below, kept for history:
+
 **v1.1 is fully closed 2026-07-20, including BACKLOG 17 (security review of accounts+sync,
 the last item).** Both the `security-review` skill and an independent cross-check sub-agent
 reviewed `worker/worker.js` (JWT verification, D1 access, `/state` + `/account`),
@@ -365,13 +390,9 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-**v1.1 is fully closed** (BACKLOG 1–17 all ✅, done 2026-07-20, including the account-deletion
-ordering fix). Next up: **BACKLOG 18, email + password sign-in** (v1.2, planned 2026-07-20) —
-the user intends to post sipdeck on an AI forum, which reverses the earlier "Google-only,
-add email/password if a friend asks" YAGNI call from a real anticipated audience, not
-speculation. Full plan (Firebase console step, `accountSection()` UI, byte-budget check,
-verification, recept's file/line reference to copy the pattern from) is in BACKLOG.md under
-"v1.2 — planned". No other v2 item is prioritized; see BACKLOG.md "v2 / ideas".
+**v1.2 is closed** (BACKLOG 1–18 all ✅, done 2026-07-20). No v2 item is prioritized yet;
+see BACKLOG.md "v2 / ideas" for unordered candidates (richer filter UI, search, custom
+domain, service worker/offline, "missing one ingredient" pantry view, shake-to-shuffle).
 
 ## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
 

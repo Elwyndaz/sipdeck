@@ -52,6 +52,9 @@ const STRINGS = {
     account_google: 'Sign in with Google', account_signed_in_as: 'Signed in as',
     account_signout: 'Sign out', account_delete: 'Delete account',
     account_delete_confirm: 'Delete your account and all synced data? This cannot be undone.',
+    account_email: 'Email', account_password: 'Password', account_login: 'Log in',
+    account_register: 'Create account', account_forgot: 'Forgot password?',
+    account_forgot_sent: 'Password reset email sent.',
   },
   sv: {
     wheel_entry: 'Välj åt mig', wheel_title: 'Välj åt mig', wheel_back: 'Tillbaka',
@@ -103,6 +106,9 @@ const STRINGS = {
     account_google: 'Logga in med Google', account_signed_in_as: 'Inloggad som',
     account_signout: 'Logga ut', account_delete: 'Radera konto',
     account_delete_confirm: 'Radera ditt konto och all synkad data? Går inte att ångra.',
+    account_email: 'E-post', account_password: 'Lösenord', account_login: 'Logga in',
+    account_register: 'Skapa konto', account_forgot: 'Glömt lösenordet?',
+    account_forgot_sent: 'Återställningsmejl skickat.',
   },
 };
 function t(lang, key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
@@ -976,6 +982,15 @@ if (typeof document !== 'undefined') (function () {
       <h2>${esc(t(lang(), 'account_title'))}</h2>
       <p>${esc(t(lang(), 'account_hint'))}</p>
       <button data-acc="google">${esc(t(lang(), 'account_google'))}</button>
+      <form id="emailForm" class="account-form">
+        <label>${esc(t(lang(), 'account_email'))} <input type="email" id="accEmail" autocomplete="username" required></label>
+        <label>${esc(t(lang(), 'account_password'))} <input type="password" id="accPw" minlength="6" maxlength="64" autocomplete="current-password" required></label>
+        <div class="account-actions">
+          <button type="submit" data-mode="login">${esc(t(lang(), 'account_login'))}</button>
+          <button type="submit" data-mode="register">${esc(t(lang(), 'account_register'))}</button>
+          <button type="button" data-acc="forgot">${esc(t(lang(), 'account_forgot'))}</button>
+        </div>
+      </form>
       <p id="accError" class="warn" hidden></p>
     </section>`;
   }
@@ -1225,6 +1240,11 @@ if (typeof document !== 'undefined') (function () {
       try {
         const action = accBtn.dataset.acc;
         if (action === 'google') await fb.signInWithPopup(fb.auth, new fb.GoogleAuthProvider());
+        else if (action === 'forgot') {
+          await fb.sendPasswordResetEmail(fb.auth, $('#accEmail').value.trim());
+          errEl.textContent = t(lang(), 'account_forgot_sent');
+          errEl.hidden = false;
+        }
         else if (action === 'signout') await fb.signOut(fb.auth);
         else if (action === 'delete' && confirm(t(lang(), 'account_delete_confirm'))) {
           const token = await fbUser.getIdToken(); // grab before delete: fbUser is unusable after
@@ -1294,6 +1314,19 @@ if (typeof document !== 'undefined') (function () {
       favHistoryEntry = true;
       location.hash = '#/favoriter/' + encodeURIComponent(row.dataset.id);
     }
+  });
+
+  $('#view').addEventListener('submit', async e => {
+    const form = e.target.closest('#emailForm');
+    if (!form) return;
+    e.preventDefault();
+    const errEl = $('#accError');
+    errEl.hidden = true;
+    const mode = e.submitter ? e.submitter.dataset.mode : 'login';
+    try {
+      if (mode === 'register') await fb.createUserWithEmailAndPassword(fb.auth, $('#accEmail').value.trim(), $('#accPw').value);
+      else await fb.signInWithEmailAndPassword(fb.auth, $('#accEmail').value.trim(), $('#accPw').value);
+    } catch (err) { errEl.textContent = err.message; errEl.hidden = false; } // ponytail: raw Firebase message, matches the data-acc catch above
   });
 
   $('#view').addEventListener('change', e => {
