@@ -24,6 +24,7 @@ const STRINGS = {
     favorites_empty: 'Nothing saved yet. Swipe right on a drink to save it here.',
     fav_back: 'Back',
     fav_unfavorite: 'Remove favorite',
+    fav_add: 'Save',
     recipe_title: 'Recipe', ingredients_title: 'Ingredients', method_title: 'Method',
     ingredient_check_hint: 'Check off ingredients as you mix.',
     check_ingredient: 'Check off', copy_recipe: 'Copy recipe',
@@ -70,6 +71,7 @@ const STRINGS = {
     favorites_empty: 'Inget sparat än. Svep höger på en drink för att spara den här.',
     fav_back: 'Tillbaka',
     fav_unfavorite: 'Ta bort favorit',
+    fav_add: 'Spara',
     recipe_title: 'Recept', ingredients_title: 'Ingredienser', method_title: 'Gör så här',
     ingredient_check_hint: 'Bocka av ingredienserna medan du blandar.',
     check_ingredient: 'Bocka av', copy_recipe: 'Kopiera receptet',
@@ -139,13 +141,14 @@ function normalizeState(raw, lang) {
   };
 }
 
-function favoriteIdFromHash(hash) {
-  const prefix = '#/favoriter/';
+function hid(hash, prefix) {
   if (typeof hash !== 'string' || hash.indexOf(prefix) !== 0) return null;
   const encoded = hash.slice(prefix.length);
   if (!encoded || encoded.includes('/')) return null;
   try { return decodeURIComponent(encoded); } catch (e) { return null; }
 }
+const favoriteIdFromHash = h => hid(h, '#/favoriter/');
+const drinkIdFromHash = h => hid(h, '#/drink/');
 
 // ---------- unit engine (BACKLOG 3) — canonical ml, linear scaling, bar rounding, display ----------
 const NONCONVERTIBLE_UNITS = ['dash', 'barspoon', 'piece', 'leaf', 'slice', 'garnish', 'top'];
@@ -405,7 +408,7 @@ function drinkAsText(drink, ingredients, servings, unit, lang) {
 }
 
 if (typeof module !== 'undefined') module.exports = {
-  STRINGS, t, UNITS, detectLang, defaultState, normalizeState, favoriteIdFromHash,
+  STRINGS, t, UNITS, detectLang, defaultState, normalizeState, favoriteIdFromHash, drinkIdFromHash,
   NONCONVERTIBLE_UNITS, scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, swipeDirectionForKey, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
@@ -748,7 +751,7 @@ if (typeof document !== 'undefined') (function () {
       return `${title}
         <div class="fav-toolbar">
           <button id="favClose" class="fav-back">${esc(t(lang(), 'fav_back'))}</button>
-          <button class="fav-remove" data-act="unfav" data-id="${esc(open.id)}" aria-label="${esc(t(lang(), 'fav_unfavorite'))}">${esc(t(lang(), 'fav_unfavorite'))}</button>
+          <button class="fav-remove" data-act="fav" data-id="${esc(open.id)}">${esc(t(lang(), state.favorites.includes(open.id) ? 'fav_unfavorite' : 'fav_add'))}</button>
         </div>
         <article class="fav-detail">
           <section class="fav-hero">
@@ -788,7 +791,7 @@ if (typeof document !== 'undefined') (function () {
             <span class="meta">${esc(taxonomyName('type', d.type))}</span>
           </span>
         </button>
-        <button class="fav-remove" data-act="unfav" data-id="${esc(d.id)}" aria-label="${esc(t(lang(), 'fav_unfavorite'))}">&times;</button>
+        <button class="fav-remove" data-act="fav" data-id="${esc(d.id)}" aria-label="${esc(t(lang(), 'fav_unfavorite'))}">&times;</button>
       </div>`).join('');
     return `${title}${list}`;
   }
@@ -1111,14 +1114,14 @@ if (typeof document !== 'undefined') (function () {
       favHistoryEntry = false;
       history.back();
     } else {
-      history.replaceState(null, '', '#/favoriter');
+      history.replaceState(null, '', drinkIdFromHash(location.hash) ? '#/' : '#/favoriter');
       render();
     }
   }
 
   function render() {
     const hash = location.hash || '#/';
-    const detailId = favoriteIdFromHash(hash);
+    const detailId = favoriteIdFromHash(hash) || drinkIdFromHash(hash);
     const route = detailId !== null ? ROUTES['#/favoriter'] : (ROUTES[hash] || ROUTES['#/']);
     const isWheel = route.view === viewWheel;
     if (isWheel && !wheelVisitActive) wheelVisitActive = true;
@@ -1200,14 +1203,13 @@ if (typeof document !== 'undefined') (function () {
       setTimeout(() => { if (copyBtn.isConnected) copyBtn.textContent = t(lang(), 'copy_recipe'); }, 2500);
       return;
     }
-    const unfavBtn = e.target.closest('[data-act="unfav"]');
-    if (unfavBtn) {
-      const id = unfavBtn.dataset.id;
-      state.favorites = state.favorites.filter(x => x !== id);
-      const closedDetail = favOpenId === id;
+    const fb = e.target.closest('[data-act="fav"]');
+    if (fb) {
+      const id = fb.dataset.id;
+      if (state.favorites.includes(id)) state.favorites = state.favorites.filter(x => x !== id);
+      else state.favorites.push(id);
       save();
-      if (closedDetail) closeFavoriteDetail();
-      else render();
+      render();
       return;
     }
     const row = e.target.closest('.fav-open');

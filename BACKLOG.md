@@ -75,7 +75,9 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     D1 `users(id, firebase_uid UNIQUE, state)`, `GET/PUT /state` + `DELETE /account`,
     JWT verification code lifted from recept worker, debounced PUT, server-wins-on-load,
     logged-out untouched. (I1)
-16. **Deep links** — `#/drink/<id>` opens a card directly (shareable).
+16. ✅ **Deep links** (done 2026-07-20) — `#/drink/<id>` opens the continuous illustrated
+    detail directly (reuses the favorite-detail view), with a Save/Remove favorite toggle
+    and a Back that returns to the deck (not the favorites list) when reached this way.
 
 ## v2 / ideas (unordered)
 

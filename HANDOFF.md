@@ -5,6 +5,18 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**v1 (BACKLOG 1–14) closed 2026-07-19. v1.1 BACKLOG 16 (deep links) done 2026-07-20;
+BACKLOG 15 (accounts + sync) is next and last for v1.1.** `#/drink/<id>` now opens any
+drink's continuous illustrated detail directly (reuses the favorite-detail view/state,
+see implementation notes below), with a Save/Remove-favorite toggle and a Back that
+returns to the deck rather than the favorites list. Verified in a Playwright phone
+viewport (390×760) against local HTTP: direct load of a valid id, saving from the
+deep-link view, list pickup, Back-to-deck fallback, and an invalid id degrading
+gracefully to the favorites list — all with zero console errors. `app.js` is 59,995
+bytes (still under the 60 kB budget; the budget is tight, watch it on the next change).
+`node test.js`: 4,308 checks green (5 new deep-link tests). Previous paragraph, superseded
+below in "v1 close-out", kept for history:
+
 **BACKLOG items 1–12 done; item 13 next; item 14 partially verified** (updated 2026-07-19).
 The approved 92-drink/123-ingredient seed and complete card artwork remain intact. Sipdeck
 now has a localized, full-screen `#/hjul` spinning wheel opened by the starting-page "Pick
@@ -27,7 +39,14 @@ before item 14's remaining browser gate can close the v1 cut.
   `db` (fetched drinks.json), `deckQueue` (deck order, ids), `flippedId` (deck flip),
   `favOpenId`/`favChecked`/`favHistoryEntry` (favorite detail, mixing progress and whether
   Close can use browser Back) — all transient, never in the state blob. Favorite detail
-  routes are parsed by the exported pure `favoriteIdFromHash()` helper.
+  routes are parsed by the exported pure `favoriteIdFromHash()` helper; deep links
+  (`#/drink/<id>`, BACKLOG 16) share the same detail view via the parallel
+  `drinkIdFromHash()` helper (both thin wrappers around an internal `hid()` prefix
+  matcher) and the same `favOpenId` state — `favDrink()` already looks up any id in `db`,
+  not just favorited ones. The toolbar button in that view is a single add/remove
+  favorite toggle (`data-act="fav"`) whose label depends on current membership; closing
+  falls back to `#/` when opened via `#/drink/`, `#/favoriter` otherwise (checked via
+  `drinkIdFromHash(location.hash)` at close time, not stored state).
 - Card faces use fixed paper-ink hex (`#211B12`/`#6E6455`), not `--sd-ink` — cards never
   theme-invert (design rule). Gesture tints are opacity-only overlays (composited).
 - Deck flip must animate by toggling `.flipped` on the LIVE element; a re-render rebuilds
@@ -239,8 +258,10 @@ in PRODUCT.md "Locked decisions".
 
 ## Immediate next steps (in order)
 
-v1 is closed (BACKLOG 1–14 ✅ on 2026-07-19). Next: v1.1 — BACKLOG 15 (accounts + sync)
-and 16 (deep links).
+v1 is closed (BACKLOG 1–14 ✅ on 2026-07-19). BACKLOG 16 (deep links) ✅ on 2026-07-20.
+Next and last for v1.1: BACKLOG 15 (accounts + sync) — needs a Firebase project and a
+Cloudflare D1 database the user creates/approves; not something an agent session can
+provision unattended. Follow the recept worker pattern per "Reuse map" above.
 
 ## v1 close-out (BACKLOG 13 + 14, 2026-07-19)
 
@@ -363,3 +384,20 @@ to say "skip-red" instead of "skip-amber". Contrast improved: 6.22:1 light (was 
 6.54:1 dark AA (was 8.38:1 AAA — still comfortably above the 4.5:1 floor). Verified
 visually via a Playwright drag-left/drag-right screenshot pair; deployed to both
 production origins. 4,303 tests green throughout.
+
+BACKLOG 16 (deep links) done 2026-07-20: `#/drink/<id>` reuses the favorite-detail view
+and `favOpenId` state — `favDrink()` already resolved any id in `db`, not just favorited
+ones, so no new render path was needed. Added the parallel `drinkIdFromHash()` helper
+(both it and `favoriteIdFromHash()` are now thin wrappers around an internal `hid()`
+prefix matcher, to stay inside the 60 kB budget), a single add/remove-favorite toggle
+button (`data-act="fav"`) replacing the old unfavorite-only button, and a Back fallback
+that goes to `#/` when opened via `#/drink/` vs `#/favoriter` otherwise (checked from
+`location.hash` at close time). Verified in a Playwright phone viewport (390x760) against
+local HTTP: direct load of `#/drink/margarita` (loading state then detail, matching the
+existing db-fetch race handling), Save toggle -> label flips to "Ta bort favorit" and the
+drink appears in the Favorites list, Back returns to `#/` (not `#/favoriter`) when opened
+via the deep link, and an unknown id degrades to the favorites list with zero console
+errors (existing "skip ids not in db" pattern already covered it, unchanged). `app.js` is
+59,995 bytes — 5 bytes under the 60 kB test.js budget; the margin is thin, watch it on
+the next app.js change. 4,308 tests green (5 new: `drinkIdFromHash` parsing/decoding/
+rejection cases). No production deploy yet for this change — local-only until deployed.

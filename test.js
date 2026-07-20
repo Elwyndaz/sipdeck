@@ -2,7 +2,7 @@
 // ponytail: plain node asserts, no framework. `node test.js` to run.
 const fs = require('fs');
 const path = require('path');
-const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash,
+const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash, drinkIdFromHash,
   scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount, shuffle, advanceQueue,
   swipeDirectionForKey,
   formatLineAmount, drinkAsText,
@@ -57,6 +57,14 @@ check(favoriteIdFromHash('#/favoriter') === null,
   'favoriteIdFromHash: favorite list is not a detail route');
 check(favoriteIdFromHash('#/favoriter/bad/id') === null,
   'favoriteIdFromHash: nested route is rejected');
+
+check(drinkIdFromHash('#/drink/margarita') === 'margarita',
+  'drinkIdFromHash: parses deep-link route (BACKLOG 16)');
+check(drinkIdFromHash('#/drink/corpse%20reviver') === 'corpse reviver',
+  'drinkIdFromHash: decodes route id');
+check(drinkIdFromHash('#/drink') === null, 'drinkIdFromHash: bare prefix is not a detail route');
+check(drinkIdFromHash('#/drink/bad/id') === null, 'drinkIdFromHash: nested route is rejected');
+check(drinkIdFromHash('#/favoriter/margarita') === null, 'drinkIdFromHash: does not match favorite route');
 
 // ---------- unit engine (BACKLOG 3) ----------
 // scaling

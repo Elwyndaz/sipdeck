@@ -283,4 +283,5 @@ mixable drinks.**
 ## Non-goals (v1)
 
 No UGC/moderation (all content is curated JSON), no search box, no richer tag filter UI,
-no service worker, no custom domain, no accounts, no share/deep links, no drink editor.
+no service worker, no custom domain, no accounts, no drink editor. (Deep links shipped in
+v1.1, BACKLOG 16.)
