@@ -304,14 +304,14 @@
       <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 72px; border-radius: 10px; background: #6E6455;"></div><span style="font-size: 12px; font-weight: 500;">ink-2 · #6E6455</span><span style="font-size: 11px; color: #6E6455;">secondary text</span></div>
       <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 72px; border-radius: 10px; background: #2F6B3F;"></div><span style="font-size: 12px; font-weight: 500;">accent · #2F6B3F</span><span style="font-size: 11px; color: #6E6455;">vermouth green · also “save”</span></div>
       <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 72px; border-radius: 10px; background: #24522F;"></div><span style="font-size: 12px; font-weight: 500;">pressed · #24522F</span><span style="font-size: 11px; color: #6E6455;">accent :active</span></div>
-      <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 72px; border-radius: 10px; background: #8A5A21;"></div><span style="font-size: 12px; font-weight: 500;">skip · #8A5A21</span><span style="font-size: 11px; color: #6E6455;">bitters amber · “to the back”</span></div>
+      <div style="display: flex; flex-direction: column; gap: 6px;"><div style="height: 72px; border-radius: 10px; background: #A03B2E;"></div><span style="font-size: 12px; font-weight: 500;">skip · #A03B2E</span><span style="font-size: 11px; color: #6E6455;">muted brick red · “to the back”</span></div>
     </div>
     <div style="background: #17130E; border-radius: 12px; padding: 24px 28px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
       <div style="display: flex; gap: 10px;">
         <div style="width: 52px; height: 72px; border-radius: 8px; background: #FBF7EF; transform: rotate(-5deg); box-shadow: 0 10px 24px -8px rgba(0,0,0,.6);"></div>
         <div style="width: 52px; height: 72px; border-radius: 8px; background: #FBF7EF; transform: rotate(4deg) translateY(4px); opacity: .55;"></div>
       </div>
-      <p style="margin: 0; flex: 1 1 280px; font-size: 14px; line-height: 1.6; color: #A79B87;"><strong style="color: #EDE5D6;">Dark mode (included):</strong> only the chrome inverts — bg <span style="color: #EDE5D6;">#17130E</span>, ink <span style="color: #EDE5D6;">#EDE5D6</span>, ink-2 <span style="color: #EDE5D6;">#A79B87</span>, accent <span style="color: #7FB56F;">#7FB56F</span>, skip <span style="color: #D8A659;">#D8A659</span>. Cards <em>stay</em> #FBF7EF: the illustrations are painted on warm-white paper, so the deck reads as lit cards on a dark bar top. Never recolor or darken the card surface.</p>
+      <p style="margin: 0; flex: 1 1 280px; font-size: 14px; line-height: 1.6; color: #A79B87;"><strong style="color: #EDE5D6;">Dark mode (included):</strong> only the chrome inverts — bg <span style="color: #EDE5D6;">#17130E</span>, ink <span style="color: #EDE5D6;">#EDE5D6</span>, ink-2 <span style="color: #EDE5D6;">#A79B87</span>, accent <span style="color: #7FB56F;">#7FB56F</span>, skip <span style="color: #DE8070;">#DE8070</span>. Cards <em>stay</em> #FBF7EF: the illustrations are painted on warm-white paper, so the deck reads as lit cards on a dark bar top. Never recolor or darken the card surface.</p>
     </div>
     <pre style="margin: 0; background: rgba(33,27,18,.055); border-radius: 10px; padding: 18px 20px; overflow: auto; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12.5px; line-height: 1.55; color: #211B12;">:root{
   --sd-bg: #EFE8DB;            /* app background — one step below paper */
@@ -321,7 +321,7 @@
   --sd-accent: #2F6B3F;        /* vermouth green */
   --sd-accent-pressed: #24522F;
   --sd-save: var(--sd-accent); /* swipe right — saving IS the brand action */
-  --sd-skip: #8A5A21;          /* swipe left — bitters amber, neutral not punitive */
+  --sd-skip: #A03B2E;          /* swipe left — muted brick red, still gesture feedback not error */
   --sd-line: rgba(33,27,18,.14);
   --sd-shadow: 0 1px 2px rgba(33,27,18,.06), 0 12px 32px -12px rgba(33,27,18,.25);
 }
@@ -332,7 +332,7 @@
   --sd-accent: #7FB56F;
   --sd-accent-pressed: #9CCB8A; /* pressed goes LIGHTER on dark */
   --sd-save: var(--sd-accent);
-  --sd-skip: #D8A659;
+  --sd-skip: #DE8070;
   --sd-line: rgba(237,229,214,.16);
   --sd-shadow: 0 2px 4px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.6);
   /* --sd-card intentionally unchanged */
@@ -345,11 +345,11 @@
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>accent #2F6B3F on card #FBF7EF (text, icons, save)</span><span style="font-variant-numeric: tabular-nums;">5.96 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>card #FBF7EF on accent #2F6B3F (button label)</span><span style="font-variant-numeric: tabular-nums;">5.96 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>accent-pressed #24522F on card #FBF7EF</span><span style="font-variant-numeric: tabular-nums;">8.46 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AAA</span></div>
-      <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>skip #8A5A21 on card #FBF7EF</span><span style="font-variant-numeric: tabular-nums;">5.51 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
+      <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>skip #A03B2E on card #FBF7EF</span><span style="font-variant-numeric: tabular-nums;">6.22 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>dark: ink #EDE5D6 on bg #17130E</span><span style="font-variant-numeric: tabular-nums;">14.77 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AAA</span></div>
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>dark: ink-2 #A79B87 on bg #17130E</span><span style="font-variant-numeric: tabular-nums;">6.76 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
       <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>dark: accent #7FB56F on bg #17130E</span><span style="font-variant-numeric: tabular-nums;">7.70 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AAA</span></div>
-      <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>dark: skip #D8A659 on bg #17130E</span><span style="font-variant-numeric: tabular-nums;">8.38 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AAA</span></div>
+      <div style="display: grid; grid-template-columns: 2.2fr 1fr .8fr; gap: 12px; padding: 9px 16px; border-top: 1px solid rgba(33,27,18,.08);"><span>dark: skip #DE8070 on bg #17130E</span><span style="font-variant-numeric: tabular-nums;">6.54 : 1</span><span style="color: #2F6B3F; font-weight: 600;">AA</span></div>
     </div>
   </section>
 
@@ -427,7 +427,7 @@
           </div>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-          <button sc-camel-on-click="{{ onSkip }}" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(33,27,18,.2); background: transparent; color: #8A5A21; cursor: pointer;">← Skip</button>
+          <button sc-camel-on-click="{{ onSkip }}" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(33,27,18,.2); background: transparent; color: #A03B2E; cursor: pointer;">← Skip</button>
           <button sc-camel-on-click="{{ onDrag }}" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(33,27,18,.2); background: transparent; color: #211B12; cursor: pointer;">Drag → release</button>
           <button sc-camel-on-click="{{ onFlip }}" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(33,27,18,.2); background: transparent; color: #211B12; cursor: pointer;">Flip</button>
           <button sc-camel-on-click="{{ onSave }}" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 16px; border-radius: 999px; border: none; background: #2F6B3F; color: #FBF7EF; cursor: pointer;" style-active="background: #24522F;">Save →</button>
@@ -455,17 +455,17 @@
 @media (prefers-reduced-motion: reduce){
   :root{ --sd-t-spring: 0ms; --sd-t-fly: 0ms; --sd-t-flip: 0ms; --sd-t-list: 0ms; --sd-t-micro: 0ms; }
 }</pre>
-    <p style="margin: 0; font-size: 14px; color: #6E6455; max-width: 74ch;">Opinions, firmly held: the deck moves on <code style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;">transform</code> and <code style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;">opacity</code> only. Spring-back is the single place overshoot is allowed — the flip must land dead, like a real card on felt. Fly-off never fades: the card leaves the screen, it doesn't evaporate. During drag, tint the card edge with save-green or skip-amber at 30% past the commit threshold so the gesture's meaning is visible before release.</p>
+    <p style="margin: 0; font-size: 14px; color: #6E6455; max-width: 74ch;">Opinions, firmly held: the deck moves on <code style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;">transform</code> and <code style="font-family: ui-monospace, Menlo, monospace; font-size: 13px;">opacity</code> only. Spring-back is the single place overshoot is allowed — the flip must land dead, like a real card on felt. Fly-off never fades: the card leaves the screen, it doesn't evaporate. During drag, tint the card edge with save-green or skip-red at 30% past the commit threshold so the gesture's meaning is visible before release.</p>
   </section>
 
   <section style="background: #FBF7EF; border: 1px solid rgba(33,27,18,.12); border-radius: 16px; padding: 36px; display: flex; flex-direction: column; gap: 16px;" data-screen-label="07 Usage rules">
     <span style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6E6455;">07 · Usage rules</span>
     <div style="display: flex; flex-direction: column; gap: 12px; max-width: 74ch;">
-      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #8A5A21; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Never fill the wordmark or icon strokes with the accent.</strong> Ink draws; green garnishes. One green dot per composition is the rule.</span></div>
-      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #8A5A21; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>No color behind the illustrations.</strong> Cards are always #FBF7EF — no tints, gradients, or dark-mode inversion on the card surface. The sketches were painted on that paper.</span></div>
-      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #8A5A21; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>No playing-card symbols.</strong> No suits, no pips, no fans of 52, no dealer language. The deck is recipe cards in a kitchen drawer, not a casino table.</span></div>
-      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #8A5A21; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Instrument Serif is for names and titles only.</strong> Never for body text, buttons, tags, or amounts — and never bolded or condensed; it ships in one weight for a reason.</span></div>
-      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #8A5A21; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Skip-amber is feedback, not judgment.</strong> Use it only during the leftward gesture — never for errors, warnings, or destructive actions. Skipping a card is neutral; it just goes to the back.</span></div>
+      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #A03B2E; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Never fill the wordmark or icon strokes with the accent.</strong> Ink draws; green garnishes. One green dot per composition is the rule.</span></div>
+      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #A03B2E; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>No color behind the illustrations.</strong> Cards are always #FBF7EF — no tints, gradients, or dark-mode inversion on the card surface. The sketches were painted on that paper.</span></div>
+      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #A03B2E; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>No playing-card symbols.</strong> No suits, no pips, no fans of 52, no dealer language. The deck is recipe cards in a kitchen drawer, not a casino table.</span></div>
+      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #A03B2E; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Instrument Serif is for names and titles only.</strong> Never for body text, buttons, tags, or amounts — and never bolded or condensed; it ships in one weight for a reason.</span></div>
+      <div style="display: flex; gap: 12px; font-size: 15px; line-height: 1.55;"><span style="color: #A03B2E; font-weight: 600; flex: 0 0 auto;">✕</span><span><strong>Skip-red is feedback, not judgment.</strong> Use it only during the leftward gesture — never for errors, warnings, or destructive actions. Skipping a card is neutral; it just goes to the back.</span></div>
     </div>
   </section>
 

@@ -352,3 +352,14 @@ had the shot filling the frame like a tumbler; wheel shots use 60% of their squa
 canvas). The home-entry mini symbol gained the twelve art rings, a green pointer wedge and
 a stronger alternating sector fill (`#ece1cd`, scoped to `.wheel-symbol`) so it reads as
 the prize wheel rather than a blank disc.
+
+Skip-gesture color changed 2026-07-20 (user feedback: left-swipe brown read as muddy next
+to the green save tint): `--sd-skip` moved from bitters amber `#8A5A21` to a muted brick
+red `#A03B2E` (dark mode `#D8A659` -> `#DE8070`), in `index.html`, `design/tokens.css` and
+both design docs (`design/README.md`, `design/identity-full.html`, including its
+recomputed contrast table rows). Still explicitly gesture feedback, never reused for
+errors — PRODUCT.md's D1/color section and the identity doc's usage rules were reworded
+to say "skip-red" instead of "skip-amber". Contrast improved: 6.22:1 light (was 5.51:1),
+6.54:1 dark AA (was 8.38:1 AAA — still comfortably above the 4.5:1 floor). Verified
+visually via a Playwright drag-left/drag-right screenshot pair; deployed to both
+production origins. 4,303 tests green throughout.

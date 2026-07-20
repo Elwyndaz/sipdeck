@@ -52,11 +52,12 @@ future drink-card reuse. The inventory and conversion command are frozen in `HAN
   (400/500/600, everything else). Both cover Swedish å/ä/ö. Google Fonts CDN link is in
   `tokens.css`'s header comment — consistent with the recept project's precedent of
   loading Firebase from a CDN with no build step.
-- Accent = vermouth green, doubles as the "save" gesture color. Skip = bitters amber,
-  explicitly neutral feedback — never reused for errors/warnings/destructive actions.
+- Accent = vermouth green, doubles as the "save" gesture color. Skip = muted brick red
+  (`#A03B2E`, changed 2026-07-20 from an earlier bitters amber) — gesture feedback only,
+  never reused for errors/warnings/destructive actions.
 - Motion is opinionated and final: deck moves on `transform`/`opacity` only; spring-back
   is the one place overshoot is allowed; fly-off never fades (leaves the screen, doesn't
-  evaporate); tint the card edge with save-green/skip-amber past 30% of the commit
+  evaporate); tint the card edge with save-green/skip-red past 30% of the commit
   threshold during drag. Exact curves/durations are in `tokens.css`.
 - Usage rules (don'ts), full list in `identity-full.html` §07 — the two most likely to
   matter mid-build: cards are always `--sd-card`, never themed/tinted or dark-mode
