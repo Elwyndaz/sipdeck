@@ -186,6 +186,11 @@ in PRODUCT.md "Locked decisions".
   correct, only this one console step remains.
 - `test.js`'s bundle-budget check was bumped 60 kB → 65 kB for this feature (comment above
   the check dates and explains it) — `app.js` is 63,853 bytes.
+- Deployed 2026-07-20: committed (`77ffb2f`), pushed, `sipdeck-api` Worker deployed, and
+  wrangler-uploaded to Cloudflare Pages (`img-src/` moved out and restored around the
+  upload, as always). Both production origins reverified after deploy — `app.js` on each
+  serves the `sipdeck-api.sipdeck.workers.dev` endpoint and `index.html` carries the
+  correct `authDomain`.
 
 ## Reuse map — copy, don't reinvent (sibling projects under C:\dev, separate repos)
 
