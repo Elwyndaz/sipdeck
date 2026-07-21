@@ -617,7 +617,7 @@ if (typeof document !== 'undefined') (function () {
 
   function ingLine(line, have) {
     const amt = formatLineAmount(line, state.settings.servings, state.settings.unit, lang());
-    const missing = line.essential && !have.has(line.id);
+    const missing = !have.has(line.id);
     return `<li${missing ? ' class="missing"' : ''}><span class="amount">${esc(amt)}</span> ${esc(ingName(line.id))}</li>`;
   }
 
@@ -832,7 +832,7 @@ if (typeof document !== 'undefined') (function () {
       const s = state.settings;
       const have = new Set(state.pantry);
       const tags = chipTags(open.ingredients, have);
-      const pantryMissing = new Set(missingIngredients(open, state.pantry).map(line => line.id));
+      const pantryMissing = new Set(open.ingredients.filter(line => !have.has(line.id)).map(line => line.id));
       const ingredientRows = open.ingredients.map(line => {
         const checked = favChecked.has(line.id);
         return `<label class="fav-ing-row${checked ? ' done' : ''}${pantryMissing.has(line.id) ? ' pantry-missing' : ''}">
