@@ -5,6 +5,23 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**BACKLOG 22 done, v1.5 closed, not yet deployed.** Two independent wheel-preference toggles in
+Settings, grilled first (`/grilling`) to resolve the opt-in/opt-out mismatch and empty-pool edge
+cases. (1) "Bara favoritdrinkar" — `buildSpinLineup`'s cocktail slots draw first from
+`state.favorites` (still intersected with `bar:true`), topping up from the full `bar:true`
+catalog with no repeats whenever favorites can't fill every slot; zero favorites = toggle-off
+behavior. (2) Per-outcome checkboxes for beer/cider, wine and shot (`wheel.json` outcomes), all
+checked by default; emptying a whole category redirects that mood's slots to extra cocktails
+instead of breaking the 12-sector lineup (`buildSpinLineup` precomputes "dead" category slots
+before sampling cocktail picks). Both fields live in `state.settings`, last-write-wins on sync
+like every other setting, no Worker/D1 schema change. `app.js` grew to 78,377 bytes; `test.js`
+budget bumped 74 kB → 79 kB, 14 new cases. `node test.js`: 4,335 green. Chrome DevTools
+MCP-verified on local HTTP: both settings persist across reload, wheel spins correctly with a
+shot excluded and with favorites-only on but zero favorites saved (full-catalog fallback, no
+crash), zero console errors. Not yet exercised: real multi-device sync of the two new settings
+fields, or a spin with enough real favorites saved to see the "only mine" pool actually bite.
+Previous paragraph, superseded below, kept for history:
+
 **BACKLOG 21 done, v1.4 closed, deployed 2026-07-21.** Full-catalog search over all 92 drinks
 by name or ingredient (`#/sok`), separate from filtering the saved favorites list — the ask was
 to find *any* drink to read its recipe or save it, not narrow down what's already saved.

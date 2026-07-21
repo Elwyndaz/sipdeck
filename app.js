@@ -45,6 +45,11 @@ const STRINGS = {
     language_en: 'English', language_sv: 'Swedish',
     settings_filter_bar: 'Bar-servable only', settings_filter_base: 'Base spirit',
     settings_filter_base_none: 'Any',
+    settings_wheel_title: 'Spinning wheel',
+    settings_wheel_favorites_only: 'Only favorite drinks',
+    settings_wheel_favorites_only_hint: "Tops up from the full menu if you don't have enough favorites.",
+    settings_wheel_outcomes_title: 'Beer, wine & shots in the wheel',
+    wheel_cat_beer_cider: 'Beer & cider', wheel_cat_wine: 'Wine', wheel_cat_shot: 'Shots',
     base_gin: 'Gin', base_vodka: 'Vodka', base_rum: 'Rum', base_tequila: 'Tequila',
     base_whiskey: 'Whiskey', base_brandy: 'Brandy', base_other: 'Other / none',
     yes: 'Yes', no: 'No',
@@ -107,6 +112,11 @@ const STRINGS = {
     language_en: 'Engelska', language_sv: 'Svenska',
     settings_filter_bar: 'Bara barserverbara', settings_filter_base: 'Bas-sprit',
     settings_filter_base_none: 'Alla',
+    settings_wheel_title: 'Snurrhjul',
+    settings_wheel_favorites_only: 'Bara favoritdrinkar',
+    settings_wheel_favorites_only_hint: 'Fyller på med hela menyn om du inte har tillräckligt många favoriter.',
+    settings_wheel_outcomes_title: 'Öl, vin och shots i hjulet',
+    wheel_cat_beer_cider: 'Öl & cider', wheel_cat_wine: 'Vin', wheel_cat_shot: 'Shots',
     base_gin: 'Gin', base_vodka: 'Vodka', base_rum: 'Rom', base_tequila: 'Tequila',
     base_whiskey: 'Whisky', base_brandy: 'Brandy', base_other: 'Annan / ingen',
     yes: 'Ja', no: 'Nej',
@@ -146,6 +156,8 @@ function defaultState(lang) {
       unit: 'cl',
       servings: 1,
       filters: { bar: false, base: null },
+      wheelFavoritesOnly: false,
+      wheelOutcomesExcluded: [],
     },
   };
 }
@@ -167,6 +179,9 @@ function normalizeState(raw, lang) {
         bar: rf.bar === true,
         base: typeof rf.base === 'string' && rf.base ? rf.base : null,
       },
+      wheelFavoritesOnly: rs.wheelFavoritesOnly === true,
+      wheelOutcomesExcluded: Array.isArray(rs.wheelOutcomesExcluded)
+        ? rs.wheelOutcomesExcluded.filter(x => typeof x === 'string') : [],
     },
   };
 }
@@ -317,27 +332,19 @@ function wheelDrinkName(drink) {
   return { en: drink.name.en || drink.name.sv || drink.id, sv: drink.name.sv || drink.name.en || drink.id };
 }
 
-function buildSpinLineup(wheel, moodId, drinks, rng) {
+function buildSpinLineup(wheel, moodId, drinks, rng, prefs) {
   if (!wheel || !Array.isArray(wheel.moods) || !wheel.outcomes) return [];
   const mood = wheel.moods.find(item => item.id === moodId);
   if (!mood || !Array.isArray(mood.slots) || mood.slots.length !== 12) return [];
+  const options = prefs || {};
+  const excluded = new Set(Array.isArray(options.excludedOutcomes) ? options.excludedOutcomes : []);
   const useBottle = moodId === 'fresh' && mood.slots.includes('flex') && wheelRng(rng) < 1 / 3;
-  const cocktailCount = mood.slots.filter(slot => slot === 'cocktail').length +
-    (mood.slots.includes('flex') && !useBottle ? 1 : 0);
-  const cocktailPool = (Array.isArray(drinks) ? drinks : [])
-    .filter(drink => wheelCocktailWeight(drink, mood) > 0);
-  let cocktailPicks = weightedSampleUnique(
-    cocktailPool, cocktailCount, drink => wheelCocktailWeight(drink, mood), rng);
-  while (cocktailPicks.length < cocktailCount && cocktailPool.length) {
-    cocktailPicks = cocktailPicks.concat(weightedSampleUnique(
-      cocktailPool, Math.min(cocktailCount - cocktailPicks.length, cocktailPool.length),
-      drink => wheelCocktailWeight(drink, mood), rng));
-  }
-  let cocktailIndex = 0;
+
   const categoryPools = {};
   const categoryIndexes = {};
   const artIndexes = {};
   Object.keys(wheel.outcomes).forEach(id => {
+    if (excluded.has(id)) return;
     const outcome = wheel.outcomes[id];
     (categoryPools[outcome.category] || (categoryPools[outcome.category] = [])).push(id);
   });
@@ -345,6 +352,36 @@ function buildSpinLineup(wheel, moodId, drinks, rng) {
     categoryPools[category] = shuffle(categoryPools[category], rng);
     categoryIndexes[category] = 0;
   });
+  // a slot whose whole category got excluded falls back to a cocktail instead of breaking the lineup
+  const deadCategorySlots = mood.slots
+    .filter(slot => slot !== 'cocktail' && slot !== 'flex' && !(categoryPools[slot] && categoryPools[slot].length))
+    .length;
+
+  const cocktailCount = mood.slots.filter(slot => slot === 'cocktail').length +
+    (mood.slots.includes('flex') && !useBottle ? 1 : 0) + deadCategorySlots;
+  const cocktailPool = (Array.isArray(drinks) ? drinks : [])
+    .filter(drink => wheelCocktailWeight(drink, mood) > 0);
+  let primaryPool = cocktailPool;
+  if (options.favoritesOnly) {
+    const favSet = new Set(Array.isArray(options.favorites) ? options.favorites : []);
+    const favPool = cocktailPool.filter(drink => favSet.has(drink.id));
+    if (favPool.length) primaryPool = favPool;
+  }
+  let cocktailPicks = weightedSampleUnique(
+    primaryPool, cocktailCount, drink => wheelCocktailWeight(drink, mood), rng);
+  if (primaryPool !== cocktailPool && cocktailPicks.length < cocktailCount) {
+    // favorites ran out before filling every cocktail slot: top up from the full catalog, no repeats
+    const pickedIds = new Set(cocktailPicks.map(drink => drink.id));
+    const remainder = cocktailPool.filter(drink => !pickedIds.has(drink.id));
+    cocktailPicks = cocktailPicks.concat(weightedSampleUnique(
+      remainder, cocktailCount - cocktailPicks.length, drink => wheelCocktailWeight(drink, mood), rng));
+  }
+  while (cocktailPicks.length < cocktailCount && cocktailPool.length) {
+    cocktailPicks = cocktailPicks.concat(weightedSampleUnique(
+      cocktailPool, Math.min(cocktailCount - cocktailPicks.length, cocktailPool.length),
+      drink => wheelCocktailWeight(drink, mood), rng));
+  }
+  let cocktailIndex = 0;
   function simpleEntry(id) {
     const outcome = wheel.outcomes[id];
     if (!outcome) return null;
@@ -378,7 +415,8 @@ function buildSpinLineup(wheel, moodId, drinks, rng) {
   let lineup = mood.slots.map(slot => {
     if (slot === 'cocktail') return takeCocktail();
     if (slot === 'flex') return useBottle ? takeCategory('bottle') : takeCocktail();
-    return takeCategory(slot);
+    const pool = categoryPools[slot] || [];
+    return pool.length ? takeCategory(slot) : takeCocktail();
   }).filter(Boolean);
   if (lineup.length !== 12) return [];
   const offset = Math.floor(wheelRng(rng) * lineup.length);
@@ -535,17 +573,18 @@ if (typeof document !== 'undefined') (function () {
 
   function loadWheelData() {
     if (wheelPromise) return wheelPromise;
+    const rerenderRoutes = ['#/hjul', '#/installningar'];
     wheelPromise = fetch('wheel.json').then(r => {
       if (!r.ok) throw new Error('wheel data');
       return r.json();
     }).then(data => {
       wheelData = data;
       wheelFailed = false;
-      if ((location.hash || '#/') === '#/hjul') render();
+      if (rerenderRoutes.includes(location.hash || '#/')) render();
       return data;
     }).catch(() => {
       wheelFailed = true;
-      if ((location.hash || '#/') === '#/hjul') render();
+      if (rerenderRoutes.includes(location.hash || '#/')) render();
     });
     return wheelPromise;
   }
@@ -982,7 +1021,7 @@ if (typeof document !== 'undefined') (function () {
     loadWheelData();
     if (!wheelMoodId && wheelData && db) { // default to first mood
       wheelMoodId = wheelData.moods[0].id;
-      wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+      wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01, wheelPrefs());
     }
     const mood = wheelMood();
     const moods = wheelData && Array.isArray(wheelData.moods) ? wheelData.moods : [];
@@ -1096,10 +1135,24 @@ if (typeof document !== 'undefined') (function () {
     </section>`;
   }
 
+  function wheelOutcomeGroups(s) {
+    if (!wheelData || !wheelData.outcomes) return '';
+    const excluded = new Set(s.wheelOutcomesExcluded);
+    const groups = ['beer-cider', 'wine', 'shot'].map(category => {
+      const items = Object.keys(wheelData.outcomes)
+        .filter(id => wheelData.outcomes[id].category === category)
+        .map(id => `<label class="filter-toggle"><input type="checkbox" data-wheel-outcome="${esc(id)}"${excluded.has(id) ? '' : ' checked'}> <span>${esc(localText(wheelData.outcomes[id].sector))}</span></label>`)
+        .join('');
+      return items ? `<fieldset class="pantry-group"><legend>${esc(t(lang(), 'wheel_cat_' + category.replace(/-/g, '_')))}</legend><div class="pantry-list">${items}</div></fieldset>` : '';
+    }).join('');
+    return groups ? `<h2 class="pantry-almost-title">${esc(t(lang(), 'settings_wheel_outcomes_title'))}</h2>${groups}` : '';
+  }
+
   function viewSettings() {
     const s = state.settings;
     const bool = v => t(lang(), v ? 'yes' : 'no');
     const base = s.filters.base ? esc(taxonomyName('base', s.filters.base)) : esc(t(lang(), 'settings_filter_base_none'));
+    loadWheelData();
     return `<h1 class="screen-title">${esc(t(lang(), 'settings_title'))}</h1>
       <dl class="settings">
         <dt>${esc(t(lang(), 'settings_lang'))}</dt><dd><div class="lang-toggle" role="group" aria-label="${esc(t(lang(), 'settings_lang'))}">
@@ -1109,11 +1162,26 @@ if (typeof document !== 'undefined') (function () {
         <dt>${esc(t(lang(), 'settings_servings'))}</dt><dd>${esc(String(s.servings))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_bar'))}</dt><dd>${esc(bool(s.filters.bar))}</dd>
         <dt>${esc(t(lang(), 'settings_filter_base'))}</dt><dd>${base}</dd>
-      </dl>${accountSection()}`;
+        <dt>${esc(t(lang(), 'settings_wheel_title'))}</dt>
+        <dd>
+          <label class="filter-toggle"><input type="checkbox" data-settings-act="wheel-favorites-only"${s.wheelFavoritesOnly ? ' checked' : ''}> <span>${esc(t(lang(), 'settings_wheel_favorites_only'))}</span></label>
+          <p class="fav-hint">${esc(t(lang(), 'settings_wheel_favorites_only_hint'))}</p>
+        </dd>
+      </dl>
+      ${wheelOutcomeGroups(s)}
+      ${accountSection()}`;
   }
 
   function random01() {
     return Math.random();
+  }
+
+  function wheelPrefs() {
+    return {
+      favoritesOnly: state.settings.wheelFavoritesOnly,
+      favorites: state.favorites,
+      excludedOutcomes: state.settings.wheelOutcomesExcluded,
+    };
   }
 
   function selectWheelMood(value) {
@@ -1121,7 +1189,7 @@ if (typeof document !== 'undefined') (function () {
     const mood = wheelData.moods[Number(value) - 1];
     if (!mood) return;
     wheelMoodId = mood.id;
-    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01, wheelPrefs());
     wheelResult = null;
     wheelRotation = 0;
     render();
@@ -1131,7 +1199,7 @@ if (typeof document !== 'undefined') (function () {
 
   function newWheel() {
     if (!wheelData || !db || !wheelMoodId || wheelSpinning) return;
-    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01);
+    wheelLineup = buildSpinLineup(wheelData, wheelMoodId, db.drinks, random01, wheelPrefs());
     wheelResult = null;
     wheelRotation = 0;
     render();
@@ -1467,6 +1535,23 @@ if (typeof document !== 'undefined') (function () {
     if (control.checked && !state.pantry.includes(id)) state.pantry.push(id);
     if (!control.checked) state.pantry = state.pantry.filter(item => item !== id);
     deckQueue = null;
+    save();
+  });
+
+  $('#view').addEventListener('change', e => {
+    const control = e.target.closest('[data-settings-act="wheel-favorites-only"]');
+    if (!control) return;
+    state.settings.wheelFavoritesOnly = control.checked;
+    save();
+  });
+
+  $('#view').addEventListener('change', e => {
+    const control = e.target.closest('[data-wheel-outcome]');
+    if (!control) return;
+    const id = control.dataset.wheelOutcome;
+    const excluded = state.settings.wheelOutcomesExcluded;
+    if (!control.checked && !excluded.includes(id)) excluded.push(id);
+    if (control.checked) state.settings.wheelOutcomesExcluded = excluded.filter(item => item !== id);
     save();
   });
 

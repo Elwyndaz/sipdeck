@@ -31,6 +31,9 @@ const d = defaultState('sv');
 check(d.v === 1 && d.settings.lang === 'sv' && d.settings.unit === 'cl' && d.settings.servings === 1,
   'defaultState: shape + lang passthrough');
 check(Array.isArray(d.favorites) && d.favorites.length === 0, 'defaultState: empty favorites');
+check(d.settings.wheelFavoritesOnly === false, 'defaultState: wheel favorites-only off by default');
+check(Array.isArray(d.settings.wheelOutcomesExcluded) && d.settings.wheelOutcomesExcluded.length === 0,
+  'defaultState: no wheel outcomes excluded by default (opt-out, everything starts checked)');
 
 // normalizeState round-trip: a valid blob comes back unchanged in shape
 const valid = { v: 1, favorites: ['margarita'], pantry: ['gin'],
@@ -39,6 +42,16 @@ const rt = normalizeState(valid, 'sv');
 check(rt.favorites.length === 1 && rt.favorites[0] === 'margarita', 'normalizeState: favorites survive');
 check(rt.settings.unit === 'oz' && rt.settings.servings === 4, 'normalizeState: settings survive');
 check(rt.settings.filters.bar === true && rt.settings.filters.base === 'gin', 'normalizeState: filters survive');
+
+const validWithWheelPrefs = Object.assign({}, valid, { settings: Object.assign({}, valid.settings,
+  { wheelFavoritesOnly: true, wheelOutcomesExcluded: ['fernet-shot', 42, 'red-wine'] }) });
+const rtWheelPrefs = normalizeState(validWithWheelPrefs, 'sv');
+check(rtWheelPrefs.settings.wheelFavoritesOnly === true, 'normalizeState: wheel favorites-only survives');
+check(rtWheelPrefs.settings.wheelOutcomesExcluded.join() === 'fernet-shot,red-wine',
+  'normalizeState: wheel outcomes excluded survives, non-string entries dropped');
+check(normalizeState({ settings: { wheelOutcomesExcluded: 'not-an-array' } }, 'en')
+  .settings.wheelOutcomesExcluded.length === 0,
+  'normalizeState: garbage wheelOutcomesExcluded falls back to empty');
 
 // normalizeState never throws on garbage, falls back to defaults
 check((() => { try { return normalizeState('garbage', 'en').v === 1; } catch (e) { return false; } })(),
@@ -224,6 +237,38 @@ check(lineups.shitfaced[selectWheelIndex(lineups.shitfaced, () => 0.99)].categor
 check(lineups.groove[selectWheelIndex(lineups.groove, () => 0.99)].eligible,
   'wheel selection normal mood: selected visible sector is eligible');
 
+// wheel prefs: favorites-only cocktails + per-outcome beer/wine/shot exclusion
+const favEnough = ['drink-0', 'drink-1', 'drink-2', 'drink-3', 'drink-4']; // groove needs 5 cocktail slots
+const lineupFavEnough = buildSpinLineup(wheelData, 'groove', wheelFixture, () => 0.5,
+  { favoritesOnly: true, favorites: favEnough });
+check(lineupFavEnough.length === 12, 'wheel prefs: favorites-only keeps 12 sectors when favorites suffice');
+check(lineupFavEnough.filter(item => item.kind === 'cocktail').every(item => favEnough.includes(item.outcomeId)),
+  'wheel prefs: favorites-only draws only favorited cocktails when there are enough');
+
+const favTooFew = ['drink-0', 'drink-1']; // groove needs 5, only 2 favorited
+const lineupFavTooFew = buildSpinLineup(wheelData, 'groove', wheelFixture, () => 0.5,
+  { favoritesOnly: true, favorites: favTooFew });
+const cocktailIdsTooFew = lineupFavTooFew.filter(item => item.kind === 'cocktail').map(item => item.outcomeId);
+check(lineupFavTooFew.length === 12, 'wheel prefs: favorites-only tops up to 12 sectors when favorites are too few');
+check(new Set(cocktailIdsTooFew).size === cocktailIdsTooFew.length,
+  'wheel prefs: favorites-only top-up never repeats a cocktail to avoid the gap');
+check(favTooFew.every(id => cocktailIdsTooFew.includes(id)),
+  'wheel prefs: favorites-only top-up still includes every favorite that fits');
+
+const lineupNoPrefs = buildSpinLineup(wheelData, 'groove', wheelFixture, () => 0.5);
+const lineupFavZero = buildSpinLineup(wheelData, 'groove', wheelFixture, () => 0.5,
+  { favoritesOnly: true, favorites: [] });
+check(JSON.stringify(lineupFavZero) === JSON.stringify(lineupNoPrefs),
+  'wheel prefs: favorites-only with zero favorites behaves exactly like the toggle being off');
+
+const shotIds = Object.keys(wheelData.outcomes).filter(id => wheelData.outcomes[id].category === 'shot');
+const lineupNoShots = buildSpinLineup(wheelData, 'fresh', wheelFixture, () => 0.99, { excludedOutcomes: shotIds });
+check(lineupNoShots.length === 12, 'wheel prefs: excluding a whole category never breaks the lineup');
+check(lineupNoShots.every(item => item.category !== 'shot'),
+  'wheel prefs: excluding every shot outcome removes the category entirely');
+check(lineupNoShots.filter(item => item.kind === 'cocktail').length === 9,
+  'wheel prefs: slots freed by an excluded category fall back to extra cocktails');
+
 const landing = wheelLandingRotation(17, 4, (() => { const values = [0.5, 0]; return () => values.shift(); })(), 12);
 const landedCenter = ((-landing % 360) + 360) % 360;
 const expectedCenter = 4 * 30;
@@ -241,7 +286,8 @@ const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 // bumped 68kB -> 70kB 2026-07-20 for pantry-missing badges/highlighting + pull-merge bugfix
 // bumped 70kB -> 71kB 2026-07-21 for deck-card pantry-missing chips/ingredient list (favorites parity)
 // bumped 71kB -> 74kB 2026-07-21 for catalog search (#/sok: name+ingredient search, deep-links into detail view)
-check(Buffer.byteLength(appSource) < 74000, 'bundle budget: app.js stays under 74 kB unminified');
+// bumped 74kB -> 79kB 2026-07-21 for wheel prefs (favorites-only cocktails, per-outcome beer/wine/shot toggles)
+check(Buffer.byteLength(appSource) < 79000, 'bundle budget: app.js stays under 79 kB unminified');
 check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),

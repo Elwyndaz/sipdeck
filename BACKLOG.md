@@ -186,6 +186,30 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     button, no-match empty state, and query+results surviving a result-detail round trip. Zero
     console errors throughout.
 
+## v1.5 — closed 2026-07-21 (item 22 done)
+
+22. ✅ **Wheel preferences** (done 2026-07-21) — restrict what the spinning wheel can land on
+    to your own taste, instead of always the full fixed catalog. Grilled first (`/grilling`):
+    resolved the opt-in/opt-out mismatch between cocktail favorites (empty by default) and
+    beer/wine/shot outcomes (start fully checked, since unchecking is the deliberate action
+    here), where the UI lives (Settings, next to each other, not the Favorites tab), and what
+    happens when a pool empties out (never break the lineup). Two independent toggles, both new
+    `state.settings` fields, both last-write-wins on sync like every other setting: (1) "Bara
+    favoritdrinkar" checkbox — when on, `buildSpinLineup`'s cocktail slots draw first from
+    `state.favorites` (still intersected with `bar:true`, same pool the wheel already used), and
+    silently top up from the full `bar:true` catalog — no repeats — whenever unique favorites
+    can't fill every cocktail slot on their own; zero favorites behaves exactly like the toggle
+    being off. (2) Per-outcome checkboxes for the three non-cocktail wheel categories (beer/cider,
+    wine, shot outcomes from `wheel.json`), all checked by default; unchecking every outcome in a
+    category doesn't break the lineup, it redirects that mood's slots to extra cocktail draws
+    instead (`buildSpinLineup` precomputes "dead" category slots before sampling so the cocktail
+    pick count still lands on exactly 12). `app.js` grew to 78,377 bytes; `test.js` budget bumped
+    74 kB → 79 kB, 14 new cases (favorites-only sufficient/insufficient/zero-favorites parity,
+    excluded-category fallback, `defaultState`/`normalizeState` round-trips). `node test.js`:
+    4,335 green. Chrome DevTools MCP-verified on local HTTP: both settings persist across reload,
+    wheel renders and spins with a shot excluded and favorites-only on with zero favorites saved
+    (full-catalog fallback, no crash), zero console errors.
+
 ## v2 / ideas (unordered)
 
 - Richer filter UI over existing tags: style, strength, **alcohol-free mode**.
