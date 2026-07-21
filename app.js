@@ -173,8 +173,6 @@ const favoriteIdFromHash = h => hid(h, '#/favoriter/');
 const drinkIdFromHash = h => hid(h, '#/drink/');
 
 // ---------- unit engine (BACKLOG 3) — canonical ml, linear scaling, bar rounding, display ----------
-const NONCONVERTIBLE_UNITS = ['dash', 'barspoon', 'piece', 'leaf', 'slice', 'garnish', 'top'];
-
 function scaleMl(ml, servings) { return ml * servings; }
 
 function convert(ml, unit) {
@@ -190,11 +188,9 @@ function roundForUnit(value, unit) {
 }
 
 function formatNumber(value, lang) {
-  const [intPart, decPart] = (Math.round(value * 100) / 100).toFixed(2).split('.');
-  const dec = decPart.replace(/0+$/, '');
-  const sep = lang === 'sv' ? ' ' : ',';
-  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
-  return dec ? grouped + (lang === 'sv' ? ',' : '.') + dec : grouped;
+  const locale = lang === 'sv' ? 'sv-SE' : 'en-US';
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value)
+    .replace(/[  ]/g, ' '); // normalize Intl no-break thousands space to a plain space
 }
 
 const OZ_FRACTIONS = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
@@ -447,7 +443,7 @@ function drinkAsText(drink, ingredients, servings, unit, lang) {
 
 if (typeof module !== 'undefined') module.exports = {
   STRINGS, t, UNITS, detectLang, defaultState, normalizeState, favoriteIdFromHash, drinkIdFromHash,
-  NONCONVERTIBLE_UNITS, scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
+  scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, swipeDirectionForKey, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
   missingIngredients, mergeState,
@@ -596,9 +592,15 @@ if (typeof document !== 'undefined') (function () {
     return t(lang(), kind + '_' + String(id).replace(/-/g, '_'));
   }
 
-  function ingLine(line) {
+  function chipTags(ingredients, have) {
+    return ingredients.filter(l => l.essential)
+      .map(l => `<span class="chip${have.has(l.id) ? '' : ' missing'}">${esc(ingName(l.id))}</span>`).join('');
+  }
+
+  function ingLine(line, have) {
     const amt = formatLineAmount(line, state.settings.servings, state.settings.unit, lang());
-    return `<li${line.essential ? '' : ' class="opt"'}><span class="amount">${esc(amt)}</span> ${esc(ingName(line.id))}</li>`;
+    const missing = line.essential && !have.has(line.id);
+    return `<li${missing ? ' class="missing"' : ''}><span class="amount">${esc(amt)}</span> ${esc(ingName(line.id))}</li>`;
   }
 
   function wireArt(img) {
@@ -622,8 +624,8 @@ if (typeof document !== 'undefined') (function () {
     el.dataset.id = drink.id;
     el.tabIndex = depth === 0 ? 0 : -1;
     el.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight');
-    const tags = drink.ingredients.filter(l => l.essential)
-      .map(l => `<span class="chip">${esc(ingName(l.id))}</span>`).join('');
+    const have = new Set(state.pantry);
+    const tags = chipTags(drink.ingredients, have);
     const s = state.settings;
     const unitBtns = UNITS.map(u =>
       `<button data-act="unit" data-unit="${u}"${u === s.unit ? ' class="active"' : ''}>${u}</button>`).join('');
@@ -637,7 +639,7 @@ if (typeof document !== 'undefined') (function () {
         </div>
         <div class="card-face card-back">
           <h2 class="card-name">${esc(drink.name)}</h2>
-          <ul class="ing">${drink.ingredients.map(ingLine).join('')}</ul>
+          <ul class="ing">${drink.ingredients.map(l => ingLine(l, have)).join('')}</ul>
           <p class="card-method">${esc(drink.method[lang()] || drink.method.en)}</p>
           <div class="card-ctrl">
             <div class="stepper" role="group" aria-label="${esc(t(lang(), 'servings'))}">
@@ -799,17 +801,8 @@ if (typeof document !== 'undefined') (function () {
     return `<span class="fav-missing">${esc(text)}</span>`;
   }
 
-  async function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
-    const area = document.createElement('textarea');
-    area.value = text;
-    area.style.position = 'fixed';
-    area.style.opacity = '0';
-    document.body.appendChild(area);
-    area.select();
-    const copied = document.execCommand('copy');
-    area.remove();
-    if (!copied) throw new Error('copy failed');
+  function copyText(text) {
+    return navigator.clipboard.writeText(text);
   }
 
   function viewFavorites() {
@@ -819,8 +812,8 @@ if (typeof document !== 'undefined') (function () {
     if (favOpenId && !open) favOpenId = null; // favorite id vanished from db: just close, no crash
     if (open) {
       const s = state.settings;
-      const tags = open.ingredients.filter(line => line.essential)
-        .map(line => `<span class="chip">${esc(ingName(line.id))}</span>`).join('');
+      const have = new Set(state.pantry);
+      const tags = chipTags(open.ingredients, have);
       const pantryMissing = new Set(missingIngredients(open, state.pantry).map(line => line.id));
       const ingredientRows = open.ingredients.map(line => {
         const checked = favChecked.has(line.id);
@@ -917,8 +910,6 @@ if (typeof document !== 'undefined') (function () {
 
   function wheelMood() { return wheelData && wheelData.moods.find(mood => mood.id === wheelMoodId) || null; }
   function localText(value) { return value && (value[lang()] || value.en) || ''; }
-  function wheelWordmark() { return '<span class="wheel-top-wordmark"><img src="design/wordmark.svg" alt="Sipdeck"></span>'; }
-
   function neutralWheelSvg() {
     const sectors = Array.from({ length: 12 }, (_, index) =>
       `<path class="wheel-sector" d="${wheelSectorPath(index)}"/>`).join('');
@@ -992,7 +983,7 @@ if (typeof document !== 'undefined') (function () {
     return `<section class="wheel-screen">
       <header class="wheel-topbar">
         <button class="wheel-back" data-wheel-act="back">‹ ${esc(t(lang(), 'wheel_back'))}</button>
-        ${wheelWordmark()}
+        <span class="wheel-top-wordmark"><img src="design/wordmark.svg" alt="Sipdeck"></span>
         <button class="wheel-sound" data-wheel-act="sound" aria-label="${esc(t(lang(), wheelMuted ? 'wheel_unmute' : 'wheel_mute'))}"
           aria-pressed="${wheelMuted ? 'true' : 'false'}">${wheelMuted ? '🔇' : '🔊'}</button>
       </header>
@@ -1072,11 +1063,6 @@ if (typeof document !== 'undefined') (function () {
   }
 
   function random01() {
-    if (window.crypto && window.crypto.getRandomValues) {
-      const value = new Uint32Array(1);
-      window.crypto.getRandomValues(value);
-      return value[0] / 4294967296;
-    }
     return Math.random();
   }
 
