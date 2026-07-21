@@ -7,6 +7,7 @@ const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash
   swipeDirectionForKey,
   formatLineAmount, drinkAsText,
   BASE_FILTERS, matchesFilters, canMake, filterDrinks, missingIngredients, mergeState,
+  searchHaystack, matchesSearch,
   weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
   wheelLandingRotation, wheelSectorPath,
   GLASS_SILHOUETTES, glassPlaceholder } = require('./app.js');
@@ -162,6 +163,16 @@ check(filterDrinks(filterSeed, { bar: true, base: null }).length === 2, 'filterD
 check(filterDrinks(filterSeed, { bar: true, base: 'rum' }).length === 0, 'filterDrinks: empty combination');
 check(filterDrinks(null, {}).length === 0, 'filterDrinks: invalid input is empty');
 
+// ---------- search (#/sok) ----------
+const searchDrink = { name: 'Margarita' };
+const searchHay = searchHaystack(searchDrink, ['Blanco tequila', 'Triple sec', 'Lime juice']);
+check(searchHay === 'margarita blanco tequila triple sec lime juice', 'searchHaystack: name + ingredients, lowercased');
+check(matchesSearch(searchHay, 'MARGA'), 'matchesSearch: case-insensitive name match');
+check(matchesSearch(searchHay, 'tequila'), 'matchesSearch: ingredient match');
+check(matchesSearch(searchHay, '  '), 'matchesSearch: blank query matches everything');
+check(matchesSearch(searchHay, ''), 'matchesSearch: empty query matches everything');
+check(!matchesSearch(searchHay, 'vodka'), 'matchesSearch: no match rejects');
+
 check(swipeDirectionForKey('ArrowLeft') === -1, 'keyboard swipe: left skips');
 check(swipeDirectionForKey('ArrowRight') === 1, 'keyboard swipe: right saves');
 check(swipeDirectionForKey('Enter') === 0, 'keyboard swipe: unrelated keys are ignored');
@@ -229,7 +240,8 @@ const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 // bumped 67kB -> 68kB 2026-07-20 for BACKLOG 19 (account linking: add Google/password to an existing account)
 // bumped 68kB -> 70kB 2026-07-20 for pantry-missing badges/highlighting + pull-merge bugfix
 // bumped 70kB -> 71kB 2026-07-21 for deck-card pantry-missing chips/ingredient list (favorites parity)
-check(Buffer.byteLength(appSource) < 71000, 'bundle budget: app.js stays under 71 kB unminified');
+// bumped 71kB -> 74kB 2026-07-21 for catalog search (#/sok: name+ingredient search, deep-links into detail view)
+check(Buffer.byteLength(appSource) < 74000, 'bundle budget: app.js stays under 74 kB unminified');
 check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),

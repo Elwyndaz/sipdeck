@@ -85,6 +85,14 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
 .wheel-entry[hidden]{display:none}
 .wheel-symbol{width:46px;height:46px;flex:0 0 46px;display:block;view-transition-name:wheel-shared}
 .wheel-symbol .wheel-sector:nth-of-type(even){fill:#ece1cd}
+.header-icons{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.search-entry{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;
+  border:1px solid var(--sd-line);border-radius:999px;background:var(--sd-card);color:#211B12;
+  box-shadow:0 8px 24px -16px rgba(33,27,18,.45);transition:transform var(--sd-t-micro) var(--sd-ease-list),box-shadow var(--sd-t-micro) linear}
+.search-entry:hover{transform:translateY(-1px);box-shadow:var(--sd-shadow)}
+.search-entry:active{transform:translateY(0) scale(.98)}
+.search-entry:focus-visible{outline:3px solid var(--sd-accent);outline-offset:3px}
+.search-symbol{width:20px;height:20px}
 
 .bottom-nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--sd-card);
   border-top:1px solid var(--sd-line);box-shadow:var(--sd-shadow);z-index:10;
@@ -225,9 +233,12 @@ dl.settings dd{min-width:0}
 .pantry-almost-row{display:flex;flex-direction:column;text-align:left;color:#211B12}
 
 /* ---- spinning wheel: full-screen bar-order chooser ---- */
-body.wheel-mode{overflow:hidden}
-body.wheel-mode>.wrap{max-width:none;padding:0}
-body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
+body.wheel-mode,body.search-mode{overflow:hidden}
+body.wheel-mode>.wrap,body.search-mode>.wrap{max-width:none;padding:0}
+body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.search-mode .bottom-nav{display:none}
+.search-body{width:min(100%,520px);margin:.2rem auto 0;padding:0 1.25rem 2rem}
+.search-input{display:block;width:100%;margin:.5rem 0 1rem;padding:.6rem .8rem;border:1px solid rgba(33,27,18,.18);
+  border-radius:8px;font:400 1rem/1.2 var(--sd-font-ui);color:var(--sd-ink);background:var(--sd-card)}
 .wheel-screen{position:fixed;inset:0;z-index:30;overflow:auto;background:var(--sd-bg);
   padding:max(.7rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right))
     max(1rem,env(safe-area-inset-bottom)) max(1rem,env(safe-area-inset-left))}
@@ -350,17 +361,25 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav{display:none}
       </a>
       <div class="tagline" id="tagline"></div>
     </div>
-    <a class="wheel-entry" id="wheelEntry" href="#/hjul" hidden>
-      <svg class="wheel-symbol" viewBox="0 0 100 100" aria-hidden="true">
-        <path class="wheel-sector" d="M50 50L37.32 2.67A49 49 0 0 1 62.68 2.67Z"/><path class="wheel-sector" d="M50 50L62.68 2.67A49 49 0 0 1 84.65 15.35Z"/><path class="wheel-sector" d="M50 50L84.65 15.35A49 49 0 0 1 97.33 37.32Z"/><path class="wheel-sector" d="M50 50L97.33 37.32A49 49 0 0 1 97.33 62.68Z"/><path class="wheel-sector" d="M50 50L97.33 62.68A49 49 0 0 1 84.65 84.65Z"/><path class="wheel-sector" d="M50 50L84.65 84.65A49 49 0 0 1 62.68 97.33Z"/><path class="wheel-sector" d="M50 50L62.68 97.33A49 49 0 0 1 37.32 97.33Z"/><path class="wheel-sector" d="M50 50L37.32 97.33A49 49 0 0 1 15.35 84.65Z"/><path class="wheel-sector" d="M50 50L15.35 84.65A49 49 0 0 1 2.67 62.68Z"/><path class="wheel-sector" d="M50 50L2.67 62.68A49 49 0 0 1 2.67 37.32Z"/><path class="wheel-sector" d="M50 50L2.67 37.32A49 49 0 0 1 15.35 15.35Z"/><path class="wheel-sector" d="M50 50L15.35 15.35A49 49 0 0 1 37.32 2.67Z"/>
-        <circle class="wheel-art-ring" cx="50" cy="26" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="29.22" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="74" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="50" cy="74" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="26" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="29.22" r="5.7"/>
-        <circle class="wheel-rim" cx="50" cy="50" r="49"/>
-        <circle class="wheel-hub" cx="50" cy="50" r="10"/>
-        <circle class="wheel-hub-dot" cx="50" cy="50" r="3"/>
-        <path fill="#2f6b3f" d="M42 0h16l-8 13z"/>
-      </svg>
-      <span id="wheelEntryLabel"></span>
-    </a>
+    <div class="header-icons">
+      <a class="wheel-entry" id="wheelEntry" href="#/hjul" hidden>
+        <svg class="wheel-symbol" viewBox="0 0 100 100" aria-hidden="true">
+          <path class="wheel-sector" d="M50 50L37.32 2.67A49 49 0 0 1 62.68 2.67Z"/><path class="wheel-sector" d="M50 50L62.68 2.67A49 49 0 0 1 84.65 15.35Z"/><path class="wheel-sector" d="M50 50L84.65 15.35A49 49 0 0 1 97.33 37.32Z"/><path class="wheel-sector" d="M50 50L97.33 37.32A49 49 0 0 1 97.33 62.68Z"/><path class="wheel-sector" d="M50 50L97.33 62.68A49 49 0 0 1 84.65 84.65Z"/><path class="wheel-sector" d="M50 50L84.65 84.65A49 49 0 0 1 62.68 97.33Z"/><path class="wheel-sector" d="M50 50L62.68 97.33A49 49 0 0 1 37.32 97.33Z"/><path class="wheel-sector" d="M50 50L37.32 97.33A49 49 0 0 1 15.35 84.65Z"/><path class="wheel-sector" d="M50 50L15.35 84.65A49 49 0 0 1 2.67 62.68Z"/><path class="wheel-sector" d="M50 50L2.67 62.68A49 49 0 0 1 2.67 37.32Z"/><path class="wheel-sector" d="M50 50L2.67 37.32A49 49 0 0 1 15.35 15.35Z"/><path class="wheel-sector" d="M50 50L15.35 15.35A49 49 0 0 1 37.32 2.67Z"/>
+          <circle class="wheel-art-ring" cx="50" cy="26" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="29.22" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="74" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="70.78" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="62" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="50" cy="74" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="70.78" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="62" r="5.7"/><circle class="wheel-art-ring" cx="26" cy="50" r="5.7"/><circle class="wheel-art-ring" cx="29.22" cy="38" r="5.7"/><circle class="wheel-art-ring" cx="38" cy="29.22" r="5.7"/>
+          <circle class="wheel-rim" cx="50" cy="50" r="49"/>
+          <circle class="wheel-hub" cx="50" cy="50" r="10"/>
+          <circle class="wheel-hub-dot" cx="50" cy="50" r="3"/>
+          <path fill="#2f6b3f" d="M42 0h16l-8 13z"/>
+        </svg>
+        <span id="wheelEntryLabel"></span>
+      </a>
+      <a class="search-entry" id="searchEntry" href="#/sok">
+        <svg class="search-symbol" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M15 15L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </a>
+    </div>
   </header>
   <main id="view" aria-live="polite"></main>
 </div>

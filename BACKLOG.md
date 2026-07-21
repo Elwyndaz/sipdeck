@@ -156,11 +156,40 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     two-device logged-out-edit-then-login run against the real Worker needs real Firebase
     credentials (same standing limitation as BACKLOG 15/18/19's real-login gaps).
 
+## v1.4 — closed 2026-07-21 (item 21 done)
+
+21. ✅ **Catalog search** (done 2026-07-21) — a full-catalog "find a specific drink" search,
+    distinct from filtering the saved favorites list: the ask was to look up any of the 92
+    drinks by name or ingredient, to read the recipe or add it as a favorite, not to narrow
+    down what's already saved. Placement was grilled first (deck filter box risked feeling
+    crowded, a favorites-only filter didn't cover "not yet a favorite" drinks); landed on the
+    same pattern the wheel already established: a header icon (`#searchEntry`, visible on
+    every tab except while the wheel or search screen itself is open) opens a full-screen
+    `#/sok` route reusing `.wheel-screen`/`.wheel-topbar` for the shell. New pure
+    `searchHaystack(drink, ingredientNames)` + `matchesSearch(haystack, query)` match on drink
+    name and current-language ingredient names (substring, case-insensitive); results reuse the
+    existing `.fav-open`/`data-id` open-detail pattern (already shared by the favorites list and
+    the wheel result) straight into the `#/favoriter/<id>` detail view, so Save/Remove and the
+    full recipe need no new code. `render()` only clears the transient `searchQuery` when
+    leaving both the search route and any detail peek (`detailId === null`), mirroring the
+    existing wheel-visit-survives-a-peek guard — first pass missed this and lost the typed query
+    on Back after opening a result, caught and fixed via Playwright before shipping. Live-as-you-
+    type filtering re-renders the whole view (same architecture as every other control), so the
+    input handler saves/restores focus and cursor position around `render()` to avoid dropping
+    keystrokes. Zero Worker/D1/state-shape changes (search state is transient, not persisted).
+    `app.js` grew to 73,504 bytes, `test.js` budget bumped 71 kB → 74 kB. `node test.js`: 4,321
+    green (7 new: `searchHaystack`/`matchesSearch` cases). Playwright-verified on local HTTP
+    (phone viewport): open search from Kortlek and from Favoriter (Back returns to whichever tab
+    it was opened from, not always the deck), live-filtered results including a same-name
+    substring false-positive check ("gin" matching "ginger" ingredients — accepted, standard
+    substring-search behavior), opening a result shows the correct recipe with a working Save
+    button, no-match empty state, and query+results surviving a result-detail round trip. Zero
+    console errors throughout.
+
 ## v2 / ideas (unordered)
 
 - Richer filter UI over existing tags: style, strength, **alcohol-free mode**.
-- Search box (name + ingredient).
-- Custom domain once the name is final.
+- ~~Custom domain once the name is final.~~ Done 2026-07-21: live at buildapp.se/sipdeck.
 - Service worker/offline (only if real-world use shows the need — recept precedent).
 - Shake-to-shuffle, haptics on save (progressive enhancement only).
 

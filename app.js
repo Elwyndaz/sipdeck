@@ -22,6 +22,10 @@ const STRINGS = {
     filter_makeable: 'Only what I can make',
     favorites_title: 'Favorites',
     favorites_empty: 'Nothing saved yet. Swipe right on a drink to save it here.',
+    search_entry: 'Search', search_title: 'Search',
+    search_placeholder: 'Search name or ingredient',
+    search_empty: 'No drinks match that search.',
+    search_intro: 'Find a drink by name or ingredient.',
     fav_back: 'Back',
     fav_unfavorite: 'Remove favorite',
     fav_add: 'Save',
@@ -80,6 +84,10 @@ const STRINGS = {
     filter_makeable: 'Bara det jag kan blanda',
     favorites_title: 'Favoriter',
     favorites_empty: 'Inget sparat än. Svep höger på en drink för att spara den här.',
+    search_entry: 'Sök', search_title: 'Sök',
+    search_placeholder: 'Sök namn eller ingrediens',
+    search_empty: 'Inga drinkar matchar sökningen.',
+    search_intro: 'Hitta en drink på namn eller ingrediens.',
     fav_back: 'Tillbaka',
     fav_unfavorite: 'Ta bort favorit',
     fav_add: 'Spara',
@@ -246,6 +254,15 @@ function filterDrinks(drinks, filters, pantry) {
   const have = Array.isArray(pantry) ? new Set(pantry) : null;
   return (Array.isArray(drinks) ? drinks : [])
     .filter(drink => matchesFilters(drink, filters) && (!have || canMake(drink, have)));
+}
+
+function searchHaystack(drink, ingredientNames) {
+  return [drink.name].concat(ingredientNames || []).join(' ').toLowerCase();
+}
+
+function matchesSearch(haystack, query) {
+  const q = (query || '').trim().toLowerCase();
+  return !q || haystack.indexOf(q) !== -1;
 }
 
 function missingIngredients(drink, pantry) {
@@ -446,7 +463,7 @@ if (typeof module !== 'undefined') module.exports = {
   scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount,
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, swipeDirectionForKey, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
-  missingIngredients, mergeState,
+  missingIngredients, mergeState, searchHaystack, matchesSearch,
   weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
   wheelLandingRotation, wheelSectorPath,
   GLASS_SILHOUETTES, glassPlaceholder,
@@ -574,6 +591,7 @@ if (typeof document !== 'undefined') (function () {
   let favChecked = new Set(); // mixing progress for the open favorite; resets when it closes
   let favHistoryEntry = false; // true only when this session opened detail from the favorite list
   let makeableOnly = false; // transient deck mode; pantry itself is the persisted source of truth
+  let searchQuery = ''; // transient #/sok input; cleared whenever the route leaves search
 
   function filteredDrinks() {
     return filterDrinks(db.drinks, state.settings.filters, makeableOnly ? state.pantry : null);
@@ -1046,6 +1064,38 @@ if (typeof document !== 'undefined') (function () {
     </section>`;
   }
 
+  function viewSearch() {
+    const q = searchQuery.trim();
+    const results = db && q
+      ? db.drinks.filter(d => matchesSearch(searchHaystack(d, d.ingredients.map(l => ingName(l.id))), q))
+      : [];
+    const rows = results.map(d => `
+      <div class="list-card fav-row">
+        <button class="fav-open" data-id="${esc(d.id)}">
+          <span class="fav-thumb">${artMarkup(d)}</span>
+          <span class="fav-info">
+            <span class="name">${esc(d.name)}</span>
+            <span class="meta">${esc(taxonomyName('type', d.type))}</span>
+          </span>
+        </button>
+      </div>`).join('');
+    const body = !db ? `<p class="empty">${esc(t(lang(), 'deck_loading'))}</p>`
+      : !q ? `<p class="empty">${esc(t(lang(), 'search_intro'))}</p>`
+      : results.length ? rows
+      : `<p class="empty">${esc(t(lang(), 'search_empty'))}</p>`;
+    return `<section class="wheel-screen search-screen">
+      <header class="wheel-topbar">
+        <button class="wheel-back" data-search-act="back">‹ ${esc(t(lang(), 'wheel_back'))}</button>
+        <span class="wheel-top-wordmark"><img src="design/wordmark.svg" alt="Sipdeck"></span>
+      </header>
+      <div class="wheel-body search-body">
+        <input type="search" id="searchInput" class="search-input" value="${esc(searchQuery)}"
+          placeholder="${esc(t(lang(), 'search_placeholder'))}" aria-label="${esc(t(lang(), 'search_placeholder'))}">
+        ${body}
+      </div>
+    </section>`;
+  }
+
   function viewSettings() {
     const s = state.settings;
     const bool = v => t(lang(), v ? 'yes' : 'no');
@@ -1223,6 +1273,7 @@ if (typeof document !== 'undefined') (function () {
   const ROUTES = {
     '#/': { view: viewDeck, match: '#/' },
     '#/hjul': { view: viewWheel, match: null },
+    '#/sok': { view: viewSearch, match: null },
     '#/favoriter': { view: viewFavorites, match: '#/favoriter' },
     '#/skafferi': { view: viewPantry, match: '#/skafferi' },
     '#/installningar': { view: viewSettings, match: '#/installningar' },
@@ -1248,6 +1299,8 @@ if (typeof document !== 'undefined') (function () {
     if (isWheel && !wheelVisitActive) wheelVisitActive = true;
     else if (!isWheel && wheelVisitActive && detailId === null) resetWheelVisit(); // survives fav detail peek
     document.body.classList.toggle('wheel-mode', isWheel);
+    document.body.classList.toggle('search-mode', route.view === viewSearch);
+    if (route.view !== viewSearch && detailId === null) searchQuery = ''; // survives fav detail peek
     if (route.view === viewFavorites) {
       if (detailId !== favOpenId) favChecked = new Set();
       favOpenId = detailId;
@@ -1265,6 +1318,7 @@ if (typeof document !== 'undefined') (function () {
     $('#wheelEntryLabel').textContent = t(lang(), 'wheel_entry');
     $('#wheelEntry').setAttribute('aria-label', t(lang(), 'wheel_entry'));
     $('#wheelEntry').hidden = route.view !== viewDeck;
+    $('#searchEntry').setAttribute('aria-label', t(lang(), 'search_entry'));
     $('#nav').setAttribute('aria-label', t(lang(), 'nav_label'));
     const navLabels = { '#/': 'nav_deck', '#/favoriter': 'nav_favorites', '#/skafferi': 'nav_pantry', '#/installningar': 'nav_settings' };
     document.querySelectorAll('#nav a').forEach(a => {
@@ -1325,6 +1379,7 @@ if (typeof document !== 'undefined') (function () {
       return;
     }
     if (e.target.closest('#favClose')) { closeFavoriteDetail(); return; }
+    if (e.target.closest('[data-search-act="back"]')) { history.back(); return; }
     const favAction = e.target.closest('[data-fav-act]');
     if (favAction) {
       const s = state.settings;
@@ -1412,6 +1467,16 @@ if (typeof document !== 'undefined') (function () {
     if (!control.checked) state.pantry = state.pantry.filter(item => item !== id);
     deckQueue = null;
     save();
+  });
+
+  $('#view').addEventListener('input', e => {
+    const control = e.target.closest('#searchInput');
+    if (!control) return;
+    searchQuery = control.value;
+    const pos = control.selectionStart;
+    render();
+    const next = $('#searchInput');
+    if (next) { next.focus(); next.setSelectionRange(pos, pos); }
   });
 
   $('#wheelEntry').addEventListener('click', () => { wheelOpenedFromHome = true; });
