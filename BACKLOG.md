@@ -216,7 +216,15 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 
 ## v2 / ideas (unordered)
 
-- Richer filter UI over existing tags: style, strength, **alcohol-free mode**.
+- Richer filter UI over existing tags: style, strength.
+- **Alcohol-free mode**: separate boolean toggle (same pattern as the `bar` filter, D1),
+  off by default. Mixing mocktails into the normal deck unprompted isn't wanted (nobody
+  asked for tequila-free surprises); an explicit "Alkoholfritt"/"Alcohol-free" toggle that
+  only shows alcohol-free-tagged drinks is the actual ask.
+- Fill out alcohol-free-tagged drinks in the seed — only worth doing once the toggle
+  above exists, otherwise they're stuck behind a tag nothing filters on.
+- Weighted shuffle: bias the deck shuffle away from recently-surfaced top drinks
+  (recency-only, no new data, pure shuffle-logic tweak).
 - ~~Custom domain once the name is final.~~ Done 2026-07-21: live at buildapp.se/sipdeck.
 - Service worker/offline (only if real-world use shows the need — recept precedent).
 - Shake-to-shuffle, haptics on save (progressive enhancement only).
