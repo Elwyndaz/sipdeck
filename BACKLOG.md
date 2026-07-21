@@ -1,5 +1,7 @@
 # Sipdeck — backlog
 
+> Tvärprojekt-prio: se `../master-backlog.md`, uppdatera båda vid ändring.
+
 Ordered by priority. Work top-down; each item is meant to be finishable in one focused
 agent session. Story/AC references point into PRODUCT.md.
 
