@@ -1312,7 +1312,8 @@ if (typeof document !== 'undefined') (function () {
     }
     $('#view').innerHTML = route.view();
     if (route.view === viewDeck && db) mountDeck();
-    if (route.view === viewFavorites) $('#view').querySelectorAll('.cocktail-art').forEach(wireArt);
+    if (route.view === viewFavorites || route.view === viewSearch) $('#view').querySelectorAll('.cocktail-art').forEach(wireArt);
+    if (route.view === viewSearch && matchMedia('(pointer: fine)').matches) $('#searchInput').focus();
     document.documentElement.lang = lang();
     $('#tagline').textContent = t(lang(), 'tagline');
     $('#wheelEntryLabel').textContent = t(lang(), 'wheel_entry');
