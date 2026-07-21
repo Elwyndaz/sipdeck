@@ -5,6 +5,30 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**BACKLOG 21 done, v1.4 closed, deployed 2026-07-21.** Full-catalog search over all 92 drinks
+by name or ingredient (`#/sok`), separate from filtering the saved favorites list — the ask was
+to find *any* drink to read its recipe or save it, not narrow down what's already saved.
+Reuses the wheel's established full-screen pattern: a new header icon (`#searchEntry`, visible
+on every tab) opens `#/sok`, which reuses `.wheel-screen`/`.wheel-topbar` for the shell and the
+existing `.fav-open`/`data-id` open-detail pattern (already shared by the favorites list and the
+wheel result) to land on the `#/favoriter/<id>` detail view — Save/Remove and the full recipe
+needed zero new code. New pure `searchHaystack(drink, ingredientNames)` +
+`matchesSearch(haystack, query)`, substring/case-insensitive against the drink name and
+current-language ingredient names. One bug caught before shipping: `render()`'s transient-state
+reset was clearing `searchQuery` on the Back-from-a-result round trip, losing the typed query —
+fixed with the same `detailId === null` guard the wheel-visit tracking already used for
+surviving a detail peek. Live-as-you-type re-renders the whole view like every other control, so
+the input handler saves/restores focus and cursor position around `render()`. Zero Worker/D1/
+state-shape changes. `app.js` grew to 73,504 bytes; `test.js` budget bumped 71 kB → 74 kB.
+`node test.js`: 4,321 green. Playwright-verified on local HTTP (phone viewport): search opened
+from both Kortlek and Favoriter (Back returns to whichever tab it opened from), live filtering,
+opening a result and saving it, no-match empty state, query+results surviving a detail round
+trip, zero console errors. Committed (`722f51f`), pushed to main, and deployed: `npx wrangler
+pages deploy . --project-name sipdeck --branch main` succeeded, both production origins
+(`sipdeck.pages.dev` and `buildapp.se/sipdeck`) reverified serving the new `app.js` after
+deploy. Not exercised: mobile Safari/real-device touch typing (only Playwright/Chromium tested
+locally). Previous paragraph, superseded below, kept for history:
+
 **Pantry-awareness pass done 2026-07-20 (grilled via `/grilling` before building, not on the
 backlog as a numbered item yet).** Three things, all sharing one new pure helper
 `missingIngredients(drink, pantry)` (app.js, next to `canMake`) that returns the essential
