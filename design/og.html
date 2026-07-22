@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- Source for /sipdeck/og.png (1200x630 OG banner). Edit here, re-screenshot at 1200x630. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sd-bg:#EFE8DB; --sd-card:#FBF7EF; --sd-ink:#211B12; --sd-ink-2:#6E6455;
+    --sd-accent:#2F6B3F; --sd-line:rgba(33,27,18,.14);
+    --sd-font-display:'Instrument Serif',Georgia,serif;
+    --sd-font-ui:'Work Sans',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px}
+  body{
+    background:var(--sd-bg); color:var(--sd-ink);
+    display:flex; align-items:center; gap:70px;
+    padding:0 110px; font-family:var(--sd-font-ui);
+  }
+  .mark{
+    width:300px; height:300px; flex:none;
+    border-radius:44px; background:var(--sd-card);
+    box-shadow:0 2px 4px rgba(33,27,18,.06),0 30px 60px -20px rgba(33,27,18,.35);
+    display:grid; place-items:center;
+  }
+  .mark svg{width:210px;height:210px}
+  .copy{display:flex;flex-direction:column}
+  .wordmark{color:var(--sd-ink)}
+  .wordmark svg{width:440px;height:auto;display:block}
+  .tagline{
+    font-family:var(--sd-font-display); font-size:76px; line-height:1.05;
+    letter-spacing:-.01em; margin-top:26px;
+  }
+  .tagline em{font-style:normal;color:var(--sd-accent)}
+  .url{
+    margin-top:40px; font-size:26px; font-weight:500; letter-spacing:.04em;
+    text-transform:lowercase; color:var(--sd-ink-2);
+  }
+</style>
+</head>
+<body>
+  <div class="mark">
+    <!-- app icon mark: swiping card + garnish -->
+    <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+      <rect x="38" y="21" width="34" height="50" rx="7" transform="rotate(7 55 46)"
+            fill="none" stroke="#211B12" stroke-width="3" opacity=".3"/>
+      <g transform="rotate(-8 48 48)">
+        <rect x="28" y="21" width="38" height="54" rx="8" fill="#FBF7EF"
+              stroke="#211B12" stroke-width="3.5"/>
+        <path d="M 36,37 L 47,51 L 58,37 Z" fill="none" stroke="#211B12"
+              stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 47,51 V 62 M 40,62 H 54" fill="none" stroke="#211B12" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="55.5" cy="33" r="4" fill="#2F6B3F"/>
+      </g>
+    </svg>
+  </div>
+  <div class="copy">
+    <span class="wordmark">
+      <svg viewBox="0 0 254 84" xmlns="http://www.w3.org/2000/svg" aria-label="sipdeck">
+        <g fill="none" stroke="currentColor" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 27,27.5 C 23.5,22 7.5,21.5 7,29 C 6.5,36.5 27.5,34.5 27,44 C 26.5,52.5 8,52.5 5.5,46"/>
+          <path d="M 42,24.5 V 55.75"/>
+          <path d="M 56.4,24.5 V 74"/><circle cx="72" cy="40" r="15.75"/>
+          <circle cx="114" cy="40" r="15.75"/><path d="M 129.75,6 V 55.75"/>
+          <path d="M 167.5,51 A 15.75,15.75 0 1 1 171.75,36.5 H 141"/>
+          <path d="M 210,29 A 15.75,15.75 0 1 0 210,51"/>
+          <path d="M 224,6 V 55.75"/><path d="M 241,25.5 L 224.5,43.5"/><path d="M 231.5,36.5 L 242,55.75"/>
+        </g>
+        <circle cx="42" cy="9" r="5.5" fill="#2F6B3F"/>
+      </svg>
+    </span>
+    <div class="tagline">Swipe. Save. <em>Shake.</em></div>
+    <div class="url">buildapp.se/sipdeck</div>
+  </div>
+</body>
+</html>
