@@ -334,6 +334,15 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
 ::view-transition-old(wheel-shared),::view-transition-new(wheel-shared){
   animation:none;mix-blend-mode:normal
 }
+/* Firefox repaints the large SVG while resizing its shared snapshot; a short dissolve stays composited. */
+@supports (-moz-appearance:none){
+  .wheel-symbol,.wheel-disc{view-transition-name:none}
+  ::view-transition-group(root){animation-duration:180ms}
+  ::view-transition-old(root){animation:wheel-firefox-out 140ms ease-out both}
+  ::view-transition-new(root){animation:wheel-firefox-in 180ms ease-out both}
+}
+@keyframes wheel-firefox-out{to{opacity:0}}
+@keyframes wheel-firefox-in{from{opacity:0}}
 
 @media (max-width:370px){
   .wheel-entry{max-width:116px;padding-right:.55rem}.wheel-symbol{width:42px;height:42px;flex-basis:42px}
