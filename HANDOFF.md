@@ -6,7 +6,8 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 ## Current state in one paragraph
 
 **Editable recipe scaling 2026-07-23.** Recipe cards and favorite details now use a number
-input plus minus/plus buttons for 1–100 servings. The count is transient to the active drink,
+input plus minus/plus buttons for 1–100 servings. Native browser spinner arrows are hidden so
+the larger controls remain the only visible steppers. The count is transient to the active drink,
 so moving to another recipe starts at 1 instead of carrying a batch size across recipes.
 The legacy `settings.servings` field remains in the v1 sync shape for compatibility but is no
 longer used by the UI. The Settings screen no longer repeats the read-only unit, servings,
@@ -18,7 +19,7 @@ in Firefox again and is shortened from 560 ms to 360 ms. Opening displays the po
 full-wheel snapshot while it grows; closing explicitly keeps that same populated snapshot
 visible while it shrinks, instead of scaling up the empty mini-wheel artwork first.
 `app.js?v=1.7` cache-busts the route change. The privacy contact in both languages is now
-`kontakt@orgutveckling.se`. `node test.js`: 4,925 green.
+`kontakt@orgutveckling.se`. `node test.js`: 4,930 green.
 
 **Privacy/global-launch baseline deployed 2026-07-23 (`a66c15d`).** `info.html` contains
 Swedish and English privacy information, local-storage/cookie information, terms and
