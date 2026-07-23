@@ -302,7 +302,7 @@ check(appSource.includes("const AUTH_KEY = KEY + '-auth'") && appSource.includes
   'privacy: requested account persistence resumes lazy auth without popup timing');
 check(appSource.split('href="info.html"').length === 3,
   'privacy: legal information is linked for signed-in and signed-out account views');
-check(infoSource.includes('Patrik Löfgren') && infoSource.includes('patz.lofgren@gmail.com') &&
+check(infoSource.includes('Patrik Löfgren') && infoSource.includes('kontakt@orgutveckling.se') &&
   infoSource.includes('id="sv"') && infoSource.includes('id="en"'),
   'legal page: controller, contact and Swedish/English notices are present');
 check(infoSource.includes('inga annonserings- eller analyscookies') &&
