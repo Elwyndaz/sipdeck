@@ -32,7 +32,7 @@ references the installable variants with subpath-safe relative URLs.
 ## Cocktail artwork
 
 Cocktail illustrations are content assets, not identity source files, so they live at
-`../img/<drink-id>.webp`. All 92 current drinks have complete, visually reviewed 640×800
+`../img/<drink-id>.webp`. All 93 current drinks have complete, visually reviewed 640×800
 coverage at ≤ 80 kB. Local generated PNG sources live in gitignored `../img-src/`; the
 frozen `gpt-image-2`
 reference prompt, curation checklist and WebP conversion command live in

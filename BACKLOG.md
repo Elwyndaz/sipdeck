@@ -37,11 +37,11 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
    rules enforced in one format layer. Settings persists `settings.lang`; navigation,
    taxonomy labels, controls and accessibility labels all route through `t()`. (F1)
 9. ✅ **Image pipeline + placeholders** — frozen `gpt-image-2` reference workflow in
-   HANDOFF.md, exact 640×800 WebP outputs at 11–58 kB, complete id coverage and lazy
+   HANDOFF.md, exact 640×800 WebP outputs at 8–58 kB, complete id coverage and lazy
    loading for the top four cards. Resilient inline SVG silhouettes are keyed by the
    seed's `coupe`, `highball`, `rocks` and `martini` glass values. (G1)
-10. ✅ **Full drink seed** — 92 reviewed recipes and 123 normalized ingredients, with EN/SV
-    methods, reviewed `bar` flags and direct published sources. All 92 ids have curated
+10. ✅ **Full drink seed** — 93 reviewed recipes and 123 normalized ingredients, with EN/SV
+    methods, reviewed `bar` flags and direct published sources. All 93 ids have curated
     source illustrations and exact 640×800 production WebPs at ≤ 80 kB. The original 26
     sources and production files, plus the preexisting Manhattan source, were preserved.
 11. ✅ **PWA manifest + icons** — relative paths, standalone. Export PNGs from
@@ -62,7 +62,7 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     required spirit, liqueur, fortified wine, bitters, syrup, purée, juice, herb or other
     ingredient, set the drink to `bar: false`. Record a concise decision and blocking
     ingredient(s) for every reviewed drink, add regression coverage for the final allowlist,
-    and do not change recipes, ingredients or the 92-drink seed. (D1)
+    and do not change recipes, ingredients or the 93-drink seed. (D1)
 14. ✅ **Performance pass + deploy** (done 2026-07-19) — static budgets, local HTTP smoke and
     Cloudflare Pages upload, plus the throttled-phone trace and live mobile smoke via
     Playwright CDP against both production origins: cold 4G load 1,8 s / LCP 1,9 s
@@ -159,7 +159,7 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 ## v1.4 — closed 2026-07-21 (item 21 done)
 
 21. ✅ **Catalog search** (done 2026-07-21) — a full-catalog "find a specific drink" search,
-    distinct from filtering the saved favorites list: the ask was to look up any of the 92
+    distinct from filtering the saved favorites list: the ask was to look up any of the 93
     drinks by name or ingredient, to read the recipe or add it as a favorite, not to narrow
     down what's already saved. Placement was grilled first (deck filter box risked feeling
     crowded, a favorites-only filter didn't cover "not yet a favorite" drinks); landed on the
@@ -235,4 +235,4 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
   now merge (union) on login instead, so logged-out edits are never silently lost.
 - Pantry matching is id-exact: seeding discipline on ingredient ids is what makes it work.
 - No image = the drink's glass silhouette forever; acceptable for future additions and
-  tracked per drink by file absence. All 92 current drinks have complete production art.
+  tracked per drink by file absence. All 93 current drinks have complete production art.

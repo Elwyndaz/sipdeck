@@ -2463,6 +2463,66 @@
       }
     },
     {
+      "id": "cranberry-jack",
+      "name": "Cranberry Jack",
+      "type": "highball",
+      "base": "whiskey",
+      "iba": false,
+      "bar": false,
+      "tags": [
+        "fruity",
+        "citrusy",
+        "sparkling"
+      ],
+      "glass": "highball",
+      "source": {
+        "label": "Drinkoteket",
+        "url": "https://drinkoteket.se/recept/cranberry-jack/"
+      },
+      "ingredients": [
+        {
+          "id": "tennessee-whiskey",
+          "ml": 40,
+          "essential": true
+        },
+        {
+          "id": "raspberry-liqueur",
+          "ml": 15,
+          "essential": true
+        },
+        {
+          "id": "cranberry-juice",
+          "ml": 40,
+          "essential": true
+        },
+        {
+          "id": "lemon-juice",
+          "ml": 10,
+          "essential": true
+        },
+        {
+          "id": "lime-juice",
+          "ml": 10,
+          "essential": true
+        },
+        {
+          "id": "lemon-lime-soda",
+          "ml": 60,
+          "essential": true
+        },
+        {
+          "id": "lime",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        }
+      ],
+      "method": {
+        "en": "Shake everything except the soda with ice. Strain into an ice-filled highball, top with soda, stir gently and garnish with lime.",
+        "sv": "Skaka allt utom läsken med is. Sila i ett highballglas med is, toppa med läsk, rör försiktigt och garnera med lime."
+      }
+    },
+    {
       "id": "aviation",
       "name": "Aviation",
       "type": "sour",

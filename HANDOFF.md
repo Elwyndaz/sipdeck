@@ -215,7 +215,7 @@ and deployed to both production origins on 2026-07-20. Previous paragraph, super
 below in "v1 close-out", kept for history:
 
 **BACKLOG items 1–12 done; item 13 next; item 14 partially verified** (updated 2026-07-19).
-The approved 92-drink/123-ingredient seed and complete card artwork remain intact. Sipdeck
+The approved 93-drink/123-ingredient seed and complete card artwork remain intact. Sipdeck
 now has a localized, full-screen `#/hjul` spinning wheel opened by the starting-page "Pick
 for me" / "Välj åt mig" mini-wheel. Its five required visit-local moods build exactly 12
 visible sectors, use the current `bar: true` cocktail pool plus normal simple orders, and
@@ -260,7 +260,7 @@ before item 14's remaining browser gate can close the v1 cut.
 - Card fronts try `img/<drink-id>.webp` for the top four live cards and retain the
   `glassPlaceholder(drink.glass)` inline silhouette until load or on error. The current
   seed uses `coupe`, `highball`, `rocks` and `martini`; unknown future values degrade to
-  `rocks`. All 92 current ids have production art; the fallback remains resilient for
+  `rocks`. All 93 current ids have production art; the fallback remains resilient for
   future additions or failed requests. `convert()` uses 30 ml/oz (bar standard;
   PRODUCT.md doesn't pin it).
 - The `#view` click/change delegates are attached ONCE at startup (the element is never
@@ -461,7 +461,7 @@ in PRODUCT.md "Locked decisions".
 3. **Curate before converting.** Check subject correctness, whole-glass framing,
    `#FBF7EF` paper, line weight, watercolor texture, whitespace, garnish accuracy and
    distinction from similar glass/color combinations. Regenerate only an outlier, with
-   one targeted correction. All 92 current sources have passed this review.
+   one targeted correction. All 93 current sources have passed this review.
 
 4. **Convert approved sources.** Pillow is available as tooling and is not an app
    dependency. Center-crop the 2:3 source to 4:5, resize to exactly 640×800 and encode
@@ -472,13 +472,19 @@ in PRODUCT.md "Locked decisions".
    ```
 
    Filename **must** be `img/<drink-id>.webp`; verify every output is 640×800 and
-   ≤ 80 kB. Current range is 10,834–57,952 bytes across 92 production images.
+   ≤ 80 kB. Current range is 8,630–57,952 bytes across 93 production images.
 
    **Completed 66-drink expansion (2026-07-19).** Manhattan's preexisting reviewed source
    and 65 new one-call sources were curated in `drinks.json` order using Margarita, Mojito,
    Negroni and Daiquiri strictly as style references. Manhattan and the 65 new sources were
    converted together with the frozen quality 72/method 6 pipeline. Do not regenerate any
    current source unless a future task explicitly replaces this reviewed set.
+
+   **2026-07-23 image refresh and Cranberry Jack addition.** Ramos Gin Fizz and Dirty
+   Martini were regenerated from their committed artwork as precise edit targets to
+   correct the foam height and olive geometry. Cranberry Jack was generated once from
+   the four frozen style references, then all three approved sources were converted with
+   the same 640×800 quality-72/method-6 pipeline.
 
    **Wheel extension (2026-07-19).** The reviewed inventory is `beer`, `cider`, `red-wine`,
    `white-wine`, `sparkling-wine`, `jagermeister-shot`, `fernet-shot`, `tequila-shot`,
@@ -558,13 +564,14 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 4258 green; `node --check app.js`: green; `git diff --check`: green. The
-92-drink dataset validates with 123 normalized ingredients, and all 92 current recipe
-source URLs returned HTTP 200. All 92 production filenames exactly match the drink ids;
-every WebP is 640×800 and 10,834–57,952 bytes. The 26 preexisting production files are
+`node test.js`: 4379 green; `node --check app.js`: green; `git diff --check`: green.
+The 93-drink dataset validates with 123
+normalized ingredients. All 93 production filenames exactly match the drink ids;
+every WebP is 640×800 and 8,630–57,952 bytes. The 26 preexisting production files are
 byte-identical to their committed versions, and the recorded SHA-256 hashes for Manhattan
-plus the four frozen style references are unchanged. The 65 remaining sources were each
-generated once, visually reviewed and accepted without regeneration.
+plus the four frozen style references are unchanged. Ramos Gin Fizz and Dirty Martini use
+the reviewed 2026-07-23 corrections; Cranberry Jack was generated once and visually
+reviewed.
 
 Before conversion, local HTTP returned 404 for the intentionally absent Manhattan WebP;
 source/runtime inspection confirmed the SVG placeholder remains while the failed image is
