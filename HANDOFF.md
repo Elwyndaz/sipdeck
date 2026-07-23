@@ -5,6 +5,13 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**Wheel-transition follow-up 2026-07-23.** The shared mini-to-full wheel transition now runs
+in Firefox again and is shortened from 560 ms to 360 ms. Opening displays the populated
+full-wheel snapshot while it grows; closing explicitly keeps that same populated snapshot
+visible while it shrinks, instead of scaling up the empty mini-wheel artwork first.
+`app.js?v=1.7` cache-busts the route change. The privacy contact in both languages is now
+`kontakt@orgutveckling.se`. `node test.js`: 4,925 green.
+
 **Privacy/global-launch baseline deployed 2026-07-23 (`a66c15d`).** `info.html` contains
 Swedish and English privacy information, local-storage/cookie information, terms and
 responsible-alcohol guidance, and is linked from both account states. Fonts are now served

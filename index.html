@@ -330,19 +330,12 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
 .wheel-result-name .fav-open{padding:0;text-align:left;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .wheel-result-note{font:500 .72rem/1.35 var(--sd-font-ui);color:#6e6455;margin-top:.25rem}
 .wheel-live{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-::view-transition-group(wheel-shared){animation-duration:560ms;animation-timing-function:var(--sd-ease-list)}
+::view-transition-group(wheel-shared){animation-duration:360ms;animation-timing-function:var(--sd-ease-list)}
 ::view-transition-old(wheel-shared),::view-transition-new(wheel-shared){
   animation:none;mix-blend-mode:normal
 }
-/* Firefox repaints the large SVG while resizing its shared snapshot; a short dissolve stays composited. */
-@supports (-moz-appearance:none){
-  .wheel-symbol,.wheel-disc{view-transition-name:none}
-  ::view-transition-group(root){animation-duration:180ms}
-  ::view-transition-old(root){animation:wheel-firefox-out 140ms ease-out both}
-  ::view-transition-new(root){animation:wheel-firefox-in 180ms ease-out both}
-}
-@keyframes wheel-firefox-out{to{opacity:0}}
-@keyframes wheel-firefox-in{from{opacity:0}}
+html.wheel-closing::view-transition-new(wheel-shared){opacity:0}
+html.wheel-closing::view-transition-old(wheel-shared){opacity:1}
 
 @media (max-width:370px){
   .wheel-entry{max-width:116px;padding-right:.55rem}.wheel-symbol{width:42px;height:42px;flex-basis:42px}
@@ -414,6 +407,6 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
   <a href="#/skafferi" data-match="#/skafferi"></a>
   <a href="#/installningar" data-match="#/installningar"></a>
 </nav>
-<script src="app.js?v=1.6"></script>
+<script src="app.js?v=1.7"></script>
 </body>
 </html>

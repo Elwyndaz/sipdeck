@@ -316,9 +316,9 @@ check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),
   'wheel transition: mini-wheel expands through progressive View Transitions');
-check(htmlSource.includes('@supports (-moz-appearance:none)') &&
-  htmlSource.includes('.wheel-symbol,.wheel-disc{view-transition-name:none}'),
-  'wheel transition: Firefox avoids the repaint-heavy shared-element resize');
+check(htmlSource.includes('html.wheel-closing::view-transition-new(wheel-shared){opacity:0}') &&
+  htmlSource.includes('animation-duration:360ms') && appSource.includes("root.classList.toggle('wheel-closing'"),
+  'wheel transition: closing shrinks the populated wheel with a short shared-element animation');
 check(appSource.includes("matchMedia('(prefers-reduced-motion: reduce)')"),
   'wheel accessibility: reduced motion is honored');
 check(appSource.includes('aria-live="polite"') && appSource.includes('aria-valuetext='),

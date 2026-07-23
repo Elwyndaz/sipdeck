@@ -1526,8 +1526,11 @@ if (typeof document !== 'undefined') (function () {
 
   function renderRoute() {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduced && document.startViewTransition) document.startViewTransition(() => render());
-    else render();
+    if (!reduced && document.startViewTransition) {
+      const root = document.documentElement;
+      root.classList.toggle('wheel-closing', document.body.classList.contains('wheel-mode') && location.hash !== '#/hjul');
+      document.startViewTransition(() => render()).finished.finally(() => root.classList.remove('wheel-closing'));
+    } else render();
   }
 
   $('#view').addEventListener('click', async e => {
