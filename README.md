@@ -6,8 +6,10 @@ build, no dependencies. English + Swedish.
 
 ## Current state
 
-The complete seed contains 93 reviewed recipes and 93 optimized, visually reviewed
-640×800 WebP illustrations, all under 58 kB. Filters, pantry, essential-ingredient
+The complete seed contains 93 source-audited recipes, 149 normalized ingredients and 93
+optimized, visually reviewed 640×800 WebP illustrations, all under 58 kB. Every recipe
+links to its specific published source; amounts, garnishes, glass and method were
+rechecked against those live pages on 2026-07-23. Filters, pantry, essential-ingredient
 makeability, EN/SV switching and glass-specific missing-art fallbacks are implemented.
 Favorites use compact art rows and a continuous recipe view with checkmarks, clipboard
 copy, published-recipe links and mobile Back navigation. Card gestures suppress native

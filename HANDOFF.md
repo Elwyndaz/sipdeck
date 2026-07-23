@@ -564,14 +564,30 @@ Commit messages: `sipdeck: <what>`.
 
 ## Verification state
 
-`node test.js`: 4379 green; `node --check app.js`: green; `git diff --check`: green.
-The 93-drink dataset validates with 123
-normalized ingredients. All 93 production filenames exactly match the drink ids;
+`node test.js`: 4908 green; `node --check app.js`: green; `git diff --check`: green.
+The 93-drink dataset validates with 149 normalized ingredients, 13 supported glass values
+and source URLs that are present and unique for every recipe. All 93 production filenames
+exactly match the drink ids;
 every WebP is 640×800 and 8,630–57,952 bytes. The 26 preexisting production files are
 byte-identical to their committed versions, and the recorded SHA-256 hashes for Manhattan
 plus the four frozen style references are unchanged. Ramos Gin Fizz and Dirty Martini use
 the reviewed 2026-07-23 corrections; Cranberry Jack was generated once and visually
 reviewed.
+
+Recipe-source audit on 2026-07-23: all 93 recipes were compared with their exact live
+published source. Sixty recipe deviations and three stale or insufficient source records
+were corrected in `drinks.json`; the Gimlet and Caipiroska links now target Difford's
+current recipes, and White Russian uses Kahlúa's direct 30/30/30 ml recipe. The ingredient
+catalog grew from 123 to 149 entries to preserve source-specific ingredients instead of
+silently substituting generic ones. Optional ingredients remain omitted only where the
+source explicitly marks them optional. Dirty Martini is now 60 ml gin, 22,5 ml dry
+vermouth and 15 ml olive brine.
+
+Display follow-up on 2026-07-23: every `barspoon` amount now includes its 5 ml / 0,5 cl
+equivalent after serving scaling, for example `2 barsked (1 cl)`. Cranberry Jack is a
+highball topped with lemon-lime soda (`top`), without a fabricated fixed volume; Lynchburg
+Lemonade separately retains its source's explicit 120 ml soda amount. `app.js` is 79,183
+bytes unminified (< 79.2 kB).
 
 Before conversion, local HTTP returned 404 for the intentionally absent Manhattan WebP;
 source/runtime inspection confirmed the SVG placeholder remains while the failed image is

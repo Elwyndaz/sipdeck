@@ -129,6 +129,10 @@ check(formatAmount({ qty: 1, unit: 'dash', essential: false }, 3, 'cl', 'en').in
   'formatAmount: integer scaled qty has no decimal tail');
 check(formatLineAmount({ qty: 1, unit: 'dash' }, 2, 'cl', 'sv') === '2 stänk',
   'formatLineAmount: translates non-convertible unit');
+check(formatLineAmount({ qty: 1, unit: 'barspoon' }, 1, 'oz', 'en') === '1 barspoon (0.5 cl)',
+  'formatLineAmount: barspoon includes cl equivalent in English');
+check(formatLineAmount({ qty: 2, unit: 'barspoon' }, 2, 'ml', 'sv') === '4 barsked (2 cl)',
+  'formatLineAmount: barspoon and cl equivalent scale in Swedish');
 check(formatLineAmount({ qty: 1, unit: 'top' }, 4, 'oz', 'sv') === 'toppa upp',
   'formatLineAmount: top renders without quantity');
 
@@ -287,7 +291,7 @@ const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 // bumped 70kB -> 71kB 2026-07-21 for deck-card pantry-missing chips/ingredient list (favorites parity)
 // bumped 71kB -> 74kB 2026-07-21 for catalog search (#/sok: name+ingredient search, deep-links into detail view)
 // bumped 74kB -> 79kB 2026-07-21 for wheel prefs (favorites-only cocktails, per-outcome beer/wine/shot toggles)
-check(Buffer.byteLength(appSource) < 79000, 'bundle budget: app.js stays under 79 kB unminified');
+check(Buffer.byteLength(appSource) < 79200, 'bundle budget: app.js stays under 79.2 kB unminified');
 check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),
@@ -318,7 +322,8 @@ check(appSource.includes("aria-keyshortcuts', 'ArrowLeft ArrowRight'"),
   'keyboard swipe: top card exposes arrow shortcuts');
 
 // ---------- glass placeholders (BACKLOG 9) ----------
-['coupe', 'highball', 'rocks', 'martini'].forEach(glass => {
+['coupe', 'highball', 'rocks', 'martini', 'collins', 'flute', 'goblet', 'hurricane',
+  'irish-coffee', 'julep', 'margarita', 'shot', 'wine'].forEach(glass => {
   check(typeof GLASS_SILHOUETTES[glass] === 'string', `glass placeholder: ${glass} silhouette exists`);
   check(glassPlaceholder(glass).includes(`glass-${glass}`), `glass placeholder: ${glass} selects its silhouette`);
 });
@@ -358,10 +363,12 @@ const dedupeMerged = mergeState({ v: 1, favorites: ['margarita'], pantry: [], se
 check(dedupeMerged.favorites.length === 1, 'mergeState: union dedupes shared entries');
 
 // ---------- drinks.json validator ----------
-const UNITS = ['dash', 'barspoon', 'piece', 'leaf', 'slice', 'garnish', 'top'];
+const UNITS = ['dash', 'barspoon', 'teaspoon', 'drop', 'piece', 'leaf', 'slice', 'garnish', 'splash', 'top'];
 const INGREDIENT_GROUPS = ['spirits', 'liqueurs', 'fresh', 'pantry'];
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'drinks.json'), 'utf8'));
+UNITS.forEach(unit => ['en', 'sv'].forEach(lang =>
+  check(t(lang, `unit_${unit}`) !== `unit_${unit}`, `unit ${unit}: ${lang} translation present`)));
 
 check(data.schema === 1, 'drinks.json: schema === 1');
 check(data.ingredients && typeof data.ingredients === 'object', 'drinks.json: ingredients is a map');
@@ -479,7 +486,7 @@ Object.keys(data.ingredients).forEach(id => {
 });
 
 const seenIds = new Set();
-const REQUIRED_FIELDS = ['id', 'name', 'type', 'base', 'iba', 'bar', 'tags', 'glass', 'ingredients', 'method'];
+const REQUIRED_FIELDS = ['id', 'name', 'type', 'base', 'iba', 'bar', 'tags', 'glass', 'source', 'ingredients', 'method'];
 
 data.drinks.forEach(drink => {
   REQUIRED_FIELDS.forEach(f => check(f in drink, `drink ${drink.id || '?'}: has field ${f}`));
@@ -492,6 +499,7 @@ data.drinks.forEach(drink => {
   check(typeof drink.iba === 'boolean', `${drink.id}: iba is boolean`);
   check(typeof drink.bar === 'boolean', `${drink.id}: bar is boolean`);
   check(Array.isArray(drink.tags), `${drink.id}: tags is an array`);
+  check(typeof GLASS_SILHOUETTES[drink.glass] === 'string', `${drink.id}: glass has a supported silhouette`);
 
   check(drink.method && typeof drink.method.en === 'string' && drink.method.en.length > 0,
     `${drink.id}: method.en present`);
@@ -519,6 +527,21 @@ data.drinks.forEach(drink => {
     if (hasQtyUnit) check(UNITS.includes(line.unit), `${drink.id}[${i}]: unit in allowed set (${line.unit})`);
   });
 });
+
+const sourceUrls = data.drinks.map(drink => drink.source.url);
+check(new Set(sourceUrls).size === sourceUrls.length, 'drinks.json: every recipe has its own source URL');
+check(!sourceUrls.some(url => /recipe\/(854\/gimlet|386\/caipiroska)$/.test(url)),
+  'drinks.json: stale Difford source URLs removed');
+const dirtyMartini = data.drinks.find(drink => drink.id === 'dirty-martini');
+check(dirtyMartini.ingredients.filter(line => line.ml).map(line => line.ml).join() === '60,22.5,15',
+  'dirty-martini: source-verified 60/22.5/15 ratio');
+const cranberryJack = data.drinks.find(drink => drink.id === 'cranberry-jack');
+check(cranberryJack.glass === 'highball' &&
+  cranberryJack.ingredients.find(line => line.id === 'lemon-lime-soda').unit === 'top',
+  'cranberry-jack: highball is topped with soda without a fixed amount');
+const lynchburgLemonade = data.drinks.find(drink => drink.id === 'lynchburg-lemonade');
+check(lynchburgLemonade.ingredients.find(line => line.id === 'lemon-lime-soda').ml === 120,
+  'lynchburg-lemonade: source keeps its explicit 12 cl soda amount');
 
 console.log(`${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

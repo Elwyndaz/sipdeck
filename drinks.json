@@ -615,6 +615,136 @@
       "en": "Blanc vermouth",
       "sv": "Vit vermouth",
       "group": "liqueurs"
+    },
+    "abbotts-bitters": {
+      "en": "Abbott's bitters",
+      "sv": "Abbott's bitters",
+      "group": "pantry"
+    },
+    "amargo-bitters": {
+      "en": "Amargo bitters",
+      "sv": "Amargo-bitter",
+      "group": "pantry"
+    },
+    "blackstrap-rum": {
+      "en": "Blackstrap rum",
+      "sv": "Blackstrap-rom",
+      "group": "spirits"
+    },
+    "candied-ginger": {
+      "en": "Candied ginger",
+      "sv": "Kanderad ingefära",
+      "group": "pantry"
+    },
+    "citron-vodka": {
+      "en": "Citron vodka",
+      "sv": "Citronvodka",
+      "group": "spirits"
+    },
+    "cointreau": {
+      "en": "Cointreau",
+      "sv": "Cointreau",
+      "group": "liqueurs"
+    },
+    "demerara-syrup": {
+      "en": "Demerara sugar syrup",
+      "sv": "Demerarasockerlag",
+      "group": "pantry"
+    },
+    "donns-mix": {
+      "en": "Donn's Mix",
+      "sv": "Donn's Mix",
+      "group": "pantry"
+    },
+    "fresh-ginger": {
+      "en": "Fresh ginger",
+      "sv": "Färsk ingefära",
+      "group": "fresh"
+    },
+    "jamaican-rum": {
+      "en": "Jamaican rum",
+      "sv": "Jamaicansk rom",
+      "group": "spirits"
+    },
+    "lemon-wedge": {
+      "en": "Lemon wedge",
+      "sv": "Citronklyfta",
+      "group": "fresh"
+    },
+    "lime-peel": {
+      "en": "Lime peel",
+      "sv": "Limeskal",
+      "group": "fresh"
+    },
+    "lime-wedge": {
+      "en": "Lime wedge",
+      "sv": "Limeklyfta",
+      "group": "fresh"
+    },
+    "martinique-molasses-rum": {
+      "en": "Martinique molasses rum",
+      "sv": "Martinique-rom av melass",
+      "group": "spirits"
+    },
+    "mint-sprig": {
+      "en": "Mint sprig",
+      "sv": "Myntakvist",
+      "group": "fresh"
+    },
+    "navy-rum": {
+      "en": "Navy rum",
+      "sv": "Navyrom",
+      "group": "spirits"
+    },
+    "oude-genever": {
+      "en": "Oude genever",
+      "sv": "Oude genever",
+      "group": "spirits"
+    },
+    "pernod": {
+      "en": "Pernod",
+      "sv": "Pernod",
+      "group": "spirits"
+    },
+    "pineapple-spear": {
+      "en": "Pineapple spear",
+      "sv": "Ananasspets",
+      "group": "fresh"
+    },
+    "powdered-sugar": {
+      "en": "Powdered sugar",
+      "sv": "Florsocker",
+      "group": "pantry"
+    },
+    "rich-sugar-syrup": {
+      "en": "Rich sugar syrup (2:1)",
+      "sv": "Rik sockerlag (2:1)",
+      "group": "pantry"
+    },
+    "saline-solution": {
+      "en": "Saline solution",
+      "sv": "Saltlösning",
+      "group": "pantry"
+    },
+    "seasonal-berry": {
+      "en": "Seasonal berry",
+      "sv": "Säsongsbär",
+      "group": "fresh"
+    },
+    "tequila-reposado": {
+      "en": "Reposado tequila",
+      "sv": "Reposadotequila",
+      "group": "spirits"
+    },
+    "vanilla-extract": {
+      "en": "Vanilla extract",
+      "sv": "Vaniljextrakt",
+      "group": "pantry"
+    },
+    "water": {
+      "en": "Water",
+      "sv": "Vatten",
+      "group": "pantry"
     }
   },
   "drinks": [
@@ -658,8 +788,8 @@
         }
       ],
       "method": {
-        "en": "Shake all ingredients with ice, strain into a chilled salt-rimmed coupe.",
-        "sv": "Skaka alla ingredienser med is, sila i ett kylt coupeglas med saltad kant."
+        "en": "Add all liquid ingredients to a shaker with ice. Shake and strain into a chilled cocktail glass with an optional half salt rim.",
+        "sv": "Häll alla flytande ingredienser i en shaker med is. Skaka och sila i ett kylt cocktailglas med en valfri halvsaltad kant."
       }
     },
     {
@@ -681,23 +811,24 @@
       "ingredients": [
         {
           "id": "white-rum",
-          "ml": 45,
+          "ml": 60,
           "essential": true
         },
         {
           "id": "lime-juice",
-          "ml": 25,
+          "ml": 20,
           "essential": true
         },
         {
-          "id": "sugar-syrup",
-          "ml": 15,
+          "id": "white-sugar",
+          "qty": 2,
+          "unit": "barspoon",
           "essential": true
         }
       ],
       "method": {
-        "en": "Shake with ice, double strain into a chilled coupe.",
-        "sv": "Skaka med is, dubbelsila i ett kylt coupeglas."
+        "en": "Add all ingredients to a shaker and stir well to dissolve the sugar. Add ice, shake and strain into a chilled cocktail glass.",
+        "sv": "Häll alla ingredienser i en shaker och rör om ordentligt tills sockret har lösts upp. Tillsätt is, skaka och sila i ett kylt cocktailglas."
       }
     },
     {
@@ -724,18 +855,19 @@
         },
         {
           "id": "lime-juice",
-          "ml": 30,
+          "ml": 20,
           "essential": true
         },
         {
-          "id": "sugar-syrup",
-          "ml": 15,
+          "id": "mint-sprig",
+          "qty": 6,
+          "unit": "piece",
           "essential": true
         },
         {
-          "id": "mint-leaves",
-          "qty": 8,
-          "unit": "leaf",
+          "id": "white-sugar",
+          "qty": 2,
+          "unit": "teaspoon",
           "essential": true
         },
         {
@@ -743,11 +875,23 @@
           "qty": 1,
           "unit": "top",
           "essential": true
+        },
+        {
+          "id": "mint-sprig",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "lime-wheel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Muddle mint gently with syrup and lime juice, add rum and crushed ice, top with soda water, stir, garnish with a mint sprig.",
-        "sv": "Mortla myntan försiktigt med sockerlag och limejuice, tillsätt rom och krossad is, fyll på med sodavatten, rör om, garnera med en myntakvist."
+        "en": "Mix the mint sprigs with the sugar and lime juice. Add a splash of soda water and fill the glass with ice. Pour in the rum, top with soda water and stir lightly. Garnish with a mint sprig and lime slice.",
+        "sv": "Blanda myntakvistarna med socker och limejuice. Tillsätt en skvätt sodavatten och fyll glaset med is. Häll i rom, toppa med sodavatten och rör om lätt. Garnera med en myntakvist och limeskiva."
       }
     },
     {
@@ -784,15 +928,15 @@
           "essential": true
         },
         {
-          "id": "orange-peel",
+          "id": "orange-slice",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Stir all ingredients with ice, strain into a rocks glass over ice, garnish with orange peel.",
-        "sv": "Rör om alla ingredienser med is, sila i ett glas med is, garnera med apelsinskal."
+        "en": "Pour all ingredients directly into a chilled rocks glass filled with ice and stir gently. Garnish with half an orange slice.",
+        "sv": "Häll alla ingredienser direkt i ett kylt rocksglas fyllt med is och rör om försiktigt. Garnera med en halv apelsinskiva."
       }
     },
     {
@@ -815,12 +959,13 @@
       "ingredients": [
         {
           "id": "bourbon",
-          "ml": 60,
+          "ml": 45,
           "essential": true
         },
         {
-          "id": "sugar-syrup",
-          "ml": 10,
+          "id": "sugar-cube",
+          "qty": 1,
+          "unit": "piece",
           "essential": true
         },
         {
@@ -830,15 +975,27 @@
           "essential": true
         },
         {
+          "id": "water",
+          "qty": 3,
+          "unit": "dash",
+          "essential": true
+        },
+        {
           "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Stir bourbon, sugar syrup and bitters with ice, strain over a large ice cube in a rocks glass, express the orange peel over the top and drop it in.",
-        "sv": "Rör om bourbon, sockerlag och bitter med is, sila över en stor isbit i ett lowballglas, pressa ur oljan ur apelsinskalet över drinken och lägg i det."
+        "en": "Place the sugar cube in a rocks glass, saturate it with bitters and add a few dashes of water. Muddle until dissolved, fill with ice, add the whiskey and stir gently. Garnish with orange zest and a cocktail cherry.",
+        "sv": "Lägg sockerbiten i ett rocksglas, dränk den med bitter och tillsätt några stänk vatten. Muddla tills sockret lösts upp, fyll med is, tillsätt whiskey och rör om försiktigt. Garnera med apelsinskal och ett cocktailbär."
       }
     },
     {
@@ -865,24 +1022,24 @@
         },
         {
           "id": "lemon-juice",
-          "ml": 30,
+          "ml": 25,
           "essential": true
         },
         {
           "id": "sugar-syrup",
-          "ml": 15,
+          "ml": 20,
           "essential": true
         },
         {
           "id": "egg-white",
-          "qty": 1,
-          "unit": "barspoon",
+          "qty": 3,
+          "unit": "drop",
           "essential": false
         },
         {
-          "id": "angostura-bitters",
+          "id": "orange-slice",
           "qty": 1,
-          "unit": "dash",
+          "unit": "garnish",
           "essential": false
         },
         {
@@ -893,8 +1050,8 @@
         }
       ],
       "method": {
-        "en": "Dry shake with the egg white, then shake again with ice, strain into a rocks glass over ice, garnish with a cherry and a dash of bitters on the foam.",
-        "sv": "Skaka torrt med äggvitan, skaka sedan igen med is, sila i ett lowballglas med is, garnera med ett bär och en skvätt bitter på skummet."
+        "en": "Shake all ingredients well with ice. Strain into an ice-filled rocks glass. If using egg white, shake harder to incorporate the foam. Garnish with half an orange slice and a maraschino cherry.",
+        "sv": "Skaka alla ingredienser ordentligt med is. Sila i ett isfyllt rocksglas. Om äggvita används, skaka kraftigare för att arbeta in skummet. Garnera med en halv apelsinskiva och ett maraschinobär."
       }
     },
     {
@@ -948,32 +1105,58 @@
         "citrusy",
         "gin-forward"
       ],
-      "glass": "martini",
+      "glass": "coupe",
       "source": {
         "label": "Difford's Guide",
-        "url": "https://www.diffordsguide.com/cocktails/recipe/854/gimlet"
+        "url": "https://www.diffordsguide.com/cocktails/recipe/831/gimlet-diffords-recipe"
       },
       "ingredients": [
         {
           "id": "gin",
-          "ml": 45,
+          "ml": 50,
           "essential": true
         },
         {
           "id": "lime-cordial",
-          "ml": 15,
+          "ml": 20,
           "essential": true
         },
         {
-          "id": "lime-wheel",
+          "id": "oude-genever",
+          "ml": 10,
+          "essential": true
+        },
+        {
+          "id": "lime-juice",
+          "ml": 5,
+          "essential": true
+        },
+        {
+          "id": "lemon-juice",
+          "ml": 5,
+          "essential": true
+        },
+        {
+          "id": "rich-sugar-syrup",
+          "ml": 5,
+          "essential": true
+        },
+        {
+          "id": "lime-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake gin and lime cordial with ice, strain into a chilled martini glass, garnish with a lime wheel.",
-        "sv": "Skaka gin och lime cordial med is, sila i ett kylt martiniglas, garnera med en limeskiva."
+        "en": "Shake all ingredients with ice and fine-strain into a chilled coupe. Express a lime zest twist over the cocktail and discard it, then garnish with a lime wedge.",
+        "sv": "Skaka alla ingredienser med is och finsila i ett kylt coupeglas. Pressa oljorna ur ett limeskal över drinken och kasta skalet, garnera sedan med en limeklyfta."
       }
     },
     {
@@ -996,17 +1179,23 @@
       "ingredients": [
         {
           "id": "vodka",
-          "ml": 40,
+          "ml": 50,
           "essential": true
         },
         {
           "id": "coffee-liqueur",
-          "ml": 20,
+          "ml": 30,
+          "essential": true
+        },
+        {
+          "id": "sugar-syrup",
+          "ml": 10,
           "essential": true
         },
         {
           "id": "espresso",
-          "ml": 20,
+          "qty": 1,
+          "unit": "piece",
           "essential": true
         },
         {
@@ -1017,8 +1206,8 @@
         }
       ],
       "method": {
-        "en": "Shake all liquids hard with ice, double strain into a chilled martini glass, garnish with three coffee beans.",
-        "sv": "Skaka alla ingredienser hårt med is, dubbelsila i ett kylt martiniglas, garnera med tre kaffebönor."
+        "en": "Pour all liquid ingredients into a shaker, shake well with ice and strain into a chilled cocktail glass. Garnish with three coffee beans.",
+        "sv": "Häll alla flytande ingredienser i en shaker, skaka ordentligt med is och sila i ett kylt cocktailglas. Garnera med tre kaffebönor."
       }
     },
     {
@@ -1039,35 +1228,35 @@
       },
       "ingredients": [
         {
-          "id": "vodka",
+          "id": "citron-vodka",
           "ml": 40,
           "essential": true
         },
         {
-          "id": "triple-sec",
-          "ml": 15,
-          "essential": true
-        },
-        {
-          "id": "cranberry-juice",
+          "id": "cointreau",
           "ml": 15,
           "essential": true
         },
         {
           "id": "lime-juice",
-          "ml": 10,
+          "ml": 15,
           "essential": true
         },
         {
-          "id": "orange-peel",
+          "id": "cranberry-juice",
+          "ml": 30,
+          "essential": true
+        },
+        {
+          "id": "lemon-peel",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into a chilled martini glass, garnish with an orange peel.",
-        "sv": "Skaka med is, sila i ett kylt martiniglas, garnera med apelsinskal."
+        "en": "Add all liquid ingredients to a shaker filled with ice. Shake well and strain into a large chilled cocktail glass. Garnish with a lemon twist.",
+        "sv": "Häll alla flytande ingredienser i en shaker fylld med is. Skaka ordentligt och sila i ett stort kylt cocktailglas. Garnera med en citrontwist."
       }
     },
     {
@@ -1212,8 +1401,8 @@
         },
         {
           "id": "egg-white",
-          "qty": 1,
-          "unit": "barspoon",
+          "qty": 3,
+          "unit": "drop",
           "essential": false
         },
         {
@@ -1224,8 +1413,8 @@
         }
       ],
       "method": {
-        "en": "Shake all ingredients well with ice and strain into a chilled coupe. Garnish with fresh raspberries.",
-        "sv": "Skaka alla ingredienser ordentligt med is och sila i ett kylt coupeglas. Garnera med färska hallon."
+        "en": "Pour all ingredients into a shaker, shake well with ice and strain into a chilled cocktail glass. Garnish with fresh raspberries.",
+        "sv": "Häll alla ingredienser i en shaker, skaka ordentligt med is och sila i ett kylt cocktailglas. Garnera med färska hallon."
       }
     },
     {
@@ -1507,11 +1696,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "white-sugar",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake everything except champagne with ice and double strain into a chilled cocktail glass. Garnish with passion fruit and serve the champagne on the side.",
-        "sv": "Skaka allt utom champagnen med is och dubbelsila i ett kylt cocktailglas. Garnera med passionsfrukt och servera champagnen vid sidan om."
+        "en": "Shake all ingredients except the champagne with ice and double-strain into a large chilled cocktail glass. Garnish with a passion-fruit cup and sugar, and serve the champagne on the side.",
+        "sv": "Skaka alla ingredienser utom champagnen med is och dubbelsila i ett stort kylt cocktailglas. Garnera med en passionsfruktshalva och socker och servera champagnen vid sidan av."
       }
     },
     {
@@ -1582,18 +1777,18 @@
       ],
       "glass": "rocks",
       "source": {
-        "label": "IBA",
-        "url": "https://iba-world.com/iba-cocktail/black-russian/"
+        "label": "Kahlúa",
+        "url": "https://www.kahlua.com/en-us/drinks/white-russian/"
       },
       "ingredients": [
         {
-          "id": "vodka",
-          "ml": 50,
+          "id": "coffee-liqueur",
+          "ml": 30,
           "essential": true
         },
         {
-          "id": "coffee-liqueur",
-          "ml": 20,
+          "id": "vodka",
+          "ml": 30,
           "essential": true
         },
         {
@@ -1603,8 +1798,8 @@
         }
       ],
       "method": {
-        "en": "Pour vodka and coffee liqueur into an ice-filled rocks glass. Float the cream on top and stir in slowly.",
-        "sv": "Häll vodka och kaffelikör i ett lowballglas med is. Häll grädden ovanpå och rör ner den långsamt."
+        "en": "Fill a rocks glass with ice. Pour in the coffee liqueur and vodka, then slowly pour the cream over the back of a spoon so it floats on top.",
+        "sv": "Fyll ett rocksglas med is. Häll i kaffelikör och vodka och häll sedan grädden långsamt över baksidan av en sked så att den lägger sig ovanpå."
       }
     },
     {
@@ -1668,7 +1863,7 @@
         "citrusy",
         "frothy"
       ],
-      "glass": "coupe",
+      "glass": "goblet",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/pisco-sour/"
@@ -1696,15 +1891,15 @@
           "essential": true
         },
         {
-          "id": "angostura-bitters",
+          "id": "amargo-bitters",
           "qty": 3,
           "unit": "dash",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake all ingredients with ice and strain into a chilled coupe. Finish with a few dashes of bitters on the foam.",
-        "sv": "Skaka alla ingredienser med is och sila i ett kylt coupeglas. Avsluta med några stänk bitter på skummet."
+        "en": "Add all ingredients except the bitters to a shaker with ice. Shake and strain into a chilled goblet. Finish with a few dashes of Amargo bitters on the foam.",
+        "sv": "Häll alla ingredienser utom bitter i en shaker med is. Skaka och sila i ett kylt pokalglas. Avsluta med några stänk Amargo-bitter på skummet."
       }
     },
     {
@@ -1719,7 +1914,7 @@
         "warm",
         "creamy"
       ],
-      "glass": "highball",
+      "glass": "irish-coffee",
       "source": {
         "label": "Systembolaget",
         "url": "https://www.systembolaget.se/sprit/drinkar-cocktails/likordrinkar/kaffe-karlsson/"
@@ -1754,8 +1949,8 @@
         }
       ],
       "method": {
-        "en": "Build the liqueurs and hot coffee in a heatproof glass and stir. Float lightly whipped cream on top and garnish with grated dark chocolate.",
-        "sv": "Bygg likörerna och det varma kaffet i ett värmetåligt glas och rör om. Lägg lättvispad grädde ovanpå och garnera med riven mörk choklad."
+        "en": "Build the liqueurs and hot coffee in an Irish coffee glass and stir. Carefully float the lightly whipped cream over the back of a spoon and garnish with grated chocolate.",
+        "sv": "Bygg likörerna och det varma kaffet i ett Irish coffee-glas och rör om. Lägg försiktigt den lättvispade grädden ovanpå över baksidan av en sked och garnera med riven choklad."
       }
     },
     {
@@ -1820,7 +2015,7 @@
         "frozen",
         "refreshing"
       ],
-      "glass": "coupe",
+      "glass": "margarita",
       "source": {
         "label": "Systembolaget",
         "url": "https://www.systembolaget.se/sprit/drinkar-cocktails/romdrinkar/frozen-strawberry-daiquiri/"
@@ -1861,8 +2056,8 @@
         }
       ],
       "method": {
-        "en": "Blend all ingredients until smooth, pour into a chilled coupe and garnish with a strawberry.",
-        "sv": "Mixa alla ingredienser till en slät konsistens, häll i ett kylt coupeglas och garnera med en jordgubbe."
+        "en": "Blend all ingredients until smooth, pour into a margarita glass and garnish with a strawberry.",
+        "sv": "Mixa alla ingredienser till en slät massa, häll upp i ett margaritaglas och garnera med en jordgubbe."
       }
     },
     {
@@ -1923,7 +2118,7 @@
         "herbal",
         "strong"
       ],
-      "glass": "rocks",
+      "glass": "martini",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/boulevardier/"
@@ -1952,8 +2147,8 @@
         }
       ],
       "method": {
-        "en": "Stir with ice, strain over fresh ice in a rocks glass and garnish with orange peel.",
-        "sv": "Rör med is, sila över ny is i ett rocksglas och garnera med apelsinskal."
+        "en": "Stir all ingredients with ice and strain into a chilled cocktail glass. Garnish with orange zest, or optionally lemon zest.",
+        "sv": "Rör alla ingredienser med is och sila i ett kylt cocktailglas. Garnera med apelsinskal eller, om så önskas, citronskal."
       }
     },
     {
@@ -2020,7 +2215,7 @@
         "complex",
         "strong"
       ],
-      "glass": "rocks",
+      "glass": "martini",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/vieux-carre/"
@@ -2054,21 +2249,21 @@
           "essential": true
         },
         {
-          "id": "angostura-bitters",
+          "id": "orange-peel",
           "qty": 1,
-          "unit": "dash",
-          "essential": true
+          "unit": "garnish",
+          "essential": false
         },
         {
-          "id": "lemon-peel",
+          "id": "maraschino-cherry",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Stir with ice and strain over fresh ice in a rocks glass. Garnish with lemon peel.",
-        "sv": "Rör med is och sila över ny is i ett rocksglas. Garnera med citronskal."
+        "en": "Stir all ingredients with ice and strain into a chilled cocktail glass. Garnish with orange zest and a maraschino cherry.",
+        "sv": "Rör alla ingredienser med is och sila i ett kylt cocktailglas. Garnera med apelsinskal och ett maraschinobär."
       }
     },
     {
@@ -2123,7 +2318,7 @@
         "herbal",
         "classic"
       ],
-      "glass": "martini",
+      "glass": "coupe",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/1681/rob-roy"
@@ -2136,14 +2331,20 @@
         },
         {
           "id": "sweet-vermouth",
-          "ml": 25,
+          "ml": 30,
           "essential": true
         },
         {
-          "id": "angostura-bitters",
-          "qty": 2,
-          "unit": "dash",
+          "id": "abbotts-bitters",
+          "qty": 8,
+          "unit": "drop",
           "essential": true
+        },
+        {
+          "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         },
         {
           "id": "maraschino-cherry",
@@ -2153,8 +2354,8 @@
         }
       ],
       "method": {
-        "en": "Stir with ice and strain into a chilled cocktail glass. Garnish with a cocktail cherry.",
-        "sv": "Rör med is och sila i ett kylt cocktailglas. Garnera med ett cocktailbär."
+        "en": "Stir all ingredients with ice and fine-strain into a chilled coupe. Express an orange peel over the drink and discard it, then garnish with a maraschino cherry.",
+        "sv": "Rör alla ingredienser med is och finsila i ett kylt coupeglas. Pressa oljorna ur ett apelsinskal över drinken och kassera det, garnera sedan med ett maraschinobär."
       }
     },
     {
@@ -2169,7 +2370,7 @@
         "refreshing",
         "strong"
       ],
-      "glass": "rocks",
+      "glass": "julep",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/mint-julep/"
@@ -2181,20 +2382,32 @@
           "essential": true
         },
         {
-          "id": "sugar-syrup",
+          "id": "mint-sprig",
+          "qty": 4,
+          "unit": "piece",
+          "essential": true
+        },
+        {
+          "id": "powdered-sugar",
+          "qty": 1,
+          "unit": "teaspoon",
+          "essential": true
+        },
+        {
+          "id": "water",
           "ml": 10,
           "essential": true
         },
         {
-          "id": "mint-leaves",
-          "qty": 8,
-          "unit": "leaf",
-          "essential": true
+          "id": "mint-sprig",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Gently press the mint with syrup, add bourbon and crushed ice, then churn until chilled.",
-        "sv": "Pressa myntan försiktigt med sockerlag, tillsätt bourbon och krossad is och rör tills drinken är kall."
+        "en": "Gently muddle the mint with powdered sugar and water in a julep cup. Fill with cracked ice, add bourbon and stir until the cup frosts. Garnish with a mint sprig.",
+        "sv": "Muddla myntan försiktigt med florsocker och vatten i en julepbägare. Fyll med krossad is, tillsätt bourbon och rör tills bägaren frostar. Garnera med en myntakvist."
       }
     },
     {
@@ -2221,6 +2434,11 @@
           "essential": true
         },
         {
+          "id": "peated-scotch",
+          "ml": 7.5,
+          "essential": true
+        },
+        {
           "id": "lemon-juice",
           "ml": 22.5,
           "essential": true
@@ -2231,14 +2449,21 @@
           "essential": true
         },
         {
-          "id": "peated-scotch",
-          "ml": 7.5,
+          "id": "fresh-ginger",
+          "qty": 3,
+          "unit": "piece",
           "essential": true
+        },
+        {
+          "id": "candied-ginger",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake all but the peated whisky with ice and strain over fresh ice. Float the peated whisky on top.",
-        "sv": "Skaka allt utom den rökiga whiskyn med is och sila över ny is. Toppa med den rökiga whiskyn."
+        "en": "Muddle the fresh ginger in a shaker. Add all remaining ingredients except the peated Scotch, shake with ice and fine-strain into a chilled rocks glass over ice. Float the peated Scotch on top and garnish with candied ginger.",
+        "sv": "Muddla den färska ingefäran i en shaker. Tillsätt alla övriga ingredienser utom den rökiga whiskyn, skaka med is och finsila i ett kylt rocksglas över is. Skikta den rökiga whiskyn ovanpå och garnera med kanderad ingefära."
       }
     },
     {
@@ -2309,29 +2534,42 @@
           "essential": true
         },
         {
-          "id": "lemon-juice",
-          "ml": 30,
-          "essential": true
-        },
-        {
           "id": "sugar-syrup",
           "ml": 22.5,
           "essential": true
         },
         {
+          "id": "lemon-juice",
+          "ml": 30,
+          "essential": true
+        },
+        {
           "id": "egg-white",
-          "ml": 15,
+          "qty": 3,
+          "unit": "drop",
           "essential": false
         },
         {
           "id": "red-wine",
           "ml": 15,
           "essential": true
+        },
+        {
+          "id": "lemon-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake everything except the wine with ice and strain over fresh ice. Float the red wine on top.",
-        "sv": "Skaka allt utom vinet med is och sila över ny is. Skikta rödvinet ovanpå."
+        "en": "Shake all ingredients except the red wine vigorously with ice. Strain into a chilled rocks glass filled with ice, float the wine on top, and garnish with lemon peel and a cherry.",
+        "sv": "Skaka alla ingredienser utom rödvinet kraftigt med is. Sila i ett kylt rocksglas fyllt med is, skikta vinet ovanpå och garnera med citronskal och ett cocktailbär."
       }
     },
     {
@@ -2366,11 +2604,23 @@
           "id": "honey-syrup",
           "ml": 22.5,
           "essential": true
+        },
+        {
+          "id": "lemon-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "lemon-wedge",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice and strain over fresh ice in a rocks glass.",
-        "sv": "Skaka med is och sila över ny is i ett rocksglas."
+        "en": "Shake with ice and fine-strain into an ice-filled rocks glass. Express the lemon peel over the drink and discard it, then garnish with a lemon wedge.",
+        "sv": "Skaka med is och finsila i ett rocksglas fyllt med is. Pressa oljorna ur citronskalet över drinken och kassera det, garnera sedan med en citronklyfta."
       }
     },
     {
@@ -2393,18 +2643,24 @@
       "ingredients": [
         {
           "id": "scotch-whisky",
-          "ml": 45,
+          "ml": 60,
           "essential": true
         },
         {
           "id": "amaretto",
-          "ml": 15,
+          "ml": 20,
           "essential": true
+        },
+        {
+          "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Build over a large ice cube in a rocks glass and stir gently.",
-        "sv": "Bygg över en stor isbit i ett rocksglas och rör försiktigt."
+        "en": "Stir with ice and strain into an ice-filled rocks glass, preferably over a large cube. Express the orange peel over the drink and use it as garnish.",
+        "sv": "Rör med is och sila i ett rocksglas fyllt med is, helst över en stor isbit. Pressa oljorna ur apelsinskalet över drinken och använd det som garnering."
       }
     },
     {
@@ -2427,39 +2683,39 @@
       "ingredients": [
         {
           "id": "tennessee-whiskey",
-          "ml": 35,
+          "ml": 30,
           "essential": true
         },
         {
           "id": "triple-sec",
-          "ml": 20,
+          "ml": 30,
           "essential": true
         },
         {
           "id": "lemon-juice",
-          "ml": 20,
+          "ml": 22.5,
           "essential": true
         },
         {
           "id": "sugar-syrup",
-          "ml": 10,
+          "ml": 7.5,
           "essential": true
         },
         {
           "id": "lemon-lime-soda",
-          "ml": 100,
+          "ml": 120,
           "essential": true
         },
         {
-          "id": "lemon-wheel",
+          "id": "lemon-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake the whiskey, liqueur, lemon and syrup with ice. Strain into an ice-filled highball, top with soda and garnish with lemon.",
-        "sv": "Skaka whiskey, likör, citron och sockerlag med is. Sila i ett highballglas med is, toppa med läsk och garnera med citron."
+        "en": "Fill a highball glass three-quarters full with cubed ice. Pour in the whiskey, add the remaining ingredients and stir. Garnish with a lemon wedge.",
+        "sv": "Fyll ett highballglas till tre fjärdedelar med isbitar. Häll i whiskeyn, tillsätt övriga ingredienser och rör om. Garnera med en citronklyfta."
       }
     },
     {
@@ -2487,12 +2743,12 @@
         },
         {
           "id": "raspberry-liqueur",
-          "ml": 15,
+          "ml": 20,
           "essential": true
         },
         {
           "id": "cranberry-juice",
-          "ml": 40,
+          "ml": 20,
           "essential": true
         },
         {
@@ -2506,20 +2762,26 @@
           "essential": true
         },
         {
-          "id": "lemon-lime-soda",
-          "ml": 60,
+          "id": "sugar-syrup",
+          "ml": 10,
           "essential": true
         },
         {
-          "id": "lime",
+          "id": "lemon-lime-soda",
+          "qty": 1,
+          "unit": "top",
+          "essential": true
+        },
+        {
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake everything except the soda with ice. Strain into an ice-filled highball, top with soda, stir gently and garnish with lime.",
-        "sv": "Skaka allt utom läsken med is. Sila i ett highballglas med is, toppa med läsk, rör försiktigt och garnera med lime."
+        "en": "Shake everything except the lemon-lime soda with ice. Strain into an ice-filled highball glass, top with soda, stir gently and garnish with a lime wedge.",
+        "sv": "Skaka allt utom citron- och limeläsken med is. Sila i ett highballglas fyllt med is, toppa med läsk, rör försiktigt och garnera med en limeklyfta."
       }
     },
     {
@@ -2635,13 +2897,18 @@
           "essential": true
         },
         {
+          "id": "honey-syrup",
+          "ml": 10,
+          "essential": true
+        },
+        {
           "id": "lemon-juice",
           "ml": 22.5,
           "essential": true
         },
         {
-          "id": "honey-syrup",
-          "ml": 15,
+          "id": "orange-juice",
+          "ml": 22.5,
           "essential": true
         },
         {
@@ -2652,8 +2919,8 @@
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into a chilled coupe and garnish with lemon peel.",
-        "sv": "Skaka med is, sila i ett kylt coupeglas och garnera med citronskal."
+        "en": "Stir the honey syrup with the lemon and orange juices until dissolved. Add gin, shake with ice and strain into a chilled coupe. Optionally garnish with lemon peel.",
+        "sv": "Rör honungssirapen med citron- och apelsinjuicen tills den lösts upp. Tillsätt gin, skaka med is och sila i ett kylt coupeglas. Garnera valfritt med citronskal."
       }
     },
     {
@@ -2712,7 +2979,7 @@
         "citrusy",
         "fresh"
       ],
-      "glass": "rocks",
+      "glass": "coupe",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/gin-basil-smash/"
@@ -2725,12 +2992,12 @@
         },
         {
           "id": "lemon-juice",
-          "ml": 30,
+          "ml": 22.5,
           "essential": true
         },
         {
           "id": "sugar-syrup",
-          "ml": 20,
+          "ml": 22.5,
           "essential": true
         },
         {
@@ -2741,8 +3008,8 @@
         }
       ],
       "method": {
-        "en": "Gently muddle basil with lemon and syrup, add gin, shake with ice and fine-strain over fresh ice.",
-        "sv": "Muddla basilika försiktigt med citron och sockerlag, tillsätt gin, skaka med is och finsila över ny is."
+        "en": "Add all ingredients to a shaker with ice, shake vigorously and pour into a chilled coupe.",
+        "sv": "Tillsätt alla ingredienser i en shaker med is, skaka kraftigt och häll i ett kylt coupeglas."
       }
     },
     {
@@ -2833,11 +3100,17 @@
           "qty": 1,
           "unit": "dash",
           "essential": true
+        },
+        {
+          "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice and strain into a chilled coupe.",
-        "sv": "Skaka med is och sila i ett kylt coupeglas."
+        "en": "Shake with ice, strain into a chilled coupe and garnish with orange peel.",
+        "sv": "Skaka med is, sila i ett kylt coupeglas och garnera med apelsinskal."
       }
     },
     {
@@ -2969,16 +3242,11 @@
           "id": "lemon-juice",
           "ml": 20,
           "essential": true
-        },
-        {
-          "id": "egg-white",
-          "ml": 15,
-          "essential": false
         }
       ],
       "method": {
-        "en": "Shake hard with ice and strain into a chilled coupe.",
-        "sv": "Skaka kraftigt med is och sila i ett kylt coupeglas."
+        "en": "Shake well with ice and strain into a chilled coupe.",
+        "sv": "Skaka väl med is och sila i ett kylt coupeglas."
       }
     },
     {
@@ -3036,6 +3304,12 @@
           "essential": true
         },
         {
+          "id": "vanilla-extract",
+          "qty": 2,
+          "unit": "drop",
+          "essential": true
+        },
+        {
           "id": "soda-water",
           "qty": 1,
           "unit": "top",
@@ -3043,8 +3317,8 @@
         }
       ],
       "method": {
-        "en": "Shake everything except soda without ice, then with ice. Strain into a highball and top slowly with soda.",
-        "sv": "Skaka allt utom soda utan is och sedan med is. Sila i ett highballglas och toppa långsamt med soda."
+        "en": "Shake all ingredients except soda water with ice for two minutes. Double-strain, return the drink to the shaker and hard-shake without ice for one minute. Strain into a highball glass and top with soda water.",
+        "sv": "Skaka alla ingredienser utom sodavattnet med is i två minuter. Dubbelsila, häll tillbaka drinken i shakern och skaka kraftigt utan is i en minut. Sila i ett highballglas och toppa med sodavatten."
       }
     },
     {
@@ -3059,7 +3333,7 @@
         "fruity",
         "complex"
       ],
-      "glass": "highball",
+      "glass": "hurricane",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/singapore-sling/"
@@ -3111,11 +3385,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into an ice-filled highball and garnish with pineapple.",
-        "sv": "Skaka med is, sila i ett highballglas fyllt med is och garnera med ananas."
+        "en": "Shake all ingredients with ice, strain into a hurricane glass and garnish with pineapple and a maraschino cherry.",
+        "sv": "Skaka alla ingredienser med is, sila i ett hurricane-glas och garnera med ananas och ett maraschinobär."
       }
     },
     {
@@ -3130,7 +3410,7 @@
         "refreshing",
         "simple"
       ],
-      "glass": "highball",
+      "glass": "collins",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/835/gin-and-tonic"
@@ -3143,19 +3423,19 @@
         },
         {
           "id": "tonic-water",
-          "ml": 150,
+          "ml": 120,
           "essential": true
         },
         {
-          "id": "lime-wheel",
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Build over plenty of ice in a highball glass, stir briefly and garnish with lime.",
-        "sv": "Bygg över rikligt med is i ett highballglas, rör kort och garnera med lime."
+        "en": "Pour the gin and tonic into a chilled Collins glass, fill with ice and garnish with a lime wedge.",
+        "sv": "Häll gin och tonic i ett kylt Collinsglas, fyll med is och garnera med en limeklyfta."
       }
     },
     {
@@ -3178,12 +3458,12 @@
       "ingredients": [
         {
           "id": "gin",
-          "ml": 75,
+          "ml": 60,
           "essential": true
         },
         {
           "id": "dry-vermouth",
-          "ml": 15,
+          "ml": 22.5,
           "essential": true
         },
         {
@@ -3199,8 +3479,8 @@
         }
       ],
       "method": {
-        "en": "Stir with ice and strain into a chilled martini glass. Garnish with olives.",
-        "sv": "Rör med is och sila i ett kylt martiniglas. Garnera med oliver."
+        "en": "Stir with ice and strain into a chilled martini glass. Garnish with skewered olives.",
+        "sv": "Rör med is och sila i ett kylt martiniglas. Garnera med oliver på spett."
       }
     },
     {
@@ -3237,15 +3517,15 @@
           "essential": true
         },
         {
-          "id": "lime-wheel",
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice in a highball glass, stir gently and garnish with lime.",
-        "sv": "Bygg över is i ett highballglas, rör försiktigt och garnera med lime."
+        "en": "Build all ingredients in a highball glass filled with ice and garnish with a lime wedge.",
+        "sv": "Bygg alla ingredienser i ett highballglas fyllt med is och garnera med en limeklyfta."
       }
     },
     {
@@ -3277,20 +3557,15 @@
           "essential": true
         },
         {
-          "id": "lime-juice",
-          "ml": 10,
-          "essential": true
-        },
-        {
-          "id": "lime-wheel",
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice in a highball glass, float the rum on top and garnish with lime.",
-        "sv": "Bygg över is i ett highballglas, skikta rommen ovanpå och garnera med lime."
+        "en": "Pour the ginger beer into an ice-filled highball glass and float the rum on top. Garnish with a lime wedge.",
+        "sv": "Häll ginger beer i ett highballglas fyllt med is och skikta rommen ovanpå. Garnera med en limeklyfta."
       }
     },
     {
@@ -3312,8 +3587,13 @@
       },
       "ingredients": [
         {
-          "id": "aged-rum",
-          "ml": 60,
+          "id": "jamaican-rum",
+          "ml": 30,
+          "essential": true
+        },
+        {
+          "id": "martinique-molasses-rum",
+          "ml": 30,
           "essential": true
         },
         {
@@ -3337,15 +3617,27 @@
           "essential": true
         },
         {
-          "id": "mint-leaves",
+          "id": "pineapple-spear",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "mint-sprig",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "lime-peel",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice and pour over crushed ice in a rocks glass. Garnish with mint.",
-        "sv": "Skaka med is och häll över krossad is i ett rocksglas. Garnera med mynta."
+        "en": "Shake all ingredients with ice and pour into a double rocks glass. Garnish with a pineapple spear, mint sprig and lime peel.",
+        "sv": "Skaka alla ingredienser med is och häll i ett dubbelt rocksglas. Garnera med en ananasspets, myntakvist och limeskal."
       }
     },
     {
@@ -3386,11 +3678,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Blend with ice until smooth, pour into a chilled glass and garnish with pineapple.",
-        "sv": "Mixa med is till en slät konsistens, häll i ett kylt glas och garnera med ananas."
+        "en": "Blend all ingredients with ice, pour into a large glass, serve with straws and garnish with pineapple and a cocktail cherry.",
+        "sv": "Mixa alla ingredienser med is, häll i ett stort glas, servera med sugrör och garnera med ananas och ett cocktailbär."
       }
     },
     {
@@ -3437,19 +3735,14 @@
           "essential": true
         },
         {
-          "id": "grapefruit-juice",
-          "ml": 20,
-          "essential": true
-        },
-        {
-          "id": "cinnamon-syrup",
-          "ml": 10,
+          "id": "donns-mix",
+          "ml": 15,
           "essential": true
         },
         {
           "id": "grenadine",
           "qty": 1,
-          "unit": "barspoon",
+          "unit": "teaspoon",
           "essential": true
         },
         {
@@ -3459,15 +3752,21 @@
           "essential": true
         },
         {
-          "id": "absinthe",
-          "qty": 1,
-          "unit": "dash",
+          "id": "pernod",
+          "qty": 6,
+          "unit": "drop",
           "essential": true
+        },
+        {
+          "id": "mint-leaves",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Blend briefly with crushed ice, pour into a tall glass and top with more crushed ice.",
-        "sv": "Mixa kort med krossad is, häll i ett högt glas och fyll på med mer krossad is."
+        "en": "Blend all ingredients for a few seconds with 170 g cracked ice, pour into a tall glass and garnish with mint leaves. Donn's Mix is two parts fresh yellow grapefruit juice to one part cinnamon syrup.",
+        "sv": "Mixa alla ingredienser i några sekunder med 170 g krossad is, häll i ett högt glas och garnera med myntablad. Donn's Mix består av två delar färsk gul grapefruktjuice och en del kanelsirap."
       }
     },
     {
@@ -3489,7 +3788,7 @@
       },
       "ingredients": [
         {
-          "id": "dark-rum",
+          "id": "blackstrap-rum",
           "ml": 45,
           "essential": true
         },
@@ -3509,7 +3808,7 @@
           "essential": true
         },
         {
-          "id": "sugar-syrup",
+          "id": "demerara-syrup",
           "ml": 15,
           "essential": true
         },
@@ -3521,8 +3820,8 @@
         }
       ],
       "method": {
-        "en": "Shake with ice, strain over fresh ice and garnish with pineapple.",
-        "sv": "Skaka med is, sila över ny is och garnera med ananas."
+        "en": "Shake with ice, strain into a rocks glass filled with ice and garnish with a pineapple wedge.",
+        "sv": "Skaka med is, sila i ett rocksglas fyllt med is och garnera med en ananasklyfta."
       }
     },
     {
@@ -3544,7 +3843,7 @@
       },
       "ingredients": [
         {
-          "id": "dark-rum",
+          "id": "jamaican-rum",
           "ml": 45,
           "essential": true
         },
@@ -3557,11 +3856,17 @@
           "id": "sugar-cane-juice",
           "ml": 30,
           "essential": true
+        },
+        {
+          "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Pour into an ice-filled highball glass and stir gently.",
-        "sv": "Häll i ett highballglas fyllt med is och rör försiktigt."
+        "en": "Pour all ingredients directly into a small tumbler. Add dilution to taste with water, ice or fresh juice, and garnish with orange peel.",
+        "sv": "Häll alla ingredienser direkt i ett litet tumblerglas. Späd efter smak med vatten, is eller färsk juice och garnera med apelsinskal."
       }
     },
     {
@@ -3576,7 +3881,7 @@
         "passion-fruit",
         "strong"
       ],
-      "glass": "highball",
+      "glass": "hurricane",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/993/hurricane"
@@ -3588,7 +3893,7 @@
           "essential": true
         },
         {
-          "id": "dark-rum",
+          "id": "navy-rum",
           "ml": 25,
           "essential": true
         },
@@ -3613,7 +3918,7 @@
           "essential": true
         },
         {
-          "id": "sugar-syrup",
+          "id": "rich-sugar-syrup",
           "ml": 7.5,
           "essential": true
         },
@@ -3623,15 +3928,21 @@
           "essential": true
         },
         {
-          "id": "orange-slice",
+          "id": "pineapple-wedge",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into a tall glass over fresh ice and garnish with orange.",
-        "sv": "Skaka med is, sila i ett högt glas över ny is och garnera med apelsin."
+        "en": "Shake all ingredients with ice and strain into a chilled Hurricane glass filled with crushed ice. Garnish with a pineapple wedge and maraschino cherry.",
+        "sv": "Skaka alla ingredienser med is och sila i ett kylt hurricane-glas fyllt med krossad is. Garnera med en ananasklyfta och ett maraschinobär."
       }
     },
     {
@@ -3653,7 +3964,7 @@
       },
       "ingredients": [
         {
-          "id": "dark-rum",
+          "id": "navy-rum",
           "ml": 45,
           "essential": true
         },
@@ -3677,11 +3988,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "pineapple-wedge",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, pour into a tall glass over fresh ice and garnish with grated nutmeg.",
-        "sv": "Skaka med is, häll i ett högt glas över ny is och garnera med riven muskot."
+        "en": "Shake with ice and strain into an ice-filled Collins glass or tiki mug. Dust with freshly grated nutmeg and garnish with a pineapple wedge.",
+        "sv": "Skaka med is och sila i ett isfyllt collinsglas eller en tikimugg. Pudra över nyriven muskot och garnera med en ananasklyfta."
       }
     },
     {
@@ -3713,7 +4030,7 @@
           "essential": true
         },
         {
-          "id": "sugar-syrup",
+          "id": "rich-sugar-syrup",
           "ml": 30,
           "essential": true
         },
@@ -3727,11 +4044,23 @@
           "id": "chilled-water",
           "ml": 60,
           "essential": true
+        },
+        {
+          "id": "orange-slice",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice and strain into an ice-filled highball glass.",
-        "sv": "Skaka med is och sila i ett highballglas fyllt med is."
+        "en": "Shake with ice and strain into an ice-filled Collins glass. Garnish with a skewered orange wheel and maraschino cherry.",
+        "sv": "Skaka med is och sila i ett isfyllt collinsglas. Garnera med en apelsinskiva och ett maraschinobär på spett."
       }
     },
     {
@@ -3822,6 +4151,12 @@
           "essential": true
         },
         {
+          "id": "saline-solution",
+          "qty": 2,
+          "unit": "drop",
+          "essential": true
+        },
+        {
           "id": "orange-peel",
           "qty": 1,
           "unit": "garnish",
@@ -3829,8 +4164,8 @@
         }
       ],
       "method": {
-        "en": "Stir with ice, strain into a chilled coupe and garnish with orange peel.",
-        "sv": "Rör med is, sila i ett kylt coupeglas och garnera med apelsinskal."
+        "en": "Stir all ingredients with ice and fine-strain into a chilled coupe. Express the orange peel over the cocktail and use it as garnish.",
+        "sv": "Rör alla ingredienser med is och finsila i ett kylt coupeglas. Pressa oljorna ur apelsinskalet över drinken och använd det som garnering."
       }
     },
     {
@@ -3942,7 +4277,7 @@
       },
       "ingredients": [
         {
-          "id": "tequila-blanco",
+          "id": "tequila-reposado",
           "ml": 45,
           "essential": true
         },
@@ -3953,24 +4288,24 @@
         },
         {
           "id": "lime-juice",
-          "ml": 15,
+          "ml": 22.5,
           "essential": true
         },
         {
           "id": "ginger-beer",
-          "ml": 90,
+          "ml": 60,
           "essential": true
         },
         {
-          "id": "lime-wheel",
+          "id": "lime-wedge",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Shake tequila, cassis and lime with ice, strain into an ice-filled highball and top with ginger beer.",
-        "sv": "Skaka tequila, cassis och lime med is, sila i ett highballglas med is och toppa med ginger beer."
+        "en": "Shake the tequila, cassis and lime juice with ice. Strain into an ice-filled Collins glass, top with ginger beer and briefly stir. Garnish with a lime wedge.",
+        "sv": "Skaka tequila, cassis och limejuice med is. Sila i ett isfyllt collinsglas, toppa med ginger beer och rör kort. Garnera med en limeklyfta."
       }
     },
     {
@@ -4120,17 +4455,17 @@
           "essential": true
         },
         {
-          "id": "gin",
-          "ml": 15,
-          "essential": true
-        },
-        {
           "id": "tequila-blanco",
           "ml": 15,
           "essential": true
         },
         {
           "id": "white-rum",
+          "ml": 15,
+          "essential": true
+        },
+        {
+          "id": "gin",
           "ml": 15,
           "essential": true
         },
@@ -4146,7 +4481,7 @@
         },
         {
           "id": "sugar-syrup",
-          "ml": 20,
+          "ml": 30,
           "essential": true
         },
         {
@@ -4163,8 +4498,8 @@
         }
       ],
       "method": {
-        "en": "Shake everything except cola with ice, strain into an ice-filled highball and top with cola.",
-        "sv": "Skaka allt utom cola med is, sila i ett highballglas fyllt med is och toppa med cola."
+        "en": "Add all ingredients to an ice-filled highball glass, top with cola and stir gently. Optionally garnish with a lemon slice.",
+        "sv": "Häll alla ingredienser i ett isfyllt highballglas, toppa med cola och rör försiktigt. Garnera valfritt med en citronskiva."
       }
     },
     {
@@ -4249,11 +4584,23 @@
           "id": "grapefruit-juice",
           "ml": 30,
           "essential": true
+        },
+        {
+          "id": "orange-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice in a highball glass and stir gently.",
-        "sv": "Bygg över is i ett highballglas och rör försiktigt."
+        "en": "Build all ingredients in an ice-filled highball glass. Garnish with orange zest and a cherry.",
+        "sv": "Bygg alla ingredienser i ett isfyllt highballglas. Garnera med apelsinskal och ett körsbär."
       }
     },
     {
@@ -4288,22 +4635,11 @@
           "id": "lemon-juice",
           "ml": 15,
           "essential": true
-        },
-        {
-          "id": "sugar-syrup",
-          "ml": 10,
-          "essential": true
-        },
-        {
-          "id": "lemon-peel",
-          "qty": 1,
-          "unit": "garnish",
-          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into a chilled martini glass and garnish with lemon peel.",
-        "sv": "Skaka med is, sila i ett kylt martiniglas och garnera med citronskal."
+        "en": "Shake all ingredients with ice and strain into a chilled cocktail glass. No garnish.",
+        "sv": "Skaka alla ingredienser med is och sila i ett kylt cocktailglas. Ingen garnering."
       }
     },
     {
@@ -4336,13 +4672,19 @@
         },
         {
           "id": "pineapple-juice",
-          "ml": 45,
+          "ml": 15,
           "essential": true
+        },
+        {
+          "id": "lemon-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Shake hard with ice and fine-strain into a chilled martini glass.",
-        "sv": "Skaka kraftigt med is och finsila i ett kylt martiniglas."
+        "en": "Shake all liquid ingredients with ice and strain into a chilled cocktail glass. Express the oil from a lemon peel over the drink.",
+        "sv": "Skaka alla flytande ingredienser med is och sila i ett kylt cocktailglas. Pressa oljan ur ett citronskal över drinken."
       }
     },
     {
@@ -4360,30 +4702,29 @@
       "glass": "rocks",
       "source": {
         "label": "Difford's Guide",
-        "url": "https://www.diffordsguide.com/cocktails/recipe/386/caipiroska"
+        "url": "https://www.diffordsguide.com/cocktails/recipe/356/caipirovska"
       },
       "ingredients": [
         {
-          "id": "vodka",
-          "ml": 50,
-          "essential": true
-        },
-        {
           "id": "lime",
-          "qty": 1,
+          "qty": 0.75,
           "unit": "piece",
           "essential": true
         },
         {
-          "id": "white-sugar",
-          "qty": 2,
-          "unit": "barspoon",
+          "id": "vodka",
+          "ml": 60,
+          "essential": true
+        },
+        {
+          "id": "rich-sugar-syrup",
+          "ml": 15,
           "essential": true
         }
       ],
       "method": {
-        "en": "Muddle lime with sugar, fill the glass with crushed ice, add vodka and churn well.",
-        "sv": "Muddla lime med socker, fyll glaset med krossad is, tillsätt vodka och rör om ordentligt."
+        "en": "Muddle the chopped lime in the base of a shaker. Add vodka, sugar syrup and crushed ice, shake, then pour everything unstrained into a chilled old-fashioned glass. Serve with straws.",
+        "sv": "Muddla den skurna limen i botten av en shaker. Tillsätt vodka, sockerlag och krossad is, skaka och häll sedan allt osilat i ett kylt old fashioned-glas. Servera med sugrör."
       }
     },
     {
@@ -4411,12 +4752,23 @@
         },
         {
           "id": "orange-juice",
-          "ml": 90,
+          "ml": 67.5,
+          "essential": true
+        },
+        {
+          "id": "rich-sugar-syrup",
+          "ml": 5,
+          "essential": true
+        },
+        {
+          "id": "orange-bitters",
+          "qty": 2,
+          "unit": "dash",
           "essential": true
         },
         {
           "id": "galliano",
-          "ml": 15,
+          "ml": 12.5,
           "essential": true
         },
         {
@@ -4427,8 +4779,8 @@
         }
       ],
       "method": {
-        "en": "Build vodka and orange juice over ice, float Galliano on top and garnish with orange.",
-        "sv": "Bygg vodka och apelsinjuice över is, skikta Galliano ovanpå och garnera med apelsin."
+        "en": "Briefly stir the vodka, orange juice, sugar syrup and bitters with ice. Strain into an ice-filled highball glass and float Galliano on the surface. Garnish with an orange slice.",
+        "sv": "Rör kort vodka, apelsinjuice, sockerlag och bitter med is. Sila i ett isfyllt highballglas och flöta Galliano ovanpå. Garnera med en apelsinskiva."
       }
     },
     {
@@ -4456,24 +4808,35 @@
         },
         {
           "id": "blue-curacao",
+          "ml": 30,
+          "essential": true
+        },
+        {
+          "id": "lime-juice",
           "ml": 20,
           "essential": true
         },
         {
           "id": "lemon-lime-soda",
-          "ml": 100,
+          "ml": 75,
           "essential": true
         },
         {
-          "id": "lemon-wheel",
+          "id": "orange-slice",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice in a highball glass, stir gently and garnish with lemon.",
-        "sv": "Bygg över is i ett highballglas, rör försiktigt och garnera med citron."
+        "en": "Pour vodka, blue curaçao and lime juice into a Collins glass and briefly stir. Fill with ice, top with lemon-lime soda and stir briefly. Garnish with an orange slice and maraschino cherry.",
+        "sv": "Häll vodka, blå curaçao och limejuice i ett collinsglas och rör kort. Fyll med is, toppa med citron- och limeläsk och rör kort igen. Garnera med en apelsinskiva och ett maraschinobär."
       }
     },
     {
@@ -4488,7 +4851,7 @@
         "sparkling",
         "refreshing"
       ],
-      "glass": "highball",
+      "glass": "wine",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/spritz/"
@@ -4506,7 +4869,8 @@
         },
         {
           "id": "soda-water",
-          "ml": 30,
+          "qty": 1,
+          "unit": "splash",
           "essential": true
         },
         {
@@ -4517,8 +4881,8 @@
         }
       ],
       "method": {
-        "en": "Build over ice in a large glass, stir gently and garnish with orange.",
-        "sv": "Bygg över is i ett stort glas, rör försiktigt och garnera med apelsin."
+        "en": "Build all ingredients in an ice-filled wine glass and stir gently. Garnish with an orange slice.",
+        "sv": "Bygg alla ingredienser i ett isfyllt vinglas och rör försiktigt. Garnera med en apelsinskiva."
       }
     },
     {
@@ -4533,43 +4897,49 @@
         "sparkling",
         "refreshing"
       ],
-      "glass": "highball",
+      "glass": "wine",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/5039/hugo-spritz"
       },
       "ingredients": [
         {
-          "id": "elderflower-liqueur",
-          "ml": 20,
-          "essential": true
-        },
-        {
-          "id": "prosecco",
-          "ml": 120,
-          "essential": true
-        },
-        {
-          "id": "soda-water",
-          "ml": 30,
-          "essential": true
-        },
-        {
           "id": "mint-leaves",
-          "qty": 4,
+          "qty": 8,
           "unit": "leaf",
           "essential": true
         },
         {
-          "id": "lime-wheel",
+          "id": "elderflower-liqueur",
+          "ml": 40,
+          "essential": true
+        },
+        {
+          "id": "soda-water",
+          "ml": 60,
+          "essential": true
+        },
+        {
+          "id": "prosecco",
+          "ml": 60,
+          "essential": true
+        },
+        {
+          "id": "lime-wedge",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
+        },
+        {
+          "id": "mint-sprig",
           "qty": 1,
           "unit": "garnish",
           "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice, stir gently and garnish with mint and lime.",
-        "sv": "Bygg över is, rör försiktigt och garnera med mynta och lime."
+        "en": "Add mint leaves to a chilled wine glass and fill with ice. Add the remaining liquid ingredients and briefly stir. Garnish with a lime wedge and bouquet of mint sprigs.",
+        "sv": "Lägg myntabladen i ett kylt vinglas och fyll med is. Tillsätt resten av de flytande ingredienserna och rör kort. Garnera med en limeklyfta och en bukett myntakvistar."
       }
     },
     {
@@ -4584,7 +4954,7 @@
         "sparkling",
         "fruity"
       ],
-      "glass": "highball",
+      "glass": "flute",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/bellini/"
@@ -4602,8 +4972,8 @@
         }
       ],
       "method": {
-        "en": "Pour peach purée into a chilled flute, slowly add prosecco and stir gently.",
-        "sv": "Häll persikopuré i ett kylt flöjtglas, tillsätt prosecco långsamt och rör försiktigt."
+        "en": "Add peach purée to a mixing glass with ice, add Prosecco and stir gently. Pour into a chilled flute. No garnish.",
+        "sv": "Häll persikopurén i ett rörglas med is, tillsätt prosecco och rör försiktigt. Häll i ett kylt flöjtglas. Ingen garnering."
       }
     },
     {
@@ -4618,26 +4988,26 @@
         "sparkling",
         "brunch"
       ],
-      "glass": "highball",
+      "glass": "flute",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/mimosa/"
       },
       "ingredients": [
         {
-          "id": "prosecco",
+          "id": "orange-juice",
           "ml": 75,
           "essential": true
         },
         {
-          "id": "orange-juice",
+          "id": "prosecco",
           "ml": 75,
           "essential": true
         }
       ],
       "method": {
-        "en": "Pour both chilled ingredients into a flute and stir gently.",
-        "sv": "Häll båda kylda ingredienserna i ett flöjtglas och rör försiktigt."
+        "en": "Pour orange juice into a flute, gently add Prosecco and stir gently.",
+        "sv": "Häll apelsinjuice i ett flöjtglas, tillsätt prosecco försiktigt och rör varsamt."
       }
     },
     {
@@ -4652,7 +5022,7 @@
         "sparkling",
         "elegant"
       ],
-      "glass": "highball",
+      "glass": "flute",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/1109/kir-royale"
@@ -4665,13 +5035,19 @@
         },
         {
           "id": "champagne",
-          "ml": 90,
+          "ml": 120,
           "essential": true
+        },
+        {
+          "id": "seasonal-berry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Pour cassis into a chilled flute and slowly top with champagne.",
-        "sv": "Häll cassis i ett kylt flöjtglas och toppa långsamt med champagne."
+        "en": "Pour crème de cassis into a chilled flute and top with chilled Champagne or sparkling wine. Garnish with a seasonal berry.",
+        "sv": "Häll crème de cassis i ett kylt flöjtglas och toppa med kyld champagne eller mousserande vin. Garnera med ett säsongsbär."
       }
     },
     {
@@ -4686,7 +5062,7 @@
         "aromatic",
         "classic"
       ],
-      "glass": "highball",
+      "glass": "flute",
       "source": {
         "label": "IBA",
         "url": "https://iba-world.com/iba-cocktail/champagne-cocktail/"
@@ -4703,15 +5079,15 @@
           "essential": true
         },
         {
-          "id": "sugar-cube",
-          "qty": 1,
-          "unit": "piece",
-          "essential": true
-        },
-        {
           "id": "angostura-bitters",
           "qty": 2,
           "unit": "dash",
+          "essential": true
+        },
+        {
+          "id": "sugar-cube",
+          "qty": 1,
+          "unit": "piece",
           "essential": true
         },
         {
@@ -4719,11 +5095,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "maraschino-cherry",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Soak the sugar cube with bitters in a chilled flute, add cognac and top slowly with champagne.",
-        "sv": "Dränk sockerbiten med bitter i ett kylt flöjtglas, tillsätt cognac och toppa långsamt med champagne."
+        "en": "Place the sugar cube and bitters in a large Champagne glass, add Cognac and gently pour in chilled Champagne. Garnish with orange zest and a maraschino cherry.",
+        "sv": "Lägg sockerbiten och bitter i ett stort champagneglas, tillsätt cognac och häll försiktigt i kyld champagne. Garnera med apelsinskal och ett maraschinobär."
       }
     },
     {
@@ -4765,11 +5147,17 @@
           "qty": 1,
           "unit": "garnish",
           "essential": false
+        },
+        {
+          "id": "lemon-peel",
+          "qty": 1,
+          "unit": "garnish",
+          "essential": false
         }
       ],
       "method": {
-        "en": "Build over ice, top with soda, stir gently and garnish with orange.",
-        "sv": "Bygg över is, toppa med soda, rör försiktigt och garnera med apelsin."
+        "en": "Build in an ice-filled old-fashioned glass, add a splash of soda water and stir gently. Garnish with half an orange slice and lemon zest.",
+        "sv": "Bygg i ett isfyllt old fashioned-glas, tillsätt en skvätt sodavatten och rör försiktigt. Garnera med en halv apelsinskiva och citronskal."
       }
     },
     {
@@ -4804,17 +5192,11 @@
           "id": "lemon-juice",
           "ml": 20,
           "essential": true
-        },
-        {
-          "id": "orange-peel",
-          "qty": 1,
-          "unit": "garnish",
-          "essential": false
         }
       ],
       "method": {
-        "en": "Shake with ice, strain into a chilled coupe and garnish with orange peel.",
-        "sv": "Skaka med is, sila i ett kylt coupeglas och garnera med apelsinskal."
+        "en": "Shake all ingredients with ice and strain into a chilled cocktail glass. No garnish.",
+        "sv": "Skaka alla ingredienser med is och sila i ett kylt cocktailglas. Ingen garnering."
       }
     },
     {
@@ -4916,23 +5298,23 @@
       "ingredients": [
         {
           "id": "creme-de-cacao-white",
-          "ml": 30,
+          "ml": 20,
           "essential": true
         },
         {
           "id": "creme-de-menthe-green",
-          "ml": 30,
+          "ml": 20,
           "essential": true
         },
         {
           "id": "fresh-cream",
-          "ml": 30,
+          "ml": 20,
           "essential": true
         }
       ],
       "method": {
-        "en": "Shake with ice and strain into a chilled coupe.",
-        "sv": "Skaka med is och sila i ett kylt coupeglas."
+        "en": "Shake briskly with ice for a few seconds and strain into a chilled cocktail glass. No garnish.",
+        "sv": "Skaka kraftigt med is i några sekunder och sila i ett kylt cocktailglas. Ingen garnering."
       }
     },
     {
@@ -4947,7 +5329,7 @@
         "creamy",
         "layered"
       ],
-      "glass": "rocks",
+      "glass": "shot",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/133/b-52-shot"
@@ -4955,23 +5337,23 @@
       "ingredients": [
         {
           "id": "coffee-liqueur",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         },
         {
           "id": "cream-liqueur",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         },
         {
           "id": "grand-marnier",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         }
       ],
       "method": {
-        "en": "Layer the coffee liqueur, cream liqueur and orange liqueur carefully in a chilled shot glass.",
-        "sv": "Skikta kaffelikör, gräddlikör och apelsinlikör försiktigt i ett kylt shotglas."
+        "en": "Refrigerate the ingredients, then layer them in the listed order in a chilled shot glass.",
+        "sv": "Kyl ingredienserna och skikta dem sedan i angiven ordning i ett kylt shotglas."
       }
     },
     {
@@ -4986,7 +5368,7 @@
         "warm",
         "creamy"
       ],
-      "glass": "highball",
+      "glass": "shot",
       "source": {
         "label": "Difford's Guide",
         "url": "https://www.diffordsguide.com/cocktails/recipe/986/hot-shot"
@@ -4994,23 +5376,23 @@
       "ingredients": [
         {
           "id": "galliano",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         },
         {
           "id": "hot-coffee",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         },
         {
           "id": "fresh-cream",
-          "ml": 20,
+          "ml": 15,
           "essential": true
         }
       ],
       "method": {
-        "en": "Layer Galliano, hot coffee and lightly whipped cream in a heatproof shot glass.",
-        "sv": "Skikta Galliano, varmt kaffe och lättvispad grädde i ett värmetåligt shotglas."
+        "en": "Preheat a shot glass, then layer the ingredients carefully in the listed order.",
+        "sv": "Förvärm ett shotglas och skikta sedan ingredienserna försiktigt i angiven ordning."
       }
     }
   ]

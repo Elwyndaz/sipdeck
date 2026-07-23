@@ -57,8 +57,9 @@ const STRINGS = {
     type_spirit_forward: 'Spirit-forward', type_contemporary: 'Contemporary',
     servings: 'Servings',
     servings_decrease: 'Decrease servings', servings_increase: 'Increase servings',
-    unit_dash: 'dash', unit_barspoon: 'barspoon', unit_piece: 'pc', unit_leaf: 'leaf',
-    unit_slice: 'slice', unit_garnish: 'garnish', unit_top: 'top up',
+    unit_dash: 'dash', unit_barspoon: 'barspoon', unit_teaspoon: 'tsp', unit_drop: 'drop',
+    unit_piece: 'pc', unit_leaf: 'leaf', unit_slice: 'slice', unit_garnish: 'garnish',
+    unit_splash: 'splash', unit_top: 'top up',
     account_title: 'Account', account_hint: 'Sign in to sync favorites and pantry across devices.',
     account_google: 'Sign in with Google', account_signed_in_as: 'Signed in as',
     account_signout: 'Sign out', account_delete: 'Delete account',
@@ -124,8 +125,9 @@ const STRINGS = {
     type_spirit_forward: 'Spritdominerad', type_contemporary: 'Samtida',
     servings: 'Portioner',
     servings_decrease: 'Minska antal portioner', servings_increase: 'Öka antal portioner',
-    unit_dash: 'stänk', unit_barspoon: 'barsked', unit_piece: 'st', unit_leaf: 'blad',
-    unit_slice: 'skiva', unit_garnish: 'garnering', unit_top: 'toppa upp',
+    unit_dash: 'stänk', unit_barspoon: 'barsked', unit_teaspoon: 'tsk', unit_drop: 'droppe',
+    unit_piece: 'st', unit_leaf: 'blad', unit_slice: 'skiva', unit_garnish: 'garnering',
+    unit_splash: 'skvätt', unit_top: 'toppa upp',
     account_title: 'Konto', account_hint: 'Logga in för att synka favoriter och skafferi mellan enheter.',
     account_google: 'Logga in med Google', account_signed_in_as: 'Inloggad som',
     account_signout: 'Logga ut', account_delete: 'Radera konto',
@@ -459,7 +461,12 @@ const GLASS_SILHOUETTES = {
   highball: '<path d="M29 14h38l-4 66H33l-4-66Z"/><path d="M34 25h28"/>',
   rocks: '<path d="M25 35h46l-5 43H30l-5-43Z"/><path d="M30 47h36"/>',
   martini: '<path d="M17 20h62L48 53 17 20Z"/><path d="M48 53v24M32 79h32"/>',
+  flute: '<path d="M34 10h28c0 25-4 39-14 39S34 35 34 10Z"/><path d="M48 49v29M35 80h26"/>',
+  shot: '<path d="M34 34h28l-3 38H37l-3-38Z"/><path d="M36 43h24"/>',
+  wine: '<path d="M27 16h42c-1 25-8 37-21 37S28 41 27 16Z"/><path d="M48 53v24M34 79h28"/>',
 };
+const GLASS = GLASS_SILHOUETTES;
+Object.assign(GLASS,{collins:GLASS.highball,goblet:GLASS.wine,hurricane:GLASS.highball,'irish-coffee':GLASS.highball,julep:GLASS.rocks,margarita:GLASS.martini});
 
 function glassPlaceholder(glass) {
   const known = Object.prototype.hasOwnProperty.call(GLASS_SILHOUETTES, glass);
@@ -480,6 +487,10 @@ function formatAmount(line, servings, unit, lang) {
 
 function formatLineAmount(line, servings, unit, lang) {
   if (line.unit === 'top') return t(lang, 'unit_top');
+  if (line.unit === 'barspoon') {
+    const spoons = line.qty * servings;
+    return `${formatNumber(spoons, lang)} ${t(lang, 'unit_barspoon')} (${formatNumber(spoons / 2, lang)} cl)`;
+  }
   const amount = formatAmount(line, servings, unit, lang);
   return typeof line.ml === 'number' ? amount : amount.replace(line.unit, t(lang, 'unit_' + line.unit));
 }

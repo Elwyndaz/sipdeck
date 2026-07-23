@@ -38,11 +38,12 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
    taxonomy labels, controls and accessibility labels all route through `t()`. (F1)
 9. ✅ **Image pipeline + placeholders** — frozen `gpt-image-2` reference workflow in
    HANDOFF.md, exact 640×800 WebP outputs at 8–58 kB, complete id coverage and lazy
-   loading for the top four cards. Resilient inline SVG silhouettes are keyed by the
-   seed's `coupe`, `highball`, `rocks` and `martini` glass values. (G1)
-10. ✅ **Full drink seed** — 93 reviewed recipes and 123 normalized ingredients, with EN/SV
-    methods, reviewed `bar` flags and direct published sources. All 93 ids have curated
-    source illustrations and exact 640×800 production WebPs at ≤ 80 kB. The original 26
+   loading for the top four cards. Resilient inline SVG silhouettes cover all 13 glass
+   values used by the seed, with close-family silhouettes reused where appropriate. (G1)
+10. ✅ **Full drink seed** — 93 source-audited recipes and 149 normalized ingredients,
+    with EN/SV methods, reviewed `bar` flags and unique direct published sources. All 93
+    recipes were rechecked against their live source pages on 2026-07-23. All 93 ids have
+    curated source illustrations and exact 640×800 production WebPs at ≤ 80 kB. The original 26
     sources and production files, plus the preexisting Manhattan source, were preserved.
 11. ✅ **PWA manifest + icons** — relative paths, standalone. Export PNGs from
     `design/icon.svg` (192/512/apple-touch/maskable, on `#FBF7EF` except maskable which

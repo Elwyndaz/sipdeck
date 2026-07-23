@@ -45,8 +45,9 @@ lists). Personal + friends first, but every decision assumes it goes public late
   classics. Canonical amounts in **ml**. Every ingredient has a normalized id
   (`lime-juice`) and an `essential` flag (garnish/optional = false).
 - **Units**: toggle cl / ml / oz, default **cl**, persisted. Bar rounding after scaling:
-  oz to nearest ¼, cl to 0,5, ml to 5. Dashes/barspoons/counts scale but never convert.
-  Serving stepper 1–8, linear scaling.
+  oz to nearest ¼, cl to 0,5, ml to 5. Dashes and counts scale without conversion.
+  Barspoons scale and always include their 5 ml / 0,5 cl equivalent in parentheses,
+  independent of the selected display unit. Serving stepper 1–8, linear scaling.
 - **Filters v1**: editorial boolean `bar` ("reliably servable at a normal, non-specialist
   bar"; IBA is not sufficient evidence) + base-spirit filter. Richer tags (style, strength,
   alcohol-free) live in the data now, get UI later.
@@ -137,15 +138,17 @@ This exact blob is what `PUT /state` will carry in v1.1. Never store derived dat
 ```
 
 - An ingredient line has **either** `ml` (number, canonical) **or** `qty` + `unit`
-  (`dash`, `barspoon`, `piece`, `leaf`, `slice`, `garnish`, `top` — never converted).
+  (`dash`, `barspoon`, `teaspoon`, `drop`, `piece`, `leaf`, `slice`, `garnish`,
+  `splash`, `top`). `top` renders without a numeric quantity; `barspoon` also renders
+  its 0,5 cl-per-spoon equivalent.
 - Ingredient metadata has `en`, `sv` and pantry `group`; group is one of `spirits`,
   `liqueurs`, `fresh`, `pantry` and drives the grouped checklist.
 - `name` is a string (cocktail names are proper nouns); allow `{en, sv}` object override
   for the rare translated name. `type`, `base`, `glass`, `tags`, `unit` are ids resolved
   through the string table.
-- `source` is optional for genuinely original/house recipes. When present it contains a
-  short source label and an HTTPS link to the specific published recipe; favorite detail
-  renders it as a small link after the method.
+- `source` is required in the current seed and contains a short source label and a unique
+  HTTPS link to the specific published recipe; favorite detail renders it as a small link
+  after the method.
 - `essential` is explicit on every line (validator enforces).
 
 ## User stories & acceptance criteria
@@ -188,7 +191,8 @@ This exact blob is what `PUT /state` will carry in v1.1. Never store derived dat
 
 **B2. As a maker, I want a serving stepper so that I can mix for the group.**
 - Stepper 1–8, linear scaling from canonical ml, rounding applied **after** scaling.
-- Dash/barspoon/count amounts scale linearly (2 dashes × 3 = 6 dashes), never convert.
+- Dash/barspoon/count amounts scale linearly. Barspoons additionally show 0,5 cl per
+  spoon, so 2 barskedar × 2 portions renders as `4 barsked (2 cl)`.
 - Chosen serving count persists in `settings.servings`.
 
 **B3. As a user, I want a cl/ml/oz toggle so that amounts match how I measure.**
