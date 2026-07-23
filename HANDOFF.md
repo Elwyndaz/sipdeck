@@ -5,27 +5,30 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
-**Privacy/global-launch baseline done 2026-07-23, not yet deployed.** `info.html` contains
+**Privacy/global-launch baseline deployed 2026-07-23 (`a66c15d`).** `info.html` contains
 Swedish and English privacy information, local-storage/cookie information, terms and
 responsible-alcohol guidance, and is linked from both account states. Fonts are now served
 locally. Firebase is dynamically imported only after account use (or for a returning signed-in
 user), so ordinary logged-out visits no longer contact Google or create Firebase storage.
 No client analytics, consent banner or age gate was added. Cloudflare reports the existing D1
 database with `jurisdiction: null`; an EU lock requires a separately planned create/migrate/swap.
-`node test.js`: 4,924 green. The sync/security and wheel changes below remain in the same
-uncommitted worktree. Previous paragraph, superseded below, kept for history:
+`node test.js`: 4,924 green. The same release deployed the sync/security and wheel changes
+below. Worker version: `1fa52455-c0af-4882-b331-d94efaf6ee07`; Pages deployment:
+`fb6ece2f.sipdeck.pages.dev`, redirected to the custom domain. `buildapp.se/sipdeck/info.html`
+returned 200 with the expected policy and unauthenticated `GET /state` returned 401 after
+deployment. Previous paragraph, superseded below, kept for history:
 
-**Sync/security hardening done 2026-07-23, not yet deployed.** `PUT /state` now uses an
+**Sync/security hardening done 2026-07-23, deployed in `a66c15d`.** `PUT /state` now uses an
 SHA-256 state tag plus atomic compare-and-swap; the browser persists a per-account sync base
 and three-way merges conflicts, preserving both independent edits and removals. Account
 deletion wipes state before deleting the Firebase user, leaves a two-hour tombstone so old
 tokens cannot recreate data, and an hourly Worker cron purges that marker. Firebase token
 verification now validates `iat`/`auth_time` and refreshes JWKS once on an unknown `kid`.
 `node test.js`: 4,915 green. The wheel View Transition smoothing changes in `app.js` and
-`index.html` remain in the same uncommitted worktree. Previous paragraph, superseded below,
-kept for history:
+`index.html` were included in the same release. Previous paragraph, superseded below, kept
+for history:
 
-**BACKLOG 22 done, v1.5 closed, not yet deployed.** Two independent wheel-preference toggles in
+**BACKLOG 22 done, v1.5 closed, deployed in `a66c15d`.** Two independent wheel-preference toggles in
 Settings, grilled first (`/grilling`) to resolve the opt-in/opt-out mismatch and empty-pool edge
 cases. (1) "Bara favoritdrinkar" — `buildSpinLineup`'s cocktail slots draw first from
 `state.favorites` (still intersected with `bar:true`), topping up from the full `bar:true`
@@ -563,11 +566,10 @@ npx wrangler pages deploy . --project-name sipdeck --branch main   # Cloudflare 
 cd worker && npx wrangler deploy                                   # sipdeck-api Worker
 ```
 
-Live (since 2026-07-18): **https://sipdeck.pages.dev** (Cloudflare Pages, deploy =
-wrangler command above) and **https://orgutveckling.se/sipdeck/** (GitHub Pages, deploy
-= just `git push`; serves repo root off main — note the subpath, which is why all asset
-paths must stay relative). Both were reverified with the 92-drink data, complete art,
-manifest, icons and input update on 2026-07-19. Delete `.playwright-mcp/` before wrangler
+Live: **https://sipdeck.pages.dev** (Cloudflare Pages, deploy = wrangler command above)
+and **https://buildapp.se/sipdeck/** (custom domain/subpath; asset paths must therefore
+stay relative). The custom domain, privacy page and API boundary were reverified after
+the 2026-07-23 deployment. Delete `.playwright-mcp/` before wrangler
 deploys — wrangler doesn't read `.gitignore`. API since 2026-07-20:
 **https://sipdeck-api.sipdeck.workers.dev** (Cloudflare Worker + D1, deploy = command
 above from `worker/`); smoke-tested directly (401 on unauthenticated `GET /state`).
