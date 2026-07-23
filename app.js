@@ -69,6 +69,7 @@ const STRINGS = {
     account_forgot_sent: 'Password reset email sent.',
     account_link_google: 'Link Google sign-in', account_create_password: 'Create password',
     account_share_hint: 'Your partner can then sign in with this email and password too.',
+    account_legal: 'Privacy, storage & terms',
   },
   sv: {
     wheel_entry: 'Välj åt mig', wheel_title: 'Välj åt mig', wheel_back: 'Tillbaka',
@@ -137,6 +138,7 @@ const STRINGS = {
     account_forgot_sent: 'Återställningsmejl skickat.',
     account_link_google: 'Koppla Google-inloggning', account_create_password: 'Skapa lösenord',
     account_share_hint: 'Din partner kan då också logga in med samma e-post och lösenord.',
+    account_legal: 'Integritet, lokal lagring och villkor',
   },
 };
 function t(lang, key) { return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
@@ -295,6 +297,32 @@ function mergeState(local, server) { // union pantry/favorites (never lose a log
     favorites: Array.from(new Set([...server.favorites, ...local.favorites])),
     pantry: Array.from(new Set([...server.pantry, ...local.pantry])),
     settings: server.settings,
+  };
+}
+
+function reconcileState(base, local, remote) {
+  const changed = (before, here, there) =>
+    JSON.stringify(here) !== JSON.stringify(before) ? here : there;
+  const set = (before, here, there) => Array.from(new Set([...before, ...here, ...there]))
+    .filter(item => here.includes(item) !== before.includes(item)
+      ? here.includes(item) : there.includes(item));
+  return {
+    v: 1,
+    favorites: set(base.favorites, local.favorites, remote.favorites),
+    pantry: set(base.pantry, local.pantry, remote.pantry),
+    settings: {
+      lang: changed(base.settings.lang, local.settings.lang, remote.settings.lang),
+      unit: changed(base.settings.unit, local.settings.unit, remote.settings.unit),
+      servings: changed(base.settings.servings, local.settings.servings, remote.settings.servings),
+      filters: {
+        bar: changed(base.settings.filters.bar, local.settings.filters.bar, remote.settings.filters.bar),
+        base: changed(base.settings.filters.base, local.settings.filters.base, remote.settings.filters.base),
+      },
+      wheelFavoritesOnly: changed(base.settings.wheelFavoritesOnly,
+        local.settings.wheelFavoritesOnly, remote.settings.wheelFavoritesOnly),
+      wheelOutcomesExcluded: set(base.settings.wheelOutcomesExcluded,
+        local.settings.wheelOutcomesExcluded, remote.settings.wheelOutcomesExcluded),
+    },
   };
 }
 
@@ -513,6 +541,7 @@ if (typeof module !== 'undefined') module.exports = {
   formatLineAmount, drinkAsText,
   shuffle, advanceQueue, swipeDirectionForKey, BASE_FILTERS, matchesFilters, canMake, filterDrinks,
   missingIngredients, mergeState, searchHaystack, matchesSearch,
+  reconcileState,
   weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
   wheelLandingRotation, wheelSectorPath,
   GLASS_SILHOUETTES, glassPlaceholder,
@@ -531,41 +560,125 @@ if (typeof document !== 'undefined') (function () {
 
   // ---------- accounts + sync (BACKLOG 15): Firebase Auth identity + Worker/D1 state blob.
   // Logged out = untouched, unchanged localStorage-only behavior. ----------
-  let fb = null, fbUser = null, pushTimer = null;
+  let fb = null, fbUser = null, fbPromise = null, pushTimer = null, pushPromise = null;
+  let syncUid = null, syncBase = null, syncEtag = null, deletingAccount = false;
   const API = 'https://sipdeck-api.sipdeck.workers.dev';
+  const AUTH_KEY = KEY + '-auth';
 
-  function save() { localStorage.setItem(KEY, JSON.stringify(state)); if (fbUser) pushState(); }
+  async function ensureFirebase() {
+    if (fb) return fb;
+    if (!fbPromise) fbPromise = Promise.all([
+      import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'),
+    ]).then(([core, auth]) => {
+      const app = core.initializeApp({
+        apiKey: 'AIzaSyCVDnImzoWxop-n1nKYfO7dde8qQl-SPZs',
+        authDomain: 'sipdeck.firebaseapp.com',
+        projectId: 'sipdeck',
+        appId: '1:735040812464:web:ee5191404d377daac45275',
+      });
+      fb = { auth: auth.getAuth(app), ...auth };
+      initFirebase();
+      return fb;
+    }).catch(err => { fbPromise = null; throw err; });
+    return fbPromise;
+  }
+
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    if (fbUser && !deletingAccount) pushState();
+  }
   save(); // persist first-run defaults immediately
 
   function lang() { return state.settings.lang; }
 
   async function authedFetch(path, opts) {
-    const token = await fbUser.getIdToken();
+    const user = fbUser;
+    if (!user) throw new Error('Inte inloggad.');
+    const token = await user.getIdToken();
     const headers = Object.assign({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, (opts && opts.headers) || {});
     return fetch(API + path, Object.assign({}, opts, { headers }));
   }
-  async function pullState() { // merge server state on load (union pantry/favorites, server-wins on settings); empty server state uploads local instead
+
+  function syncKey(uid) { return KEY + '-sync-' + uid; }
+  function rememberSync(base, etag) {
+    syncBase = normalizeState(base, lang());
+    syncEtag = etag;
+    localStorage.setItem(syncKey(syncUid), JSON.stringify({ base: syncBase, etag }));
+  }
+  function restoreSync(uid) {
+    syncUid = uid;
+    syncBase = null;
+    syncEtag = null;
     try {
+      const saved = JSON.parse(localStorage.getItem(syncKey(uid)) || 'null');
+      if (saved && saved.base && typeof saved.etag === 'string') {
+        syncBase = normalizeState(saved.base, lang());
+        syncEtag = saved.etag;
+      }
+    } catch (e) { /* invalid local sync metadata starts a safe first merge */ }
+  }
+
+  async function flushState() {
+    if (pushPromise || !fbUser || deletingAccount) return;
+    const uid = fbUser.uid;
+    pushPromise = (async () => {
+      let again = true;
+      while (again && fbUser && fbUser.uid === uid && !deletingAccount) {
+        again = false;
+        const outgoing = normalizeState(state, lang());
+        const res = await authedFetch('/state', {
+          method: 'PUT', body: JSON.stringify({ state: outgoing, etag: syncEtag }),
+        });
+        const data = await res.json();
+        if (res.status === 409 && typeof data.etag === 'string') {
+          const remote = normalizeState(data.state, lang());
+          state = syncBase ? reconcileState(syncBase, state, remote) : mergeState(state, remote);
+          syncEtag = data.etag;
+          localStorage.setItem(KEY, JSON.stringify(state));
+          again = true;
+        } else {
+          if (!res.ok || typeof data.etag !== 'string') throw new Error(data.error || 'Synkningen misslyckades.');
+          if (fbUser && fbUser.uid === uid) rememberSync(outgoing, data.etag);
+          again = JSON.stringify(outgoing) !== JSON.stringify(state);
+        }
+      }
+    })().catch(() => {}).finally(() => { pushPromise = null; });
+    await pushPromise;
+  }
+
+  async function pullState() {
+    try {
+      restoreSync(fbUser.uid);
       const res = await authedFetch('/state');
       const data = await res.json();
-      if (data.state) {
-        state = mergeState(state, normalizeState(data.state, lang()));
-        localStorage.setItem(KEY, JSON.stringify(state));
-        pushState(); // write the merged union back so the server reflects any logged-out edits too
-      }
-      else pushState();
+      if (!res.ok || typeof data.etag !== 'string') throw new Error(data.error || 'Synkningen misslyckades.');
+      const remote = normalizeState(data.state, lang());
+      syncEtag = data.etag;
+      if (data.state) state = syncBase
+        ? reconcileState(syncBase, state, remote) : mergeState(state, remote);
+      localStorage.setItem(KEY, JSON.stringify(state));
+      if (JSON.stringify(state) === JSON.stringify(remote)) rememberSync(remote, data.etag);
+      else await flushState();
     } catch (e) { /* offline/blocked: stay on local state */ }
   }
-  function pushState() { // debounced whole-blob PUT, last-write-wins
+
+  function pushState() {
     clearTimeout(pushTimer);
-    pushTimer = setTimeout(() => {
-      if (fbUser) authedFetch('/state', { method: 'PUT', body: JSON.stringify(state) }).catch(() => {});
-    }, 800);
+    pushTimer = setTimeout(flushState, 800);
   }
   function initFirebase() {
     fb.onAuthStateChanged(fb.auth, async user => {
       fbUser = user;
-      if (user) await pullState();
+      if (user) {
+        localStorage.setItem(AUTH_KEY, '1');
+        await pullState();
+      }
+      else {
+        localStorage.removeItem(AUTH_KEY);
+        clearTimeout(pushTimer);
+        syncUid = syncBase = syncEtag = null;
+      }
       render();
     });
   }
@@ -599,6 +712,7 @@ if (typeof document !== 'undefined') (function () {
     });
     return wheelPromise;
   }
+  loadWheelData();
 
   function resetWheelVisit() {
     if (wheelAnimation) wheelAnimation.cancel();
@@ -1077,7 +1191,6 @@ if (typeof document !== 'undefined') (function () {
   }
 
   function accountSection() {
-    if (!fb) return '';
     if (fbUser) {
       const providers = fbUser.providerData.map(p => p.providerId);
       const linkGoogle = providers.includes('google.com') ? '' : `<p><button data-acc="link-google">${esc(t(lang(), 'account_link_google'))}</button></p>`;
@@ -1094,6 +1207,7 @@ if (typeof document !== 'undefined') (function () {
         <button data-acc="signout">${esc(t(lang(), 'account_signout'))}</button>
         <button data-acc="delete">${esc(t(lang(), 'account_delete'))}</button>
       </div>
+      <p><a href="info.html">${esc(t(lang(), 'account_legal'))}</a></p>
       <p id="accError" class="warn" hidden></p>
     </section>`;
     }
@@ -1110,6 +1224,7 @@ if (typeof document !== 'undefined') (function () {
           <button type="button" data-acc="forgot">${esc(t(lang(), 'account_forgot'))}</button>
         </div>
       </form>
+      <p><a href="info.html">${esc(t(lang(), 'account_legal'))}</a></p>
       <p id="accError" class="warn" hidden></p>
     </section>`;
   }
@@ -1418,24 +1533,38 @@ if (typeof document !== 'undefined') (function () {
   $('#view').addEventListener('click', async e => {
     const accBtn = e.target.closest('[data-acc]');
     if (accBtn) {
-      const errEl = $('#accError');
       try {
         const action = accBtn.dataset.acc;
-        if (action === 'google') await fb.signInWithPopup(fb.auth, new fb.GoogleAuthProvider());
+        const email = action === 'forgot' ? $('#accEmail').value.trim() : '';
+        await ensureFirebase();
+        if (action === 'google') {
+          localStorage.setItem(AUTH_KEY, '1');
+          await fb.signInWithRedirect(fb.auth, new fb.GoogleAuthProvider());
+        }
         else if (action === 'link-google') { await fb.linkWithPopup(fbUser, new fb.GoogleAuthProvider()); render(); }
         else if (action === 'forgot') {
-          await fb.sendPasswordResetEmail(fb.auth, $('#accEmail').value.trim());
+          await fb.sendPasswordResetEmail(fb.auth, email);
+          const errEl = $('#accError');
           errEl.textContent = t(lang(), 'account_forgot_sent');
           errEl.hidden = false;
         }
         else if (action === 'signout') await fb.signOut(fb.auth);
         else if (action === 'delete' && confirm(t(lang(), 'account_delete_confirm'))) {
-          const token = await fbUser.getIdToken(); // grab before delete: fbUser is unusable after
-          await fbUser.delete(); // irreversible step first; if this throws, D1 row stays intact
-          fetch(API + '/account', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } }).catch(() => {});
+          deletingAccount = true;
+          clearTimeout(pushTimer);
+          if (pushPromise) await pushPromise;
+          const user = fbUser;
+          const res = await authedFetch('/account', { method: 'DELETE' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Kunde inte radera synkad data.');
+          localStorage.removeItem(syncKey(user.uid));
+          await user.delete();
         }
       } catch (err) { // ponytail: raw Firebase message, no i18n error map; add one if real users hit this often
+        const errEl = $('#accError');
         if (errEl) { errEl.textContent = err.message; errEl.hidden = false; }
+      } finally {
+        deletingAccount = false;
       }
       return;
     }
@@ -1506,14 +1635,20 @@ if (typeof document !== 'undefined') (function () {
     e.preventDefault();
     const errEl = $('#accError');
     errEl.hidden = true;
+    const mode = e.submitter ? e.submitter.dataset.mode : 'login';
+    const email = form.id === 'emailForm' ? $('#accEmail').value.trim() : '';
+    const password = form.id === 'emailForm' ? $('#accPw').value : $('#accNewPw').value;
     try {
-      if (form.id === 'pwForm') { await fb.updatePassword(fbUser, $('#accNewPw').value); render(); }
+      await ensureFirebase();
+      if (form.id === 'pwForm') { await fb.updatePassword(fbUser, password); render(); }
       else {
-        const mode = e.submitter ? e.submitter.dataset.mode : 'login';
-        if (mode === 'register') await fb.createUserWithEmailAndPassword(fb.auth, $('#accEmail').value.trim(), $('#accPw').value);
-        else await fb.signInWithEmailAndPassword(fb.auth, $('#accEmail').value.trim(), $('#accPw').value);
+        if (mode === 'register') await fb.createUserWithEmailAndPassword(fb.auth, email, password);
+        else await fb.signInWithEmailAndPassword(fb.auth, email, password);
       }
-    } catch (err) { errEl.textContent = err.message; errEl.hidden = false; } // ponytail: raw Firebase message, matches the data-acc catch above
+    } catch (err) {
+      const currentError = $('#accError');
+      if (currentError) { currentError.textContent = err.message; currentError.hidden = false; }
+    } // ponytail: raw Firebase message, matches the data-acc catch above
   });
 
   $('#view').addEventListener('change', e => {
@@ -1579,8 +1714,7 @@ if (typeof document !== 'undefined') (function () {
   });
 
   $('#wheelEntry').addEventListener('click', () => { wheelOpenedFromHome = true; });
-  if (window.fb) { fb = window.fb; initFirebase(); }
-  else window.addEventListener('fb-ready', () => { fb = window.fb; initFirebase(); }, { once: true });
+  if (localStorage.getItem(AUTH_KEY) === '1') ensureFirebase().catch(() => {});
   window.addEventListener('hashchange', renderRoute);
   window.addEventListener('keydown', e => {
     const dir = swipeDirectionForKey(e.key);

@@ -6,7 +6,7 @@ const { STRINGS, t, detectLang, defaultState, normalizeState, favoriteIdFromHash
   scaleMl, convert, roundForUnit, formatNumber, formatOz, formatAmount, shuffle, advanceQueue,
   swipeDirectionForKey,
   formatLineAmount, drinkAsText,
-  BASE_FILTERS, matchesFilters, canMake, filterDrinks, missingIngredients, mergeState,
+  BASE_FILTERS, matchesFilters, canMake, filterDrinks, missingIngredients, mergeState, reconcileState,
   searchHaystack, matchesSearch,
   weightedSampleUnique, wheelCocktailWeight, buildSpinLineup, selectWheelIndex,
   wheelLandingRotation, wheelSectorPath,
@@ -284,6 +284,8 @@ check(wheelSectorPath(0, 12) !== wheelSectorPath(1, 12), 'wheel SVG: adjacent se
 
 const appSource = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
 const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const infoSource = fs.readFileSync(path.join(__dirname, 'info.html'), 'utf8');
+const workerSource = fs.readFileSync(path.join(__dirname, 'worker', 'worker.js'), 'utf8');
 // budget bumped 60kB -> 65kB 2026-07-20 for BACKLOG 15 (accounts+sync, Firebase Auth + Worker/D1 client)
 // bumped 65kB -> 67kB 2026-07-20 for BACKLOG 18 (email+password sign-in)
 // bumped 67kB -> 68kB 2026-07-20 for BACKLOG 19 (account linking: add Google/password to an existing account)
@@ -291,7 +293,25 @@ const htmlSource = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 // bumped 70kB -> 71kB 2026-07-21 for deck-card pantry-missing chips/ingredient list (favorites parity)
 // bumped 71kB -> 74kB 2026-07-21 for catalog search (#/sok: name+ingredient search, deep-links into detail view)
 // bumped 74kB -> 79kB 2026-07-21 for wheel prefs (favorites-only cocktails, per-outcome beer/wine/shot toggles)
-check(Buffer.byteLength(appSource) < 79200, 'bundle budget: app.js stays under 79.2 kB unminified');
+check(Buffer.byteLength(appSource) < 86000, 'bundle budget: app.js stays under 86 kB unminified');
+check(!htmlSource.includes('fonts.googleapis.com') && htmlSource.includes("fonts/work-sans.woff2"),
+  'privacy: fonts are self-hosted with no Google Fonts request');
+check(!htmlSource.includes('gstatic.com/firebase') && appSource.includes("async function ensureFirebase()"),
+  'privacy: Firebase is lazy-loaded only by account use or remembered sign-in');
+check(appSource.includes("const AUTH_KEY = KEY + '-auth'") && appSource.includes("signInWithRedirect"),
+  'privacy: requested account persistence resumes lazy auth without popup timing');
+check(appSource.split('href="info.html"').length === 3,
+  'privacy: legal information is linked for signed-in and signed-out account views');
+check(infoSource.includes('Patrik Löfgren') && infoSource.includes('patz.lofgren@gmail.com') &&
+  infoSource.includes('id="sv"') && infoSource.includes('id="en"'),
+  'legal page: controller, contact and Swedish/English notices are present');
+check(infoSource.includes('inga annonserings- eller analyscookies') &&
+  infoSource.includes('current D1 database is not locked'),
+  'legal page: current storage, analytics and D1 jurisdiction are disclosed');
+['instrument-serif-regular.woff2', 'instrument-serif-italic.woff2', 'work-sans.woff2'].forEach(file => {
+  const font = fs.readFileSync(path.join(__dirname, 'fonts', file));
+  check(font.subarray(0, 4).toString() === 'wOF2', `self-hosted font: ${file} is valid WOFF2`);
+});
 check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),
@@ -361,6 +381,35 @@ check(merged.settings === serverState.settings, 'mergeState: settings stay serve
 const dedupeMerged = mergeState({ v: 1, favorites: ['margarita'], pantry: [], settings: localState.settings },
   { v: 1, favorites: ['margarita'], pantry: [], settings: serverState.settings });
 check(dedupeMerged.favorites.length === 1, 'mergeState: union dedupes shared entries');
+const syncBase = normalizeState({
+  favorites: ['margarita', 'negroni'], pantry: ['gin'],
+  settings: { lang: 'sv', unit: 'cl', servings: 1 },
+}, 'sv');
+const syncLocal = normalizeState({
+  favorites: ['margarita'], pantry: ['gin'],
+  settings: { lang: 'sv', unit: 'oz', servings: 1 },
+}, 'sv');
+const syncRemote = normalizeState({
+  favorites: ['margarita', 'negroni', 'daiquiri'], pantry: ['gin', 'lime-juice'],
+  settings: { lang: 'en', unit: 'cl', servings: 1 },
+}, 'sv');
+const reconciled = reconcileState(syncBase, syncLocal, syncRemote);
+check(!reconciled.favorites.includes('negroni') && reconciled.favorites.includes('daiquiri'),
+  'reconcileState: local removal and independent remote addition both survive');
+check(reconciled.pantry.includes('lime-juice'),
+  'reconcileState: unchanged local set accepts remote additions');
+check(reconciled.settings.unit === 'oz' && reconciled.settings.lang === 'en',
+  'reconcileState: local and remote setting edits merge field by field');
+check(workerSource.includes('WHERE id = ? AND state = ?') && workerSource.includes("}, 409)"),
+  'sync Worker: compare-and-swap rejects stale state writes');
+check(appSource.indexOf("authedFetch('/account'") < appSource.indexOf('await user.delete()'),
+  'account deletion: D1 wipe is awaited before Firebase deletion');
+check(workerSource.includes('allowDeleted = false') && workerSource.includes('deletedAt: Date.now()') &&
+  workerSource.includes('Date.now() - 2 * 60 * 60 * 1000'),
+  'account deletion: tombstone blocks old tokens and is purged after token expiry');
+check(workerSource.includes('!refreshed && Date.now() - jwksMissRefresh') &&
+  workerSource.includes('c.iat <= now') && workerSource.includes('c.auth_time <= now'),
+  'Firebase verifier: unknown keys refresh once and required time claims are checked');
 
 // ---------- drinks.json validator ----------
 const UNITS = ['dash', 'barspoon', 'teaspoon', 'drop', 'piece', 'leaf', 'slice', 'garnish', 'splash', 'top'];

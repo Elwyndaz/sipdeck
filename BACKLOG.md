@@ -215,6 +215,21 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     → `accountSection()` → a second `<dl class="settings">` (wheel favorites-only) → the outcome
     checkboxes. Purely a markup reorder, no new strings or state.
 
+23. ✅ **Conflict-safe sync + account deletion hardening** (done 2026-07-23) — D1 state writes
+    now use an SHA-256 state tag and atomic compare-and-swap. The client keeps a per-account
+    last-synced base and three-way merges a `409`, so independent edits survive and removed
+    favorites/pantry entries stay removed. Account deletion awaits the D1 wipe before Firebase
+    deletion; a two-hour tombstone blocks still-valid tokens from recreating the row and an
+    hourly Worker cron purges it. JWT checks now include `iat`/`auth_time`, and an unknown
+    `kid` triggers one rate-limited JWKS refresh.
+
+24. ✅ **Global privacy baseline** (done 2026-07-23) — Added a bilingual privacy, storage,
+    terms and responsible-alcohol page linked from both account states. Google Fonts are
+    self-hosted and Firebase is loaded only when account functionality is used. No client
+    analytics, advertising, cookie banner or age popup was added. The current D1 database
+    has no EU jurisdiction lock; moving it to a newly created EU-jurisdiction database is a
+    separate production migration, not a silent configuration change.
+
 ## v2 / ideas (unordered)
 
 - Richer filter UI over existing tags: style, strength.
@@ -232,8 +247,8 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 
 ## Known accepted limitations
 
-- Last-write-wins sync applies to `settings` only (v1.3, BACKLOG 20): `pantry`/`favorites`
-  now merge (union) on login instead, so logged-out edits are never silently lost.
+- A first login without a stored sync baseline still unions local and remote lists once;
+  subsequent syncs use conflict-safe three-way merge.
 - Pantry matching is id-exact: seeding discipline on ingredient ids is what makes it work.
 - No image = the drink's glass silhouette forever; acceptable for future additions and
   tracked per drink by file absence. All 93 current drinks have complete production art.

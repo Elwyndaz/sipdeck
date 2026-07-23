@@ -39,7 +39,10 @@ lists). Personal + friends first, but every decision assumes it goes public late
   domain deferred until the name is final.
 - **Accounts**: **v1.1**, not v1. Recept pattern, minimal cut: Firebase Auth (identity
   only) + Cloudflare Worker + D1, table `users(id, firebase_uid UNIQUE, state)`, endpoints
-  `GET /state`, `PUT /state` (debounced client-side), `DELETE /account`. Last-write-wins.
+  `GET /state`, `PUT /state` (debounced client-side), `DELETE /account`. Conditional whole-blob
+  writes plus a client-side three-way merge preserve independent edits and removals.
+  Firebase loads lazily on account use; the account section links to bilingual privacy,
+  storage, terms and responsible-alcohol information.
   v1's obligation: keep client state one sync-shaped blob (below).
 - **Data**: own `drinks.json`, ~80–100 drinks seeded from the IBA official list + modern
   classics. Canonical amounts in **ml**. Every ingredient has a normalized id
@@ -265,8 +268,9 @@ mixable drinks.**
 
 **I1. As a multi-device user, I want optional login so that favorites/pantry follow me.**
 - Firebase Auth (email+password and/or Google), identity only. Logged-out = full app.
-- Whole-state blob PUT (debounced ~800 ms) to Worker + D1; on login/load server state wins
-  if present, else local uploads. Last-write-wins. `DELETE /account` = GDPR wipe.
+- Whole-state blob PUT (debounced ~800 ms) to Worker + D1; stale writes receive `409` and
+  three-way merge against the last synced base. `DELETE /account` wipes state immediately,
+  blocks old tokens temporarily, then removes the marker after token expiry.
 
 ### Epic J — Spinning wheel
 

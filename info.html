@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integritet och villkor – Sipdeck</title>
+<meta name="description" content="Sipdecks information om integritet, lokal lagring, villkor och ansvarsfull alkoholanvändning.">
+<link rel="icon" href="design/favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;
+  src:url('fonts/instrument-serif-regular.woff2') format('woff2')}
+@font-face{font-family:'Work Sans';font-style:normal;font-weight:400 600;font-display:swap;
+  src:url('fonts/work-sans.woff2') format('woff2')}
+:root{--bg:#efe8db;--paper:#fbf7ef;--ink:#211b12;--muted:#6e6455;--accent:#2f6b3f;--line:rgba(33,27,18,.14)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 'Work Sans',system-ui,sans-serif}
+main{width:min(100% - 2rem,760px);margin:auto;padding:1.5rem 0 4rem}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+.top img{width:112px;display:block}.top nav{display:flex;gap:.5rem;flex-wrap:wrap}
+a{color:var(--accent);text-underline-offset:2px}.top nav a{padding:.35rem .65rem;border:1px solid var(--line);border-radius:8px}
+article{background:var(--paper);padding:clamp(1.2rem,4vw,2.5rem);border-radius:16px;margin-bottom:1.5rem;box-shadow:0 12px 32px -20px rgba(33,27,18,.35)}
+h1,h2{font-family:'Instrument Serif',Georgia,serif;font-weight:400;line-height:1.15}h1{font-size:2.35rem;margin:.2rem 0}
+h2{font-size:1.55rem;margin:2rem 0 .5rem}h3{font-size:1rem;margin:1.25rem 0 .25rem}
+p,ul{margin:.4rem 0 1rem}li+li{margin-top:.35rem}.meta{color:var(--muted);font-size:.86rem}
+.notice{border-left:4px solid var(--accent);padding:.7rem 1rem;background:rgba(47,107,63,.07)}
+@media(prefers-color-scheme:dark){:root{--bg:#17130e;--ink:#ede5d6;--muted:#a79b87;--accent:#7fb56f;--line:rgba(237,229,214,.16)}
+  article{color:#211b12}.meta{color:#6e6455}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a href="./" aria-label="Till Sipdeck"><img src="design/wordmark.svg" alt="Sipdeck"></a>
+    <nav aria-label="Språk / Language"><a href="#sv">Svenska</a><a href="#en">English</a></nav>
+  </div>
+
+  <article id="sv" lang="sv">
+    <h1>Integritet, lokal lagring och villkor</h1>
+    <p class="meta">Senast uppdaterad 23 juli 2026 · Version 1.0</p>
+    <p class="notice">Sipdeck är ett gratis hobbyprojekt utan annonser, beteendespårning eller försäljning av personuppgifter.</p>
+
+    <h2>Vem ansvarar för uppgifterna?</h2>
+    <p>Personuppgiftsansvarig är <strong>Patrik Löfgren</strong>, Umeå, Sverige. Kontakta
+      <a href="mailto:patz.lofgren@gmail.com">patz.lofgren@gmail.com</a> för frågor eller för att använda dina rättigheter.</p>
+
+    <h2>Vilka uppgifter behandlas?</h2>
+    <h3>Utan konto</h3>
+    <p>Favoriter, skafferi och inställningar sparas bara lokalt i din webbläsare. Sipdeck tar inte emot dessa uppgifter så länge du är utloggad.
+      Cloudflare behandlar tekniska uppgifter som IP-adress, tidpunkt, efterfrågad adress och webbläsarinformation när sidan levereras och skyddas.</p>
+    <h3>Med konto</h3>
+    <p>Firebase Authentication behandlar e-postadress, inloggningsleverantör, tekniska identifierare, IP-adress och webbläsarinformation.
+      Sipdeck lagrar ett Firebase-UID tillsammans med dina synkade favoriter, ditt skafferi och dina inställningar i Cloudflare D1.
+      Sipdeck tar aldrig emot ditt lösenord.</p>
+    <p>Ingen profilering eller automatiserat beslutsfattande med rättsliga eller liknande betydande effekter sker.</p>
+
+    <h2>Varför och med vilken rättslig grund?</h2>
+    <ul>
+      <li><strong>Appfunktioner och lokal lagring:</strong> för att tillhandahålla funktionerna du uttryckligen använder.</li>
+      <li><strong>Konto och synk:</strong> för att fullgöra den kostnadsfria tjänst du begär när du skapar eller använder ett konto.</li>
+      <li><strong>Säkerhet och teknisk drift:</strong> berättigat intresse av att förebygga missbruk, felsöka och hålla tjänsten säker.</li>
+      <li><strong>Support:</strong> för att besvara din begäran och, där det behövs, vårt berättigade intresse av att dokumentera lösta ärenden.</li>
+    </ul>
+
+    <h2>Cookies och lagring på din enhet</h2>
+    <p>Sipdeck använder inga annonserings- eller analyscookies och laddar ingen klientbaserad analystjänst. Appen använder:</p>
+    <ul>
+      <li><code>localStorage</code> för appens state, senaste synkbas och för att minnas att du tidigare har valt kontosynk.</li>
+      <li>Firebase-lagring i IndexedDB först när du använder kontofunktionen eller tidigare har valt att vara inloggad.</li>
+    </ul>
+    <p>Lagringen är nödvändig för de funktioner du begär och aktiveras därför utan samtyckesbanner. Du kan ta bort lokal data genom att rensa
+      webbplatsdata för buildapp.se i webbläsaren. Om Sipdeck senare inför icke-nödvändig analytics eller annonsering kommer denna information och
+      samtyckeslösningen att uppdateras innan sådan teknik aktiveras.</p>
+
+    <h2>Lagringstid och radering</h2>
+    <ul>
+      <li>Lokal data finns kvar tills du rensar webbplatsdata.</li>
+      <li>Synkad data sparas tills du raderar kontot. Radering finns i Sipdecks inställningar.</li>
+      <li>Vid kontoradering tas synkat app-state bort direkt. En spärrmarkör utan app-state kan finnas i högst cirka två timmar för att hindra gamla
+        inloggningstoken från att återskapa uppgifterna.</li>
+      <li>Firebase uppger att autentiseringsdata tas bort från aktiva system och backupsystem inom upp till 180 dagar efter radering.
+        Loggade IP-adresser kan sparas i några veckor.</li>
+      <li>Supportmejl raderas normalt senast 12 månader efter att ärendet avslutats, om de inte behöver sparas längre för säkerhet eller rättsliga anspråk.</li>
+    </ul>
+
+    <h2>Leverantörer och överföring utanför EU/EES</h2>
+    <p>Cloudflare tillhandahåller hosting, trafikskydd, Worker-API och D1-databas. Google tillhandahåller Firebase Authentication.
+      Firebase Authentication behandlar data i USA. Cloudflare kan behandla data globalt och den nuvarande D1-databasen har inte en låst
+      EU-jurisdiktion. Leverantörernas dataskyddsvillkor och godkända överföringsmekanismer, exempelvis Data Privacy Framework och
+      standardavtalsklausuler där de är tillämpliga, används för dessa överföringar.</p>
+
+    <h2>Dina rättigheter</h2>
+    <p>Du kan begära tillgång, rättelse, radering, begränsning, dataportabilitet eller invända mot behandling som grundas på berättigat intresse.
+      Begäran hanteras manuellt via kontaktadressen ovan. Du har också rätt att klaga hos
+      <a href="https://www.imy.se/" rel="external">Integritetsskyddsmyndigheten (IMY)</a>. Vi kan behöva kontrollera att begäran gäller ditt konto.</p>
+
+    <h2>Användarvillkor</h2>
+    <ul>
+      <li>Sipdeck tillhandahålls kostnadsfritt i befintligt skick och kan ändras eller avslutas.</li>
+      <li>Recepten är informationsmaterial. Kontrollera ingredienser, allergier, mängder och lokala regler själv.</li>
+      <li>Du ansvarar för hur tjänsten och recepten används. Sipdeck säljer eller levererar inte alkohol.</li>
+      <li>Försök inte störa tjänsten, komma åt andras konton eller använda den olagligt.</li>
+      <li>Sipdecks egen kod, design och illustrationer får inte återpubliceras kommersiellt utan tillstånd. Publicerade receptkällor tillhör sina respektive ägare.</li>
+    </ul>
+
+    <h2>Ansvarsfull alkoholanvändning</h2>
+    <p>Sipdeck riktar sig till vuxna som har laglig rätt att ta del av och använda alkoholrecept där de befinner sig. I Sverige används 18 år som
+      lägsta åldersrekommendation för innehållet; andra regler gäller bland annat för köp. Drick ansvarsfullt, servera aldrig minderåriga,
+      kör aldrig efter alkohol och välj alkoholfritt när situationen kräver det.</p>
+
+    <h2>Ändringar</h2>
+    <p>Väsentliga ändringar publiceras här med nytt datum. Om ett nytt ändamål kräver samtycke inhämtas det innan behandlingen börjar.</p>
+  </article>
+
+  <article id="en" lang="en">
+    <h1>Privacy, local storage and terms</h1>
+    <p class="meta">Last updated 23 July 2026 · Version 1.0</p>
+    <p class="notice">Sipdeck is a free hobby project with no advertising, behavioural tracking or sale of personal data.</p>
+
+    <h2>Who is responsible for the data?</h2>
+    <p>The data controller is <strong>Patrik Löfgren</strong>, Umeå, Sweden. Contact
+      <a href="mailto:patz.lofgren@gmail.com">patz.lofgren@gmail.com</a> with questions or to exercise your rights.</p>
+
+    <h2>What data is processed?</h2>
+    <h3>Without an account</h3>
+    <p>Favorites, pantry contents and settings are stored only in your browser. Sipdeck does not receive this data while you are signed out.
+      Cloudflare processes technical data such as IP address, time, requested address and browser information to deliver and protect the site.</p>
+    <h3>With an account</h3>
+    <p>Firebase Authentication processes your email address, sign-in provider, technical identifiers, IP address and browser information.
+      Sipdeck stores a Firebase UID with your synced favorites, pantry and settings in Cloudflare D1. Sipdeck never receives your password.</p>
+    <p>No profiling or automated decision-making with legal or similarly significant effects takes place.</p>
+
+    <h2>Purposes and legal bases</h2>
+    <ul>
+      <li><strong>App features and local storage:</strong> to provide features you explicitly use.</li>
+      <li><strong>Account and sync:</strong> to perform the free service you request when creating or using an account.</li>
+      <li><strong>Security and technical operation:</strong> our legitimate interest in preventing abuse, troubleshooting and keeping the service secure.</li>
+      <li><strong>Support:</strong> to answer your request and, where needed, our legitimate interest in documenting resolved matters.</li>
+    </ul>
+
+    <h2>Cookies and storage on your device</h2>
+    <p>Sipdeck uses no advertising or analytics cookies and loads no client-side analytics service. The app uses:</p>
+    <ul>
+      <li><code>localStorage</code> for app state, the latest sync base and to remember that you previously chose account sync.</li>
+      <li>Firebase storage in IndexedDB only after you use the account feature or have previously chosen to stay signed in.</li>
+    </ul>
+    <p>This storage is necessary for features you request and is therefore activated without a consent banner. You can remove local data by clearing
+      site data for buildapp.se in your browser. If Sipdeck later introduces non-essential analytics or advertising, this notice and the consent
+      mechanism will be updated before that technology is enabled.</p>
+
+    <h2>Retention and deletion</h2>
+    <ul>
+      <li>Local data remains until you clear the site's data.</li>
+      <li>Synced data is retained until you delete the account. Deletion is available in Sipdeck's settings.</li>
+      <li>On account deletion, synced app state is removed immediately. A blocking marker without app state may remain for up to approximately two
+        hours to prevent old sign-in tokens from recreating the data.</li>
+      <li>Firebase states that authentication data is removed from live and backup systems within up to 180 days after deletion.
+        Logged IP addresses may be retained for a few weeks.</li>
+      <li>Support email is normally deleted no later than 12 months after the matter is closed, unless longer retention is needed for security or legal claims.</li>
+    </ul>
+
+    <h2>Providers and transfers outside the EU/EEA</h2>
+    <p>Cloudflare provides hosting, traffic protection, the Worker API and D1 database. Google provides Firebase Authentication.
+      Firebase Authentication processes data in the United States. Cloudflare may process data globally and the current D1 database is not locked
+      to an EU jurisdiction. Provider data protection terms and approved transfer mechanisms, such as the Data Privacy Framework and Standard
+      Contractual Clauses where applicable, are used for these transfers.</p>
+
+    <h2>Your rights</h2>
+    <p>You may request access, correction, deletion, restriction, data portability or object to processing based on legitimate interests.
+      Requests are handled manually through the contact address above. You may also complain to the
+      <a href="https://www.imy.se/" rel="external">Swedish Authority for Privacy Protection (IMY)</a>. We may need to verify that a request concerns your account.</p>
+
+    <h2>Terms of use</h2>
+    <ul>
+      <li>Sipdeck is provided free of charge as available and may be changed or discontinued.</li>
+      <li>Recipes are informational. Check ingredients, allergies, quantities and local rules yourself.</li>
+      <li>You are responsible for how you use the service and recipes. Sipdeck does not sell or deliver alcohol.</li>
+      <li>Do not disrupt the service, access another person's account or use it unlawfully.</li>
+      <li>Sipdeck's original code, design and illustrations may not be republished commercially without permission. Published recipe sources belong to their owners.</li>
+    </ul>
+
+    <h2>Responsible alcohol use</h2>
+    <p>Sipdeck is intended for adults who may legally access and use alcohol recipes where they are located. In Sweden, 18 is used as the minimum
+      age recommendation for this content; separate rules apply to purchasing. Drink responsibly, never serve minors, never drive after drinking
+      and choose alcohol-free options whenever appropriate.</p>
+
+    <h2>Changes</h2>
+    <p>Material changes will be published here with a new date. If a new purpose requires consent, it will be requested before processing begins.</p>
+  </article>
+</main>
+</body>
+</html>

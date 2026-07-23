@@ -5,6 +5,26 @@ Read this first, then PRODUCT.md (what to build + acceptance criteria), then BAC
 
 ## Current state in one paragraph
 
+**Privacy/global-launch baseline done 2026-07-23, not yet deployed.** `info.html` contains
+Swedish and English privacy information, local-storage/cookie information, terms and
+responsible-alcohol guidance, and is linked from both account states. Fonts are now served
+locally. Firebase is dynamically imported only after account use (or for a returning signed-in
+user), so ordinary logged-out visits no longer contact Google or create Firebase storage.
+No client analytics, consent banner or age gate was added. Cloudflare reports the existing D1
+database with `jurisdiction: null`; an EU lock requires a separately planned create/migrate/swap.
+`node test.js`: 4,924 green. The sync/security and wheel changes below remain in the same
+uncommitted worktree. Previous paragraph, superseded below, kept for history:
+
+**Sync/security hardening done 2026-07-23, not yet deployed.** `PUT /state` now uses an
+SHA-256 state tag plus atomic compare-and-swap; the browser persists a per-account sync base
+and three-way merges conflicts, preserving both independent edits and removals. Account
+deletion wipes state before deleting the Firebase user, leaves a two-hour tombstone so old
+tokens cannot recreate data, and an hourly Worker cron purges that marker. Firebase token
+verification now validates `iat`/`auth_time` and refreshes JWKS once on an unknown `kid`.
+`node test.js`: 4,915 green. The wheel View Transition smoothing changes in `app.js` and
+`index.html` remain in the same uncommitted worktree. Previous paragraph, superseded below,
+kept for history:
+
 **BACKLOG 22 done, v1.5 closed, not yet deployed.** Two independent wheel-preference toggles in
 Settings, grilled first (`/grilling`) to resolve the opt-in/opt-out mismatch and empty-pool edge
 cases. (1) "Bara favoritdrinkar" — `buildSpinLineup`'s cocktail slots draw first from

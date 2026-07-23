@@ -16,7 +16,10 @@ copy, published-recipe links and mobile Back navigation. Card gestures suppress 
 image/text dragging and also support Arrow Left/Right. A relative web app manifest and the
 finalized icon set make the app installable without a service worker. The starting page also
 opens a tactile EN/SV spinning wheel that adapts 12 visible choices to a five-step mood
-slider while keeping its sound, result and history visit-local. See `HANDOFF.md` for
+slider while keeping its sound, result and history visit-local. Optional Firebase login
+syncs favorites and pantry through a Cloudflare Worker and D1; Firebase loads only when
+account functionality is used. Bilingual privacy, local-storage, terms and
+responsible-alcohol information lives in `info.html`. See `HANDOFF.md` for
 the current verification state and `BACKLOG.md` for the remaining v1 work.
 
 ## Run

@@ -1,7 +1,7 @@
 // API för Sipdeck (sync, v1.1). Auth: Firebase ID-token (JWT, verifieras mot Googles JWKS).
 // GET    /state    (Bearer) -> {state}
 // PUT    /state    (Bearer) <- hela state-bloben {v,favorites,pantry,settings}
-// DELETE /account  (Bearer) -> {ok}  raderar D1-raden (Firebase-usern raderas client-side)
+// DELETE /account  (Bearer) -> {ok}  raderar state; spärrmarkören städas efter två timmar
 const FIREBASE_PROJECT = 'sipdeck';
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -11,16 +11,27 @@ const cors = {
 const json = (d, s = 200) => Response.json(d, { status: s, headers: cors });
 
 // ---- Firebase ID-token-verifiering (RS256 mot Googles publika JWKS, ingen SDK) ----
-let jwksCache = null, jwksExpires = 0;
+let jwksCache = null, jwksExpires = 0, jwksMissRefresh = 0;
+async function refreshJwks() {
+  const res = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
+  if (!res.ok) return false;
+  const body = await res.json();
+  if (!Array.isArray(body.keys)) return false;
+  const m = /max-age=(\d+)/.exec(res.headers.get('Cache-Control') || '');
+  jwksExpires = Date.now() + (m ? Number(m[1]) : 3600) * 1000;
+  jwksCache = body.keys;
+  return true;
+}
 async function googleJwk(kid) {
-  if (!jwksCache || Date.now() > jwksExpires) {
-    const res = await fetch('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com');
-    if (!res.ok) return null;
-    const m = /max-age=(\d+)/.exec(res.headers.get('Cache-Control') || '');
-    jwksExpires = Date.now() + (m ? Number(m[1]) : 3600) * 1000;
-    jwksCache = (await res.json()).keys;
+  let refreshed = false;
+  if (!jwksCache || Date.now() > jwksExpires) refreshed = await refreshJwks();
+  let key = jwksCache && jwksCache.find(k => k.kid === kid);
+  if (!key && !refreshed && Date.now() - jwksMissRefresh > 60000) {
+    jwksMissRefresh = Date.now();
+    await refreshJwks();
+    key = jwksCache && jwksCache.find(k => k.kid === kid);
   }
-  return jwksCache.find(k => k.kid === kid) || null;
+  return key || null;
 }
 
 function b64urlToBytes(s) {
@@ -42,14 +53,19 @@ async function verifyFirebaseToken(token) {
     const c = JSON.parse(new TextDecoder().decode(b64urlToBytes(p)));
     const now = Date.now() / 1000;
     if (c.aud !== FIREBASE_PROJECT || c.iss !== 'https://securetoken.google.com/' + FIREBASE_PROJECT) return null;
-    if (!(c.exp > now) || !c.sub) return null;
+    if (!(c.exp > now) || !(c.iat <= now) || !(c.auth_time <= now)
+      || typeof c.sub !== 'string' || !c.sub) return null;
     return c;
   } catch (e) {
     return null;
   }
 }
 
-async function userFromRequest(req, env) {
+function isDeleted(u) {
+  try { return Number.isFinite(JSON.parse(u.state).deletedAt); } catch (e) { return false; }
+}
+
+async function userFromRequest(req, env, allowDeleted = false) {
   const t = (req.headers.get('Authorization') || '').replace(/^Bearer /, '');
   if (t.split('.').length !== 3) return null;
   const claims = await verifyFirebaseToken(t);
@@ -59,7 +75,12 @@ async function userFromRequest(req, env) {
     await env.DB.prepare('INSERT INTO users (firebase_uid, state) VALUES (?, ?)').bind(claims.sub, '').run().catch(() => {});
     u = await env.DB.prepare('SELECT * FROM users WHERE firebase_uid = ?').bind(claims.sub).first();
   }
-  return u;
+  return u && (allowDeleted || !isDeleted(u)) ? u : null;
+}
+
+async function stateEtag(raw) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export default {
@@ -70,30 +91,53 @@ export default {
       if (path === '/state') {
         const u = await userFromRequest(req, env);
         if (!u) return json({ error: 'Inte inloggad.' }, 401);
-        if (req.method === 'GET') return json({ state: u.state ? JSON.parse(u.state) : null });
+        if (req.method === 'GET') return json({
+          state: u.state ? JSON.parse(u.state) : null,
+          etag: await stateEtag(u.state),
+        });
         if (req.method === 'PUT') {
           const body = await req.text();
           if (body.length > 65536) return json({ error: 'För mycket data (max 64 kB).' }, 413);
-          let s;
-          try { s = JSON.parse(body); } catch (e) { return json({ error: 'Ogiltig data.' }, 400); }
+          let request;
+          try { request = JSON.parse(body); } catch (e) { return json({ error: 'Ogiltig data.' }, 400); }
+          const s = request && request.state;
           if (!s || typeof s !== 'object' || !Array.isArray(s.favorites) || !Array.isArray(s.pantry)) {
             return json({ error: 'Ogiltig data.' }, 400);
           }
-          await env.DB.prepare('UPDATE users SET state = ? WHERE id = ?').bind(JSON.stringify(s), u.id).run();
-          return json({ ok: true });
+          const currentEtag = await stateEtag(u.state);
+          if (request.etag !== currentEtag) {
+            return json({ error: 'Synkkonflikt.', state: u.state ? JSON.parse(u.state) : null, etag: currentEtag }, 409);
+          }
+          const next = JSON.stringify(s);
+          const result = await env.DB.prepare('UPDATE users SET state = ? WHERE id = ? AND state = ?')
+            .bind(next, u.id, u.state).run();
+          if (!result.meta || result.meta.changes !== 1) {
+            const latest = await env.DB.prepare('SELECT state FROM users WHERE id = ?').bind(u.id).first();
+            const raw = latest ? latest.state : '';
+            return json({ error: 'Synkkonflikt.', state: raw ? JSON.parse(raw) : null, etag: await stateEtag(raw) }, 409);
+          }
+          return json({ ok: true, etag: await stateEtag(next) });
         }
       }
 
-      // GDPR: raderar D1-raden. Firebase-användaren raderas client-side (user.delete()).
+      // Tar bort state direkt och blockerar gamla token tills Firebase-raderingen hunnit slå igenom.
       if (path === '/account' && req.method === 'DELETE') {
-        const u = await userFromRequest(req, env);
+        const u = await userFromRequest(req, env, true);
         if (!u) return json({ error: 'Inte inloggad.' }, 401);
-        await env.DB.prepare('DELETE FROM users WHERE id = ?').bind(u.id).run();
+        await env.DB.prepare('UPDATE users SET state = ? WHERE id = ?')
+          .bind(JSON.stringify({ deletedAt: Date.now() }), u.id).run();
         return json({ ok: true });
       }
     } catch (e) {
       return json({ error: 'Serverfel.' }, 500);
     }
     return json({ error: 'Hittades inte.' }, 404);
+  },
+  async scheduled(controller, env) {
+    const cutoff = Date.now() - 2 * 60 * 60 * 1000;
+    await env.DB.prepare(`
+      DELETE FROM users
+      WHERE CASE WHEN json_valid(state) THEN json_extract(state, '$.deletedAt') END < ?
+    `).bind(cutoff).run();
   },
 };

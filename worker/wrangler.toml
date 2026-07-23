@@ -6,3 +6,6 @@ compatibility_date = "2026-07-06"
 binding = "DB"
 database_name = "sipdeck"
 database_id = "ffdfc07e-e916-4085-b379-140069fd43fc"
+
+[triggers]
+crons = ["17 * * * *"]
