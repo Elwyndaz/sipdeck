@@ -311,6 +311,9 @@ check(appSource.split('href="info.html"').length === 3,
 check(appSource.split('data-servings').length >= 5 && appSource.includes('max="${MAX_SERVINGS}"') &&
   appSource.includes('if (servingDrinkId !== id)'),
   'recipe scaling: deck and favorite views accept 1–100 and another drink resets to 1');
+check(htmlSource.includes('.servings-input::-webkit-inner-spin-button') &&
+  htmlSource.includes('-moz-appearance:textfield'),
+  'recipe scaling: native number spinners stay hidden beside the larger minus/plus controls');
 const settingsViewSource = appSource.slice(appSource.indexOf('function viewSettings()'),
   appSource.indexOf('function random01()'));
 check(!settingsViewSource.includes("settings_unit')") &&

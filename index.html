@@ -168,7 +168,9 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
 .stepper button,.units button{border:1px solid rgba(33,27,18,.18);border-radius:8px;color:#211B12;
   padding:.3rem .65rem;font:500 .85rem/1 var(--sd-font-ui);background:none}
 .servings-input{width:3.8rem;padding:.3rem .25rem;border:1px solid rgba(33,27,18,.18);
-  border-radius:8px;background:#fbf7ef;color:#211b12;text-align:center;font:500 .85rem/1 var(--sd-font-ui)}
+  border-radius:8px;background:#fbf7ef;color:#211b12;text-align:center;font:500 .85rem/1 var(--sd-font-ui);
+  appearance:textfield;-moz-appearance:textfield}
+.servings-input::-webkit-inner-spin-button,.servings-input::-webkit-outer-spin-button{appearance:none;margin:0}
 .units{display:flex;gap:.3rem}
 .units button.active{background:#2F6B3F;border-color:#2F6B3F;color:#FBF7EF}
 /* gesture tint: opacity-only per frame (composited), fixed paper-palette colors */
