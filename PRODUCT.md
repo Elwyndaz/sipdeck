@@ -35,8 +35,11 @@ lists). Personal + friends first, but every decision assumes it goes public late
 - **Stack**: vanilla JS + CSS + HTML. No build, no dependencies. Pure functions at the top
   of `app.js`, exported for `test.js` (plain `node test.js` asserts, recept pattern).
   Coarse re-render per view on state change; the card stack is the only imperative-DOM zone.
-- **Hosting**: Cloudflare Pages, direct upload (`npx wrangler pages deploy .`). Custom
-  domain deferred until the name is final.
+- **Hosting**: Cloudflare Pages, direct upload (`npx wrangler pages deploy .`). Static
+  responses use committed `_headers` for MIME sniffing, framing, referrer, permissions and
+  CSP controls. The canonical `buildapp.se/sipdeck/` proxy must mirror those controls and
+  enforce HTTP→HTTPS externally; HSTS with `includeSubDomains` requires a whole-domain
+  inventory and is never a project-local default.
 - **Accounts**: **v1.1**, not v1. Recept pattern, minimal cut: Firebase Auth (identity
   only) + Cloudflare Worker + D1, table `users(id, firebase_uid UNIQUE, state)`, endpoints
   `GET /state`, `PUT /state` (debounced client-side), `DELETE /account`. Conditional whole-blob
@@ -98,6 +101,12 @@ color. Baked-in specifics:
   card's edge with save/skip color past 30% of the commit threshold, before release.
   Exact curves in `design/tokens.css`. This is the concrete spec for Epic A/B's "buttery"
   requirement — implement against these values, don't reinvent them.
+- **Accessibility baseline**: only the active card and visible face participate in focus
+  and the accessibility tree. Enter/Space flips; Arrow Left/Right skips/saves; focus follows
+  the promoted card. Selected and missing states must have programmatic semantics and a
+  visible cue that does not rely on color alone. Dynamic account feedback is announced and
+  associated with its fields. Every routed screen has a meaningful H1, which may be
+  visually hidden when the locked layout already supplies its visual identity.
 - **Usage rules**: no color fill in the wordmark/icon strokes (ink draws, green
   garnishes); no playing-card iconography anywhere (suits, pips, dealer language); cards
   never tinted or theme-inverted; Instrument Serif never for body/buttons/tags/amounts.
@@ -175,7 +184,7 @@ transient and never synced. Never store derived data in the blob.
   off-screen and requeues it at the **back** of the deck. No permanent dismiss exists.
 - Below threshold: card springs back with damped easing.
 - Native image dragging and text selection never steal the card gesture. Arrow Left invokes
-  the same skip path for keyboard users.
+  the same skip path for keyboard users; hidden cards and faces are inert.
 
 **A3. As a browser, I want swipe right = save so that keeping a drink is one gesture.**
 - Right swipe saves to `favorites` (idempotent), animates off with a brief save cue, and
@@ -187,7 +196,8 @@ transient and never synced. Never store derived data in the blob.
 - Tap (movement < ~10 px, so drags never misfire) flips with a 3D rotateY;
   `backface-visibility` back face shows the recipe. Tap flips back. Swiping works from
   either face; stepper/toggle controls are dead zones.
-- Flip state resets when the card leaves the top of the deck.
+- Enter/Space invokes the same flip for keyboard users. `aria-expanded`, `aria-hidden` and
+  focusability follow the visible face; flip state resets when the card leaves the top.
 
 ### Epic B — Recipe (card back)
 
@@ -280,8 +290,11 @@ mixable drinks.**
 
 **J1. As an individual orderer, I want a polished wheel to choose my next normal bar order.**
 - The starting-page mini-wheel expands into a full-screen route with a graceful fallback
-  when View Transitions are unavailable. A required five-step EN/SV mood slider builds a
-  12-sector lineup from current `bar: true` cocktails and the wheel-only catalog.
+  when View Transitions are unavailable or deliberately avoided for compositor safety.
+  The pointer joins the composed transition, Firefox uses a native fade-only snapshot path
+  instead of nested transforms, and reduced motion removes the scene animations. A required
+  five-step EN/SV mood slider builds a 12-sector lineup from current `bar: true` cocktails
+  and the wheel-only catalog.
 - Every normal spin preselects one eligible visible sector and animates that exact sector
   to the pointer in 5–6 seconds. The highest level may show non-water decoys but only its
   seven visible water sectors are eligible. Re-spin keeps the lineup; New wheel rebuilds it.

@@ -230,8 +230,40 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     has no EU jurisdiction lock; moving it to a newly created EU-jurisdiction database is a
     separate production migration, not a silent configuration change.
 
+25. ✅ **Premium wheel transition + current device matrix** (done 2026-07-24) — Gave the
+    full-wheel pointer its own View Transition layer so it enters after the expanding disc
+    and exits before the disc shrinks. Firefox keeps native same-document View Transitions
+    but uses a compositor-safe fade-only snapshot path instead of nested transforms; the CSS
+    fallback remains for browsers without View Transitions with a 900 ms lifetime, and
+    reduced motion removes the pointer animation. Added a Firefox-specific regression test,
+    updated mobile Safari emulation from iPhone 13 to iPhone 15 Pro, and cache-busted
+    `app.js?v=1.12`. Firefox passes 3/3 locally and against the isolated Cloudflare preview;
+    ten repeated open/close cycles retained the native shared-element geometry without
+    clipping or console errors.
+
+26. ✅ **Vibekollen follow-up: accessibility, metadata and Pages headers** (done
+    2026-07-24) — Verified the scanner against project code and live responses before
+    changing anything. The deck now removes non-top cards and hidden faces from keyboard
+    and accessibility traversal with native `inert`, exposes only the current face through
+    `aria-hidden`, flips with Enter/Space, preserves Arrow Left/Right and focus promotion,
+    marks active units with `aria-pressed`, and gives missing ingredients both text/ARIA and
+    non-color visual cues. Account feedback is a polite live region associated with its
+    fields. Added localized hidden H1s, canonical links for both HTML pages, Cloudflare Pages
+    `_headers` (`nosniff`, clickjacking/referrer/permissions policies, minimal enforced CSP,
+    fuller CSP Report-Only), and `tests/a11y.spec.js`. `node test.js`: 4,936 green; Chromium
+    accessibility 2/2 and wheel 2/2 green; non-Firefox browser matrix green. Firefox wheel
+    tests pass 3/3 outside the managed Windows sandbox; inside it, Firefox cannot spawn its
+    tab subprocess before navigation.
+
 ## v2 / ideas (unordered)
 
+- **Canonical-domain transport/header follow-up**: `buildapp.se/sipdeck/` is currently
+  Cloudflare-fronted but exposes GitHub Pages/Fastly origin behavior. Configure permanent
+  HTTP→HTTPS and mirror `_headers` at that external proxy/zone. Inventory every
+  `buildapp.se` subdomain before any HSTS `includeSubDomains` rollout.
+- **CSP promotion**: exercise Firebase email/Google sign-in and sync on a deployed preview,
+  inspect the Report-Only console/reports, then narrow and promote directives only if no
+  required origin is blocked.
 - Richer filter UI over existing tags: style, strength.
 - **Alcohol-free mode**: separate boolean toggle (same pattern as the `bar` filter, D1),
   off by default. Mixing mocktails into the normal deck unprompted isn't wanted (nobody

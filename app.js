@@ -16,6 +16,7 @@ const STRINGS = {
     deck_empty: 'No drinks yet. Deal the deck once drinks.json ships.',
     deck_loading: 'Dealing the deck...',
     deck_error: "Couldn't load the deck. Reload to try again.",
+    deck_title: 'Cocktail deck',
     deck_count_label: 'drinks in the deck',
     deck_no_matches: 'No drinks match those filters. Try another combination.',
     filters_label: 'Filter drinks',
@@ -85,6 +86,7 @@ const STRINGS = {
     deck_empty: 'Inga drinkar än. Kortleken delas ut när drinks.json finns.',
     deck_loading: 'Delar ut kortleken...',
     deck_error: 'Kunde inte ladda kortleken. Ladda om sidan för att försöka igen.',
+    deck_title: 'Drinkkortlek',
     deck_count_label: 'drinkar i kortleken',
     deck_no_matches: 'Inga drinkar matchar filtren. Prova en annan kombination.',
     filters_label: 'Filtrera drinkar',
@@ -751,7 +753,7 @@ if (typeof document !== 'undefined') (function () {
     const matches = filteredDrinks();
     const count = `<p class="deck-count"><span class="amount">${matches.length}</span> ${esc(t(lang(), 'deck_count_label'))}</p>`;
     const deck = matches.length ? '<div class="deck" id="deck"></div>' : `<p class="empty">${esc(t(lang(), 'deck_no_matches'))}</p>`;
-    return `${deck}${controls}${count}`;
+    return `<h1 class="sr-only">${esc(t(lang(), 'deck_title'))}</h1>${deck}${controls}${count}`;
   }
 
   // ---------- deck: the one imperative-DOM zone (drag/flip animate outside re-renders) ----------
@@ -796,13 +798,16 @@ if (typeof document !== 'undefined') (function () {
 
   function chipTags(ingredients, have) {
     return ingredients.filter(l => l.essential)
-      .map(l => `<span class="chip${have.has(l.id) ? '' : ' missing'}">${esc(ingName(l.id))}</span>`).join('');
+      .map(l => {
+        const missing = !have.has(l.id);
+        return `<span class="chip${missing ? ' missing' : ''}">${missing ? `<span class="sr-only">${esc(t(lang(), 'missing_prefix'))}</span>` : ''}${esc(ingName(l.id))}</span>`;
+      }).join('');
   }
 
   function ingLine(line, have, servings) {
     const amt = formatLineAmount(line, servings, state.settings.unit, lang());
     const missing = !have.has(line.id);
-    return `<li${missing ? ' class="missing"' : ''}><span class="amount">${esc(amt)}</span> ${esc(ingName(line.id))}</li>`;
+    return `<li${missing ? ' class="missing"' : ''}>${missing ? `<span class="sr-only">${esc(t(lang(), 'missing_prefix'))}</span>` : ''}<span class="amount">${esc(amt)}</span> ${esc(ingName(line.id))}</li>`;
   }
 
   function wireArt(img) {
@@ -825,13 +830,15 @@ if (typeof document !== 'undefined') (function () {
     el.dataset.depth = depth;
     el.dataset.id = drink.id;
     el.tabIndex = depth === 0 ? 0 : -1;
-    el.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight');
+    el.inert = depth !== 0;
+    el.setAttribute('aria-keyshortcuts', 'Enter Space ArrowLeft ArrowRight');
+    el.setAttribute('aria-label', drink.name);
     const have = new Set(state.pantry);
     const tags = chipTags(drink.ingredients, have);
     const s = state.settings;
     const servings = depth === 0 ? servingsFor(drink.id) : 1;
     const unitBtns = UNITS.map(u =>
-      `<button data-act="unit" data-unit="${u}"${u === s.unit ? ' class="active"' : ''}>${u}</button>`).join('');
+      `<button data-act="unit" data-unit="${u}" aria-pressed="${u === s.unit}"${u === s.unit ? ' class="active"' : ''}>${u}</button>`).join('');
     el.innerHTML = `
       <div class="card-inner">
         <div class="card-face card-front">
@@ -859,8 +866,20 @@ if (typeof document !== 'undefined') (function () {
       <div class="tint tint-save"></div>
       <div class="tint tint-skip"></div>` : ''}`;
     const art = el.querySelector('.cocktail-art');
+    setCardFlipped(el, flipped);
     wireArt(art);
     return el;
+  }
+
+  function setCardFlipped(card, flipped) {
+    card.classList.toggle('flipped', flipped);
+    card.setAttribute('aria-expanded', String(flipped));
+    const front = card.querySelector('.card-front');
+    const back = card.querySelector('.card-back');
+    front.inert = flipped;
+    back.inert = !flipped;
+    front.setAttribute('aria-hidden', String(flipped));
+    back.setAttribute('aria-hidden', String(!flipped));
   }
 
   function mountDeck() {
@@ -889,6 +908,8 @@ if (typeof document !== 'undefined') (function () {
     const deckEl = $('#deck');
     if (!deckEl) return;
     const moveFocus = leavingCard === document.activeElement || leavingCard.contains(document.activeElement);
+    leavingCard.inert = true;
+    leavingCard.tabIndex = -1;
     ensureQueue();
     const desired = deckQueue.slice(0, 4);
     Array.from(deckEl.querySelectorAll('.card')).forEach(card => {
@@ -903,6 +924,7 @@ if (typeof document !== 'undefined') (function () {
       }
       card.dataset.depth = depth;
       card.tabIndex = depth === 0 ? 0 : -1;
+      card.inert = depth !== 0;
     });
     const nextCard = Array.from(deckEl.querySelectorAll('.card'))
       .find(el => el !== leavingCard && el.dataset.depth === '0');
@@ -917,6 +939,14 @@ if (typeof document !== 'undefined') (function () {
     const threshold = () => card.offsetWidth * 0.35;
     let dragging = false, moved = false, startX = 0, startY = 0, dx = 0, dy = 0;
     let lastX = 0, lastT = 0, vx = 0;
+
+    card.addEventListener('keydown', e => {
+      if (e.target !== card || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      const id = deckQueue[0];
+      flippedId = flippedId === id ? null : id;
+      setCardFlipped(card, flippedId === id);
+    });
 
     card.addEventListener('pointerdown', e => {
       if (e.target.closest('.card-ctrl')) return; // controls are dead zones
@@ -956,7 +986,7 @@ if (typeof document !== 'undefined') (function () {
         if (!moved && !e.target.closest('.card-ctrl')) { // a tap, not a drag: flip
           const id = deckQueue[0];
           flippedId = flippedId === id ? null : id;
-          card.classList.toggle('flipped', flippedId === id);
+          setCardFlipped(card, flippedId === id);
         }
       }
     }
@@ -1030,7 +1060,7 @@ if (typeof document !== 'undefined') (function () {
           <span>${esc(ingName(line.id))}</span>
         </label>`;
       }).join('');
-      const unitBtns = UNITS.map(unit => `<button data-fav-act="unit" data-unit="${unit}"${unit === s.unit ? ' class="active"' : ''}>${unit}</button>`).join('');
+      const unitBtns = UNITS.map(unit => `<button data-fav-act="unit" data-unit="${unit}" aria-pressed="${unit === s.unit}"${unit === s.unit ? ' class="active"' : ''}>${unit}</button>`).join('');
       const source = open.source && open.source.url && open.source.label
         ? `<p class="fav-source"><a href="${esc(open.source.url)}" target="_blank" rel="noopener noreferrer">${esc(t(lang(), 'source_label'))}: ${esc(open.source.label)}</a></p>`
         : '';
@@ -1222,7 +1252,7 @@ if (typeof document !== 'undefined') (function () {
       const providers = fbUser.providerData.map(p => p.providerId);
       const linkGoogle = providers.includes('google.com') ? '' : `<p><button data-acc="link-google">${esc(t(lang(), 'account_link_google'))}</button></p>`;
       const pwForm = providers.includes('password') ? '' : `<form id="pwForm" class="account-form">
-        <label>${esc(t(lang(), 'account_create_password'))} <input type="password" id="accNewPw" minlength="6" maxlength="64" autocomplete="new-password" required></label>
+        <label>${esc(t(lang(), 'account_create_password'))} <input type="password" id="accNewPw" minlength="6" maxlength="64" autocomplete="new-password" aria-describedby="accError" required></label>
         <p>${esc(t(lang(), 'account_share_hint'))}</p>
         <button type="submit">${esc(t(lang(), 'account_create_password'))}</button>
       </form>`;
@@ -1235,7 +1265,7 @@ if (typeof document !== 'undefined') (function () {
         <button data-acc="delete">${esc(t(lang(), 'account_delete'))}</button>
       </div>
       <p><a href="info.html">${esc(t(lang(), 'account_legal'))}</a></p>
-      <p id="accError" class="warn" hidden></p>
+      <p id="accError" class="warn" role="status" aria-live="polite" aria-atomic="true" hidden></p>
     </section>`;
     }
     return `<section class="account">
@@ -1243,8 +1273,8 @@ if (typeof document !== 'undefined') (function () {
       <p>${esc(t(lang(), 'account_hint'))}</p>
       <button data-acc="google">${esc(t(lang(), 'account_google'))}</button>
       <form id="emailForm" class="account-form">
-        <label>${esc(t(lang(), 'account_email'))} <input type="email" id="accEmail" autocomplete="username" required></label>
-        <label>${esc(t(lang(), 'account_password'))} <input type="password" id="accPw" minlength="6" maxlength="64" autocomplete="current-password" required></label>
+        <label>${esc(t(lang(), 'account_email'))} <input type="email" id="accEmail" autocomplete="username" aria-describedby="accError" required></label>
+        <label>${esc(t(lang(), 'account_password'))} <input type="password" id="accPw" minlength="6" maxlength="64" autocomplete="current-password" aria-describedby="accError" required></label>
         <div class="account-actions">
           <button type="submit" data-mode="login">${esc(t(lang(), 'account_login'))}</button>
           <button type="submit" data-mode="register">${esc(t(lang(), 'account_register'))}</button>
@@ -1252,7 +1282,7 @@ if (typeof document !== 'undefined') (function () {
         </div>
       </form>
       <p><a href="info.html">${esc(t(lang(), 'account_legal'))}</a></p>
-      <p id="accError" class="warn" hidden></p>
+      <p id="accError" class="warn" role="status" aria-live="polite" aria-atomic="true" hidden></p>
     </section>`;
   }
 
@@ -1281,6 +1311,7 @@ if (typeof document !== 'undefined') (function () {
         <span class="wheel-top-wordmark"><img src="design/wordmark.svg" alt="Sipdeck"></span>
       </header>
       <div class="wheel-body search-body">
+        <h1 class="sr-only">${esc(t(lang(), 'search_title'))}</h1>
         <input type="search" id="searchInput" class="search-input" value="${esc(searchQuery)}"
           placeholder="${esc(t(lang(), 'search_placeholder'))}" aria-label="${esc(t(lang(), 'search_placeholder'))}">
         ${body}
@@ -1563,10 +1594,29 @@ if (typeof document !== 'undefined') (function () {
 
   function renderRoute() {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduced && document.startViewTransition) {
-      const root = document.documentElement;
-      root.classList.toggle('wheel-closing', document.body.classList.contains('wheel-mode') && location.hash !== '#/hjul');
-      document.startViewTransition(() => render()).finished.finally(() => root.classList.remove('wheel-closing'));
+    const root = document.documentElement;
+    const wasWheel = document.body.classList.contains('wheel-mode');
+    const enteringWheel = !wasWheel && location.hash === '#/hjul';
+    const leavingWheel = wasWheel && location.hash !== '#/hjul';
+    const nativeWebKit = /AppleWebKit/.test(navigator.userAgent) &&
+      !/(Chrome|Chromium|Edg|OPR)/.test(navigator.userAgent);
+    if (!reduced && document.startViewTransition && !nativeWebKit) {
+      root.classList.toggle('wheel-opening', enteringWheel);
+      root.classList.toggle('wheel-closing', leavingWheel);
+      root.classList.toggle('wheel-firefox', /Firefox\//.test(navigator.userAgent));
+      const transition = document.startViewTransition(() => render());
+      const settle = () => root.classList.remove('wheel-opening', 'wheel-closing', 'wheel-firefox');
+      transition.finished.then(settle, settle);
+    } else if (!reduced && enteringWheel) {
+      root.classList.add('wheel-fallback-opening');
+      render();
+      setTimeout(() => root.classList.remove('wheel-fallback-opening'), 900);
+    } else if (!reduced && leavingWheel) {
+      root.classList.add('wheel-fallback-closing');
+      setTimeout(() => {
+        root.classList.remove('wheel-fallback-closing');
+        render();
+      }, 420);
     } else render();
   }
 

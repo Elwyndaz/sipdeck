@@ -13,13 +13,18 @@ rechecked against those live pages on 2026-07-23. Filters, pantry, essential-ing
 makeability, EN/SV switching and glass-specific missing-art fallbacks are implemented.
 Favorites use compact art rows and a continuous recipe view with checkmarks, clipboard
 copy, published-recipe links and mobile Back navigation. Card gestures suppress native
-image/text dragging and also support Arrow Left/Right. A relative web app manifest and the
-finalized icon set make the app installable without a service worker. The starting page also
-opens a tactile EN/SV spinning wheel that adapts 12 visible choices to a five-step mood
-slider while keeping its sound, result and history visit-local. Optional Firebase login
+image/text dragging; Arrow Left/Right skips/saves, Enter/Space flips, and only the active
+card face participates in the focus order. Missing ingredients and selected units use both
+visual and programmatic status. A relative web app manifest and the finalized icon set make
+the app installable without a service worker. The starting page also opens a tactile EN/SV
+spinning wheel that adapts 12 visible choices to a five-step mood slider while keeping its
+sound, result and history visit-local. Its mini-to-full transition includes the pointer,
+uses a compositor-safe Firefox fade path and respects reduced motion. Optional Firebase login
 syncs favorites and pantry through a Cloudflare Worker and D1; Firebase loads only when
 account functionality is used. Bilingual privacy, local-storage, terms and
-responsible-alcohol information lives in `info.html`. See `HANDOFF.md` for
+responsible-alcohol information lives in `info.html`. Canonical metadata and Cloudflare
+Pages security headers are committed; the `buildapp.se` proxy still needs its own external
+HTTP→HTTPS/header configuration. See `HANDOFF.md` for
 the current verification state and `BACKLOG.md` for the remaining v1 work.
 
 ## Run
@@ -27,7 +32,8 @@ the current verification state and `BACKLOG.md` for the remaining v1 work.
 ```
 python -m http.server   # then open http://localhost:8000
 node test.js            # plain node asserts, no framework
-npm run test:e2e        # wheel smoke test in desktop + mobile browser engines
+npm run test:e2e        # wheel + accessibility smoke tests across browser projects
+$env:BASE_URL='https://preview.example'; npm run test:e2e  # test a deployed preview
 ```
 
 ## Docs

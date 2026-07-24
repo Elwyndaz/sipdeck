@@ -299,9 +299,22 @@ const workerSource = fs.readFileSync(path.join(__dirname, 'worker', 'worker.js')
 // bumped 71kB -> 74kB 2026-07-21 for catalog search (#/sok: name+ingredient search, deep-links into detail view)
 // bumped 74kB -> 79kB 2026-07-21 for wheel prefs (favorites-only cocktails, per-outcome beer/wine/shot toggles)
 // bumped 86kB -> 87kB 2026-07-23 for transient editable 1–100 recipe servings
-check(Buffer.byteLength(appSource) < 87000, 'bundle budget: app.js stays under 87 kB unminified');
+// bumped 87kB -> 89kB 2026-07-24 for keyboard-safe card faces and accessible status semantics
+check(Buffer.byteLength(appSource) < 89000, 'bundle budget: app.js stays under 89 kB unminified');
 check(!htmlSource.includes('fonts.googleapis.com') && htmlSource.includes("fonts/work-sans.woff2"),
   'privacy: fonts are self-hosted with no Google Fonts request');
+check(htmlSource.includes('rel="canonical" href="https://buildapp.se/sipdeck/"') &&
+  infoSource.includes('rel="canonical" href="https://buildapp.se/sipdeck/info.html"'),
+  'seo: public HTML pages declare their canonical URLs');
+const headersSource = fs.readFileSync(path.join(__dirname, '_headers'), 'utf8');
+check(headersSource.includes('X-Content-Type-Options: nosniff') &&
+  headersSource.includes("frame-ancestors 'none'") &&
+  headersSource.includes('Permissions-Policy: camera=(), microphone=(), geolocation=()'),
+  'hosting: static responses declare the safe project-scoped security headers');
+check(appSource.includes('el.inert = depth !== 0') &&
+  appSource.includes("e.key !== 'Enter' && e.key !== ' '") &&
+  appSource.includes('aria-describedby="accError"'),
+  'accessibility: hidden cards leave the tab order, keyboard flips work and account errors are associated');
 check(!htmlSource.includes('gstatic.com/firebase') && appSource.includes("async function ensureFirebase()"),
   'privacy: Firebase is lazy-loaded only by account use or remembered sign-in');
 check(appSource.includes("const AUTH_KEY = KEY + '-auth'") && appSource.includes("signInWithPopup") &&
@@ -335,9 +348,16 @@ check(htmlSource.includes('href="#/hjul"') && appSource.includes("'#/hjul'"),
   'wheel route: starting-page entry and router target are wired');
 check(htmlSource.includes('view-transition-name:wheel-shared') && appSource.includes('document.startViewTransition'),
   'wheel transition: mini-wheel expands through progressive View Transitions');
-check(htmlSource.includes('html.wheel-closing::view-transition-new(wheel-shared){opacity:0}') &&
-  htmlSource.includes('animation-duration:360ms') && appSource.includes("root.classList.toggle('wheel-closing'"),
-  'wheel transition: closing shrinks the populated wheel with a short shared-element animation');
+check(htmlSource.includes('html.wheel-opening::view-transition-new(wheel-shared)') &&
+  htmlSource.includes('html.wheel-closing::view-transition-old(wheel-shared)') &&
+  appSource.includes("root.classList.toggle('wheel-opening'") &&
+  appSource.includes("root.classList.toggle('wheel-closing'"),
+  'wheel transition: opening and closing use composed, directional shared-element scenes');
+check(htmlSource.includes('wheel-fallback-screen-in') && htmlSource.includes('wheel-fallback-screen-out') &&
+  appSource.includes("root.classList.add('wheel-fallback-opening')") &&
+  appSource.includes("root.classList.add('wheel-fallback-closing')") &&
+  appSource.includes('const nativeWebKit = /AppleWebKit/'),
+  'wheel transition: unsupported and native WebKit engines retain a deliberate fallback');
 check(appSource.includes("matchMedia('(prefers-reduced-motion: reduce)')"),
   'wheel accessibility: reduced motion is honored');
 check(appSource.includes('aria-live="polite"') && appSource.includes('aria-valuetext='),
@@ -366,8 +386,8 @@ check(htmlSource.includes('<svg class="wheel-symbol" viewBox="0 0 100 100"') &&
 check(appSource.includes('draggable="false"'), 'pointer swipe: artwork disables native image dragging');
 check(appSource.includes('e.preventDefault(); // own the gesture'), 'pointer swipe: card owns pointer gesture');
 check(htmlSource.includes('user-select:none;-webkit-user-select:none'), 'pointer swipe: card text selection disabled');
-check(appSource.includes("aria-keyshortcuts', 'ArrowLeft ArrowRight'"),
-  'keyboard swipe: top card exposes arrow shortcuts');
+check(appSource.includes("aria-keyshortcuts', 'Enter Space ArrowLeft ArrowRight'"),
+  'keyboard card: top card exposes flip and swipe shortcuts');
 
 // ---------- glass placeholders (BACKLOG 9) ----------
 ['coupe', 'highball', 'rocks', 'martini', 'collins', 'flute', 'goblet', 'hurricane',

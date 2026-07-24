@@ -15,6 +15,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#EFE8DB">
+<link rel="canonical" href="https://buildapp.se/sipdeck/">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="design/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
@@ -82,6 +83,8 @@ html,body{min-height:100%}
 body{min-height:100dvh;font:400 16px/1.5 var(--sd-font-ui);background:var(--sd-bg);color:var(--sd-ink);-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .wrap{max-width:640px;margin:0 auto;padding:1.25rem 1.25rem calc(6rem + env(safe-area-inset-bottom))}
 header.brand{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1rem;padding:.5rem 0 1rem}
 .brand-copy{display:flex;flex-direction:column;gap:.35rem;min-width:0}
@@ -158,11 +161,11 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
 .card-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
 .chip{border:1px solid rgba(33,27,18,.18);border-radius:999px;padding:.12rem .6rem;
   font:500 .72rem/1.4 var(--sd-font-ui);color:var(--sd-ink)}
-.chip.missing{color:var(--sd-ink-2);opacity:.55}
+.chip.missing{color:var(--sd-ink-2);opacity:.55;border-style:dashed}
 .ing{list-style:none;margin:.5rem 0;flex-shrink:0}
 .ing li{display:flex;gap:.6rem;padding:.22rem 0;font:400 .92rem/1.4 var(--sd-font-ui)}
 .ing li .amount{min-width:4.2em;text-align:right}
-.ing li.missing{color:var(--sd-ink-2);opacity:.55}
+.ing li.missing{color:var(--sd-ink-2);opacity:.55;font-style:italic}
 .card-method{font:400 .85rem/1.5 var(--sd-font-ui);color:#211B12;overflow-y:auto;min-height:0}
 .card-ctrl{margin-top:auto;padding-top:.7rem;display:flex;align-items:center;justify-content:space-between}
 .stepper{display:flex;align-items:center;gap:.7rem}
@@ -173,7 +176,8 @@ header.brand .tagline{font:500 .8rem/1.4 var(--sd-font-ui);color:var(--sd-ink-2)
   appearance:textfield;-moz-appearance:textfield}
 .servings-input::-webkit-inner-spin-button,.servings-input::-webkit-outer-spin-button{appearance:none;margin:0}
 .units{display:flex;gap:.3rem}
-.units button.active{background:#2F6B3F;border-color:#2F6B3F;color:#FBF7EF}
+.units button.active{background:#2F6B3F;border-color:#2F6B3F;color:#FBF7EF;text-decoration:underline;
+  text-decoration-thickness:2px;text-underline-offset:2px}
 /* gesture tint: opacity-only per frame (composited), fixed paper-palette colors */
 .tint{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;
   transition:opacity var(--sd-t-micro) linear}
@@ -227,7 +231,7 @@ dl.settings dd{min-width:0}
 .fav-ing-row input{width:1.05rem;height:1.05rem;accent-color:#2F6B3F}
 .fav-ing-row .amount{text-align:right;font-size:.82rem}
 .fav-ing-row.done span{text-decoration:line-through;color:#6E6455}
-.fav-ing-row.pantry-missing span:last-child{color:var(--sd-ink-2)}
+.fav-ing-row.pantry-missing span:last-child{color:var(--sd-ink-2);font-style:italic}
 .fav-method{margin-top:.45rem;font:.88rem/1.55 var(--sd-font-ui)}
 .fav-source{text-align:right;margin-top:.7rem;font:500 .7rem/1.4 var(--sd-font-ui);color:#6E6455}
 .fav-source a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
@@ -299,7 +303,8 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
 .wheel-hub-button:focus-visible{outline:3px solid var(--sd-accent);outline-offset:3px}
 .wheel-hub-button:disabled{opacity:.55;cursor:not-allowed}
 .wheel-pointer{position:absolute;z-index:3;top:-.4rem;left:50%;width:2.2rem;height:2.7rem;
-  transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(33,27,18,.22))}
+  transform:translateX(-50%);filter:drop-shadow(0 3px 3px rgba(33,27,18,.22));
+  view-transition-name:wheel-pointer}
 .wheel-pointer::before{content:"";position:absolute;inset:0;background:var(--sd-accent);
   clip-path:polygon(50% 100%,5% 15%,22% 0,78% 0,95% 15%);border-radius:7px}
 .wheel-pointer.tick{animation:wheel-pointer-tick 90ms ease-out}
@@ -335,12 +340,106 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
 .wheel-result-name .fav-open{padding:0;text-align:left;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .wheel-result-note{font:500 .72rem/1.35 var(--sd-font-ui);color:#6e6455;margin-top:.25rem}
 .wheel-live{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-::view-transition-group(wheel-shared){animation-duration:360ms;animation-timing-function:var(--sd-ease-list)}
-::view-transition-old(wheel-shared),::view-transition-new(wheel-shared){
-  animation:none;mix-blend-mode:normal
+/* The wheel route is one composed scene: the disc travels first, then its controls settle around it. */
+::view-transition-old(root),::view-transition-new(root),
+::view-transition-old(wheel-shared),::view-transition-new(wheel-shared),
+::view-transition-old(wheel-pointer),::view-transition-new(wheel-pointer){mix-blend-mode:normal}
+::view-transition-group(wheel-shared){z-index:40;animation-duration:760ms;
+  animation-timing-function:cubic-bezier(.16,1,.3,1)}
+::view-transition-group(wheel-pointer){z-index:41}
+
+html.wheel-opening::view-transition-old(root){animation:wheel-scene-old-out 420ms cubic-bezier(.4,0,1,1) both}
+html.wheel-opening::view-transition-new(root){animation:wheel-scene-new-in 620ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-opening::view-transition-old(wheel-shared){animation:wheel-mini-out 300ms cubic-bezier(.4,0,.8,1) both}
+html.wheel-opening::view-transition-new(wheel-shared){animation:wheel-disc-in 760ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-opening::view-transition-new(wheel-pointer){animation:wheel-pointer-in 220ms 680ms cubic-bezier(.16,1,.3,1) both}
+
+html.wheel-closing::view-transition-group(wheel-shared){animation-duration:620ms;
+  animation-timing-function:cubic-bezier(.7,0,.2,1)}
+html.wheel-closing::view-transition-old(root){animation:wheel-scene-close-old 360ms cubic-bezier(.4,0,1,1) both}
+html.wheel-closing::view-transition-new(root){animation:wheel-scene-close-new 560ms 80ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-closing::view-transition-old(wheel-shared){animation:wheel-disc-out 620ms cubic-bezier(.7,0,.2,1) both}
+html.wheel-closing::view-transition-new(wheel-shared){animation:wheel-mini-in 620ms cubic-bezier(.7,0,.2,1) both}
+html.wheel-closing::view-transition-old(wheel-pointer){animation:wheel-pointer-out 160ms ease-in both}
+
+/* Firefox keeps the shared geometry but avoids nested snapshot transforms. */
+html.wheel-firefox::view-transition-old(root),
+html.wheel-firefox::view-transition-old(wheel-shared){animation:wheel-fade-out 220ms ease both}
+html.wheel-firefox::view-transition-new(root),
+html.wheel-firefox::view-transition-new(wheel-shared){animation:wheel-fade-in 300ms 100ms ease both}
+
+@keyframes wheel-scene-old-out{
+  to{opacity:0;transform:scale(.985)}
 }
-html.wheel-closing::view-transition-new(wheel-shared){opacity:0}
-html.wheel-closing::view-transition-old(wheel-shared){opacity:1}
+@keyframes wheel-scene-new-in{
+  from{opacity:0;transform:scale(1.012)}
+  45%{opacity:1}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes wheel-mini-out{
+  0%{opacity:1;transform:scale(1) rotate(0)}
+  70%,100%{opacity:0;transform:scale(.9) rotate(-8deg)}
+}
+@keyframes wheel-disc-in{
+  0%,20%{opacity:0;transform:scale(.9) rotate(-5deg)}
+  58%{opacity:1;transform:scale(1.018) rotate(.8deg)}
+  78%{transform:scale(.995) rotate(-.2deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+@keyframes wheel-scene-close-old{
+  to{opacity:0;transform:scale(1.012)}
+}
+@keyframes wheel-scene-close-new{
+  from{opacity:0;transform:scale(.988)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes wheel-disc-out{
+  0%,42%{opacity:1;transform:scale(1) rotate(0)}
+  100%{opacity:0;transform:scale(.94) rotate(5deg)}
+}
+@keyframes wheel-mini-in{
+  0%,50%{opacity:0;transform:scale(.86) rotate(7deg)}
+  82%{opacity:1;transform:scale(1.06) rotate(-1deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+@keyframes wheel-pointer-in{
+  from{opacity:0;transform:translateY(-10px) scale(.82)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes wheel-pointer-out{
+  to{opacity:0;transform:translateY(-7px) scale(.9)}
+}
+@keyframes wheel-fade-out{to{opacity:0}}
+@keyframes wheel-fade-in{from{opacity:0}to{opacity:1}}
+
+/* Browsers without same-document View Transitions still get a deliberate entrance/exit. */
+html.wheel-fallback-opening .wheel-screen{animation:wheel-fallback-screen-in 520ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-opening .wheel-stage{animation:wheel-fallback-disc-in 680ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-opening .wheel-pointer{animation:wheel-pointer-in 220ms 610ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-opening .wheel-topbar{animation:wheel-fallback-chrome-in 420ms 90ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-opening .wheel-heading{animation:wheel-fallback-chrome-in 440ms 150ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-opening .wheel-controls{animation:wheel-fallback-chrome-in 460ms 215ms cubic-bezier(.16,1,.3,1) both}
+html.wheel-fallback-closing .wheel-screen{animation:wheel-fallback-screen-out 400ms cubic-bezier(.4,0,1,1) both}
+html.wheel-fallback-closing .wheel-stage{animation:wheel-fallback-disc-out 400ms cubic-bezier(.4,0,1,1) both}
+@keyframes wheel-fallback-screen-in{
+  from{opacity:0;transform:scale(1.012)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes wheel-fallback-disc-in{
+  from{opacity:0;transform:scale(.76) rotate(-6deg)}
+  68%{opacity:1;transform:scale(1.018) rotate(.8deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+@keyframes wheel-fallback-chrome-in{
+  from{opacity:0;transform:translateY(12px) scale(.988)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes wheel-fallback-screen-out{
+  to{opacity:0;transform:scale(.985)}
+}
+@keyframes wheel-fallback-disc-out{
+  to{opacity:0;transform:scale(.72) rotate(5deg)}
+}
 
 @media (max-width:370px){
   .wheel-entry{max-width:116px;padding-right:.55rem}.wheel-symbol{width:42px;height:42px;flex-basis:42px}
@@ -357,7 +456,12 @@ html.wheel-closing::view-transition-old(wheel-shared){opacity:1}
   .wheel-controls{grid-area:controls;align-self:start}.wheel-result{grid-area:result;margin-top:.5rem}
 }
 @media (prefers-reduced-motion:reduce){
-  ::view-transition-group(wheel-shared){animation-duration:0ms}.wheel-pointer.tick{animation:none}
+  ::view-transition-group(wheel-shared),::view-transition-group(wheel-pointer){animation-duration:0ms}.wheel-pointer.tick{animation:none}
+  html.wheel-fallback-opening .wheel-screen,html.wheel-fallback-opening .wheel-stage,
+  html.wheel-fallback-opening .wheel-pointer,
+  html.wheel-fallback-opening .wheel-topbar,html.wheel-fallback-opening .wheel-heading,
+  html.wheel-fallback-opening .wheel-controls,html.wheel-fallback-closing .wheel-screen,
+  html.wheel-fallback-closing .wheel-stage{animation:none}
 }
 </style>
 </head>
@@ -412,6 +516,6 @@ html.wheel-closing::view-transition-old(wheel-shared){opacity:1}
   <a href="#/skafferi" data-match="#/skafferi"></a>
   <a href="#/installningar" data-match="#/installningar"></a>
 </nav>
-<script src="app.js?v=1.9"></script>
+<script src="app.js?v=1.12"></script>
 </body>
 </html>
