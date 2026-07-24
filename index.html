@@ -310,6 +310,8 @@ body.wheel-mode .brand,body.wheel-mode .bottom-nav,body.search-mode .brand,body.
 .wheel-pointer.tick{animation:wheel-pointer-tick 90ms ease-out}
 @keyframes wheel-pointer-tick{50%{transform:translateX(-50%) rotate(7deg);transform-origin:50% 10%}}
 .wheel-win .wheel-sector[data-winning="true"]{filter:brightness(.92);stroke:#2f6b3f;stroke-width:1.1}
+.wheel-disc.wheel-pulse{animation:wheel-pulse .18s ease-out}
+@keyframes wheel-pulse{50%{opacity:.55}}
 .wheel-neutral{opacity:.58}
 .wheel-controls{width:min(100%,430px);padding:.8rem 1rem 1rem;border:1px solid var(--sd-line);
   border-radius:16px;background:var(--sd-bg);

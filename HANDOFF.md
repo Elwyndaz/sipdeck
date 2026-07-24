@@ -785,3 +785,13 @@ grid-areas regardless of DOM order. `app.js` is 67,422 bytes, under the 68 kB
 budget; 4,308 tests green (no test covers heading DOM order). Committed as
 `a6f9f67` and pushed to main; not deployed to Cloudflare Pages/GitHub Pages
 (not requested).
+
+Reduced-motion spin feedback 2026-07-24 (bug report: iPhone 15 user saw no
+wheel spin animation). Root cause: intentional reduced-motion fast path
+(`spinWheel` in `app.js`) skips the WAAPI rotation entirely and lands the
+result after a bare 180ms `setTimeout`, so a user with iOS Reduce Motion
+enabled gets zero visual feedback that a spin happened. Added a `.wheel-pulse`
+opacity-dip keyframe (`index.html`, 180ms, mid-point `opacity:.55`) toggled on
+`#wheelDisc` for that branch only; it's a fade, not motion, so it's untouched
+by the existing `prefers-reduced-motion` media query that zeroes the pointer
+tick and view-transition durations.
