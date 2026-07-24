@@ -237,7 +237,9 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     fallback remains for browsers without View Transitions with a 900 ms lifetime, and
     reduced motion removes the pointer animation. Added a Firefox-specific regression test,
     updated mobile Safari emulation from iPhone 13 to iPhone 15 Pro, and cache-busted
-    `app.js?v=1.11`.
+    `app.js?v=1.12`. Firefox passes 3/3 locally and against the isolated Cloudflare preview;
+    ten repeated open/close cycles retained the native shared-element geometry without
+    clipping or console errors.
 
 26. ✅ **Vibekollen follow-up: accessibility, metadata and Pages headers** (done
     2026-07-24) — Verified the scanner against project code and live responses before
@@ -249,9 +251,9 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
     fields. Added localized hidden H1s, canonical links for both HTML pages, Cloudflare Pages
     `_headers` (`nosniff`, clickjacking/referrer/permissions policies, minimal enforced CSP,
     fuller CSP Report-Only), and `tests/a11y.spec.js`. `node test.js`: 4,936 green; Chromium
-    accessibility 2/2 and wheel 2/2 green; non-Firefox browser matrix green. The local
-    Playwright Firefox runtime fails before navigation with an internal `newPage`/`_page`
-    error, reproduced in isolation.
+    accessibility 2/2 and wheel 2/2 green; non-Firefox browser matrix green. Firefox wheel
+    tests pass 3/3 outside the managed Windows sandbox; inside it, Firefox cannot spawn its
+    tab subprocess before navigation.
 
 ## v2 / ideas (unordered)
 
@@ -262,9 +264,6 @@ Items 1–12 ✅ done 2026-07-19 (see HANDOFF.md "Current state"). Next up: item
 - **CSP promotion**: exercise Firebase email/Google sign-in and sync on a deployed preview,
   inspect the Report-Only console/reports, then narrow and promote directives only if no
   required origin is blocked.
-- **Playwright Firefox runtime**: repair/update the local Firefox runner until the
-  Firefox-only compositor-fade test opens a page and passes; current failure occurs
-  before app navigation.
 - Richer filter UI over existing tags: style, strength.
 - **Alcohol-free mode**: separate boolean toggle (same pattern as the `bar` filter, D1),
   off by default. Mixing mocktails into the normal deck unprompted isn't wanted (nobody

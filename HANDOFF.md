@@ -23,15 +23,17 @@ View Transition layer and delayed entrance/early exit. Firefox keeps the shared 
 transition geometry but uses a dedicated fade-only snapshot path to avoid nested compositor
 transforms; the CSS fallback remains available for browsers without View Transitions and
 stays active for 900 ms. Reduced motion disables the pointer animation, the cache key is
-`app.js?v=1.11`, and the mobile
+`app.js?v=1.12`, and the mobile
 Safari project now targets iPhone 15 Pro. Tests: `node --check app.js` green,
 `node test.js` 4,936 green, Chromium accessibility 2/2 green, Chromium wheel 2/2 green
 (one Firefox-only case skipped), and the full non-Firefox matrix green across Chromium,
 WebKit, mobile Chrome and mobile Safari with zero browser-console warnings/errors in manual
-desktop/mobile checks. The installed Playwright Firefox runtime failed all five Firefox
-tests before navigation with `browserContext.newPage` reading `_page`; the same failure
-reproduced in isolation and is recorded as a local runner/browser blocker, not an app
-assertion failure. Nothing in this paragraph has been deployed yet.
+desktop/mobile checks. Firefox wheel tests pass 3/3 both locally and against the isolated
+Cloudflare preview; ten repeated open/close cycles kept the native shared-element geometry
+active in both directions with no console errors or clipped snapshots. The managed Windows
+sandbox cannot spawn Firefox's tab subprocess, so Firefox must run outside that sandbox.
+The wheel-only preview is `https://wheel-firefox-preview.sipdeck.pages.dev` (immutable build
+`https://eb8ca1ab.sipdeck.pages.dev`); the accessibility/header changes are not deployed.
 
 **Garnish-overlap artwork fix 2026-07-23.** Champagne Cocktail, Cosmopolitan, Bee's
 Knees and El Presidente were precisely retouched so their citrus curls no longer pass
@@ -651,10 +653,12 @@ Commit messages: `sipdeck: <what>`.
 
 `node test.js`: 4936 green; `node --check app.js`: green; `git diff --check`: green.
 `tests/a11y.spec.js` passes 2/2 in Chromium and passed in the non-Firefox projects during
-the full matrix. `tests/wheel.spec.js` passes 2/2 in Chromium (the Firefox-only fallback
-case is skipped there). Full matrix result on this Windows/Node 26 environment: 16 passed,
-4 expected skips and 5 Firefox startup failures before navigation; isolated Firefox gives
-the same Playwright-internal `browserContext.newPage`/`_page` error. Manual Playwright at
+the full matrix. `tests/wheel.spec.js` passes 2/2 in Chromium (the Firefox-only shared-
+transition case is skipped there) and 3/3 in Firefox when run outside the managed Windows
+sandbox. The same Firefox suite passes 3/3 against the Cloudflare preview; ten repeated
+open/close cycles exercised the native `wheel-shared` group in both directions with zero
+console errors. Inside the managed sandbox Firefox still cannot spawn its tab subprocess;
+that is an execution-environment restriction, not an app failure. Manual Playwright at
 390×844 and 1280×800 verified unchanged layout, keyboard flip/swipe focus continuity,
 non-color missing/unit states and zero console warnings/errors.
 The 93-drink dataset validates with 149 normalized ingredients, 13 supported glass values
