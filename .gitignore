@@ -1,4 +1,9 @@
 .playwright-mcp/
+.playwright/
+debug.log
+node_modules/
+playwright-report/
+test-results/
 .wrangler/
 img-src/
 .firebaserc

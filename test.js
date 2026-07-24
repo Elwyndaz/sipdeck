@@ -344,6 +344,12 @@ check(appSource.includes('aria-live="polite"') && appSource.includes('aria-value
   'wheel accessibility: result and slider meaning are announced');
 check(appSource.includes('navigator.vibrate(18)') && appSource.includes('wheelMuted = false'),
   'wheel feedback: one landing haptic and visit-local sound default');
+check(appSource.includes('sound is optional and must never block a spin') &&
+  appSource.includes('wheelAudio = null;'),
+  'wheel resilience: unavailable Web Audio cannot block a spin');
+check(appSource.includes('wheelAnimation.onfinish =') &&
+  appSource.includes('setTimeout(() => finishWheelSpin(index, end, false), 180)'),
+  'wheel resilience: animation API differences cannot leave controls locked');
 check(appSource.includes('!wheelMoodId && wheelData && db'),
   'wheel start: opens live on the first mood, no empty intro wheel');
 check(appSource.split("wheelResult ? 'wheel_respin' : 'wheel_spin'").length === 3,

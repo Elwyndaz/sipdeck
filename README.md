@@ -27,6 +27,7 @@ the current verification state and `BACKLOG.md` for the remaining v1 work.
 ```
 python -m http.server   # then open http://localhost:8000
 node test.js            # plain node asserts, no framework
+npm run test:e2e        # wheel smoke test in desktop + mobile browser engines
 ```
 
 ## Docs

@@ -1367,22 +1367,32 @@ if (typeof document !== 'undefined') (function () {
     if (wheelMuted) return null;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return null;
-    if (!wheelAudio) wheelAudio = new AudioCtx();
-    if (wheelAudio.state === 'suspended') wheelAudio.resume();
-    return wheelAudio;
+    try {
+      if (!wheelAudio) wheelAudio = new AudioCtx();
+      if (wheelAudio.state === 'suspended') {
+        const resumed = wheelAudio.resume();
+        if (resumed && resumed.catch) resumed.catch(() => {});
+      }
+      return wheelAudio;
+    } catch (err) {
+      wheelAudio = null; // sound is optional and must never block a spin
+      return null;
+    }
   }
 
   function wheelTone(frequency, duration, volume, delay) {
     const context = audioContext();
     if (!context) return;
-    const start = context.currentTime + (delay || 0);
-    const oscillator = context.createOscillator(), gain = context.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, start);
-    gain.gain.setValueAtTime(Math.max(0.0001, volume), start);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-    oscillator.connect(gain); gain.connect(context.destination);
-    oscillator.start(start); oscillator.stop(start + duration);
+    try {
+      const start = context.currentTime + (delay || 0);
+      const oscillator = context.createOscillator(), gain = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(Math.max(0.0001, volume), start);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain); gain.connect(context.destination);
+      oscillator.start(start); oscillator.stop(start + duration);
+    } catch (err) { /* sound is optional and must never block a spin */ }
   }
 
   function tickWheel() {
@@ -1465,11 +1475,16 @@ if (typeof document !== 'undefined') (function () {
     }
     const end = wheelLandingRotation(wheelRotation, index, random01, 12);
     const travel = end - wheelRotation, duration = 6200 + Math.round(random01() * 1200);
-    wheelAnimation = disc.animate([
-      { transform: `rotate(${wheelRotation}deg)`, offset: 0, easing: 'cubic-bezier(.45,0,1,1)' },
-      { transform: `rotate(${wheelRotation + travel * .08}deg)`, offset: .12, easing: 'cubic-bezier(.08,.58,.12,1)' },
-      { transform: `rotate(${end}deg)`, offset: 1 },
-    ], { duration, fill: 'forwards' });
+    try {
+      wheelAnimation = disc.animate([
+        { transform: `rotate(${wheelRotation}deg)`, offset: 0, easing: 'cubic-bezier(.45,0,1,1)' },
+        { transform: `rotate(${wheelRotation + travel * .08}deg)`, offset: .12, easing: 'cubic-bezier(.08,.58,.12,1)' },
+        { transform: `rotate(${end}deg)`, offset: 1 },
+      ], { duration, fill: 'forwards' });
+    } catch (err) {
+      setTimeout(() => finishWheelSpin(index, end, false), 180);
+      return;
+    }
     let lastSector = null, raf = 0;
     const watchTicks = () => {
       if (!wheelSpinning || !disc.isConnected) return;
@@ -1480,10 +1495,11 @@ if (typeof document !== 'undefined') (function () {
       raf = requestAnimationFrame(watchTicks);
     };
     raf = requestAnimationFrame(watchTicks);
-    wheelAnimation.finished.then(() => {
+    wheelAnimation.onfinish = () => {
       cancelAnimationFrame(raf);
       finishWheelSpin(index, end, false);
-    }).catch(() => cancelAnimationFrame(raf));
+    };
+    wheelAnimation.oncancel = () => cancelAnimationFrame(raf);
   }
 
   // ---------- router: hashchange -> coarse re-render per view ----------
