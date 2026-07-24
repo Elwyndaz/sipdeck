@@ -1501,7 +1501,8 @@ if (typeof document !== 'undefined') (function () {
     audioContext(); // unlock Web Audio from the explicit user gesture
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced || !disc.animate) {
-      setTimeout(() => finishWheelSpin(index, wheelRotation, true), 180);
+      disc.classList.add('wheel-pulse');
+      setTimeout(() => { disc.classList.remove('wheel-pulse'); finishWheelSpin(index, wheelRotation, true); }, 180);
       return;
     }
     const end = wheelLandingRotation(wheelRotation, index, random01, 12);
